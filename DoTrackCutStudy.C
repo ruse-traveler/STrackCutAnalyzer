@@ -40,7 +40,7 @@ void DoTrackCutStudy() {
   cout << "\n  Beginning track cut study..." << endl;
 
   // input parameters
-  const TString sInFile("input/sPhenixG4_forTrackCutStudy_test00000t19_g4svtxeval.d14m11y2022.root");
+  const TString sInFile("input/sPhenixG4_forTrackCutStudy_test0t59_g4svtxeval.d27m11y2022.root");
   const TString sInTuple("ntp_track");
 
   // output parameters
@@ -421,12 +421,16 @@ void DoTrackCutStudy() {
       cout << "      Processing entry " << iProg << "/" << nEntries << "...\r" << flush;
     }
 
+    cout << "CHECK: dca3dxy = " << dca3dxy << ", dca3dz = " << dca3dz << endl;
+
     // perform calculations
-    const Float_t  glayers = gnmaps + gnintt + gntpc;
-    const Double_t perMaps = (Double_t) nmaps / (Double_t) gnmaps;
-    const Double_t perIntt = (Double_t) nintt / (Double_t) gnintt;
-    const Double_t perTpc  = (Double_t) ntpc / (Double_t) gntpc;
-    const Double_t perTot  = (Double_t) layers / (Double_t) glayers;
+    const Float_t  glayers    = gnmaps + gnintt + gntpc;
+    const Double_t perMaps    = (Double_t) nmaps / (Double_t) gnmaps;
+    const Double_t perIntt    = (Double_t) nintt / (Double_t) gnintt;
+    const Double_t perTpc     = (Double_t) ntpc / (Double_t) gntpc;
+    const Double_t perTot     = (Double_t) layers / (Double_t) glayers;
+    const Double_t scaleDcaXY = dca3dxy * 1000;
+    const Double_t scaleDcaZ  = dca3dz * 1000;
 
     // fill track histograms
     hTrackNMap        -> Fill(nmaps);
@@ -438,8 +442,8 @@ void DoTrackCutStudy() {
     hTrackPerTpc      -> Fill(perTpc);
     hTrackPerTot      -> Fill(perTot);
     hTrackQuality     -> Fill(quality);
-    hTrackDCAxy       -> Fill(dca3dxy);
-    hTrackDCAz        -> Fill(dca3dz);
+    hTrackDCAxy       -> Fill(scaleDcaXY);
+    hTrackDCAz        -> Fill(scaleDcaZ);
     hTrackPt          -> Fill(pt);
     hTrackPtVsNMap    -> Fill(nmaps, pt);
     hTrackPtVsNInt    -> Fill(nintt, pt);
@@ -450,8 +454,8 @@ void DoTrackCutStudy() {
     hTrackPtVsPerTpc  -> Fill(perTpc, pt);
     hTrackPtVsPerTot  -> Fill(perTot, pt);
     hTrackPtVsQuality -> Fill(quality, pt);
-    hTrackPtVsDCAxy   -> Fill(dca3dxy, pt);
-    hTrackPtVsDCAz    -> Fill(dca3dz, pt);
+    hTrackPtVsDCAxy   -> Fill(scaleDcaXY, pt);
+    hTrackPtVsDCAz    -> Fill(scaleDcaZ, pt);
 
     // fill truth histograms
     hTruthNMap        -> Fill(gnmaps);
@@ -466,8 +470,8 @@ void DoTrackCutStudy() {
     hTruthPtVsNTot    -> Fill(glayers, gpt);
     hTruthPtVsNTpc    -> Fill(nhits, gpt);
     hTruthPtVsQuality -> Fill(quality, gpt);
-    hTruthPtVsDCAxy   -> Fill(dca3dxy, gpt);
-    hTruthPtVsDCAz    -> Fill(dca3dz, gpt);
+    hTruthPtVsDCAxy   -> Fill(scaleDcaXY, gpt);
+    hTruthPtVsDCAz    -> Fill(scaleDcaZ, gpt);
   }  // end entry loop
   cout << "    Finished entry loop." << endl;
 
@@ -483,8 +487,8 @@ void DoTrackCutStudy() {
   TString sTrkNTpc("N_{hit}^{TPC}");
   TString sTrkNTot("N_{hit}^{tot}");
   TString sTrkQuality("#chi^{2}/ndf");
-  TString sTrkDCAxy("DCA_{xy} [cm]");
-  TString sTrkDCAz("DCA_{z} [cm]");
+  TString sTrkDCAxy("DCA_{xy} [mm]");
+  TString sTrkDCAz("DCA_{z} [mm]");
   TString sTrkPt("p_{T}^{trk} [GeV/c]");
   // truth specific axis titles
   TString sTruNMap("N_{hit}^{MAPS}");

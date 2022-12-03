@@ -267,7 +267,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy(
   //======================
 
   // QA, main switch
-  Enable::QA = true;
+  //Enable::QA = true;
+  Enable::QA = false;  // no need [Derek, 12.03.2022]
 
   // Global options (enabled for all enables subsystems - if implemented)
   //  Enable::ABSORBER = true;
@@ -318,7 +319,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy(
   Enable::CEMC_CELL = Enable::CEMC && true;
   Enable::CEMC_TOWER = Enable::CEMC_CELL && true;
   Enable::CEMC_CLUSTER = Enable::CEMC_TOWER && true;
-  Enable::CEMC_EVAL = Enable::CEMC_CLUSTER && true;
+  //Enable::CEMC_EVAL = Enable::CEMC_CLUSTER && true;
+  Enable::CEMC_EVAL = false;  // no need [Derek, 12.03.2022]
   Enable::CEMC_QA = Enable::CEMC_CLUSTER && Enable::QA && true;
 
   Enable::HCALIN = true;
@@ -326,7 +328,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy(
   Enable::HCALIN_CELL = Enable::HCALIN && true;
   Enable::HCALIN_TOWER = Enable::HCALIN_CELL && true;
   Enable::HCALIN_CLUSTER = Enable::HCALIN_TOWER && true;
-  Enable::HCALIN_EVAL = Enable::HCALIN_CLUSTER && true;
+  //Enable::HCALIN_EVAL = Enable::HCALIN_CLUSTER && true;
+  Enable::HCALIN_EVAL = false;  // no need [Derek, 12.03.2022]
   Enable::HCALIN_QA = Enable::HCALIN_CLUSTER && Enable::QA && true;
 
   Enable::MAGNET = true;
@@ -337,7 +340,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy(
   Enable::HCALOUT_CELL = Enable::HCALOUT && true;
   Enable::HCALOUT_TOWER = Enable::HCALOUT_CELL && true;
   Enable::HCALOUT_CLUSTER = Enable::HCALOUT_TOWER && true;
-  Enable::HCALOUT_EVAL = Enable::HCALOUT_CLUSTER && true;
+  //Enable::HCALOUT_EVAL = Enable::HCALOUT_CLUSTER && true;
+  Enable::HCALOUT_EVAL = false;  // no need [Derek, 12.03.2022]
   Enable::HCALOUT_QA = Enable::HCALOUT_CLUSTER && Enable::QA && true;
 
   Enable::EPD = true;
@@ -349,7 +353,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy(
 //  Enable::ZDC_ABSORBER = true;
 //  Enable::ZDC_SUPPORT = true;
   Enable::ZDC_TOWER = Enable::ZDC && true;
-  Enable::ZDC_EVAL = Enable::ZDC_TOWER && true;
+  //Enable::ZDC_EVAL = Enable::ZDC_TOWER && true;
+  Enable::ZDC_EVAL = false;  // no need [Derek, 12.03.2022]
 
   //! forward flux return plug door. Out of acceptance and off by default.
   //Enable::PLUGDOOR = true;
@@ -366,7 +371,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy(
   Enable::CALOTRIGGER = Enable::CEMC_TOWER && Enable::HCALIN_TOWER && Enable::HCALOUT_TOWER && false;
 
   Enable::JETS = (Enable::GLOBAL_RECO || Enable::GLOBAL_FASTSIM) && true;
-  Enable::JETS_EVAL = Enable::JETS && true;
+  //Enable::JETS_EVAL = Enable::JETS && true;
+  Enable::JETS_EVAL = false;  // no need [Derek, 12.03.2022]
   Enable::JETS_QA = Enable::JETS && Enable::QA && true;
 
   // HI Jet Reco for p+Au / Au+Au collisions (default is false for

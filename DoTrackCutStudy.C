@@ -25,9 +25,9 @@
 using namespace std;
 
 // global constants
-static const UInt_t NDir(3);
 static const UInt_t NVtx(4);
 static const UInt_t NTxt(3);
+static const UInt_t NTyp(3);
 static const UInt_t NRange(2);
 static const UInt_t NPanel(2);
 
@@ -45,7 +45,7 @@ void DoTrackCutStudy() {
 
   // output parameters
   const TString sOutFile("test.root");
-  const TString sOutDir[NDir] = {"Track", "Truth", "Weird"};
+  const TString sOutDir[NTyp] = {"Track", "Truth", "Weird"};
 
   // calculation parameters
   const Double_t weirdPtFracMin(0.20);
@@ -54,12 +54,13 @@ void DoTrackCutStudy() {
   // plot parameters
   const UInt_t fColTrk(923);
   const UInt_t fColTru(899);
+  const UInt_t fColOdd(859);
   const UInt_t fMarTrk(20);
   const UInt_t fMarTru(24);
+  const UInt_t fMarOdd(25);
 
   // text parameters
-  const TString sOdd("#bf{#color[899]{WEIRD TRACKS}}");
-  const TString sLeg[NDir]   = {"Tracks", "Truth", "Weird"};
+  const TString sLeg[NTyp]   = {"Tracks", "Truth", "Weird Tracks"};
   const TString sTxtEO[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "0-20 fm Hijing, 50 kHz pileup", "#bf{Embedded Only Tracks}"};
 
   // open files
@@ -357,6 +358,11 @@ void DoTrackCutStudy() {
   TH1D *hWeirdEta;
   TH1D *hWeirdPhi;
   TH1D *hWeirdPt;
+  TH1D *hWeirdDeltaDCAxy;
+  TH1D *hWeirdDeltaDCAz;
+  TH1D *hWeirdDeltaEta;
+  TH1D *hWeirdDeltaPhi;
+  TH1D *hWeirdDeltaPt;
 
   const UInt_t  nNHitBins(100);
   const UInt_t  nQualBins(20);
@@ -456,6 +462,11 @@ void DoTrackCutStudy() {
   hWeirdEta          = new TH1D("hWeirdEta",          "Weird #eta",                           nEtaBins,  rEtaBins[0],  rEtaBins[1]);
   hWeirdPhi          = new TH1D("hWeirdPhi",          "Weird #phi",                           nPhiBins,  rPhiBins[0],  rPhiBins[1]);
   hWeirdPt           = new TH1D("hWeirdPt",           "Weird p_{T}",                          nPtBins,   rPtBins[0],   rPtBins[1]);
+  hWeirdDeltaDCAxy   = new TH1D("hWeirdDeltaDCAxy",   "Weird DCA_{xy} \%-error",              nErrBins,  rErrBins[0],  rErrBins[1]);
+  hWeirdDeltaDCAz    = new TH1D("hWeirdDeltaDCAz",    "Weird DCA_{z} \%-error",               nErrBins,  rErrBins[0],  rErrBins[1]);
+  hWeirdDeltaEta     = new TH1D("hWeirdDeltaEta",     "Weird #eta \%-error",                  nErrBins,  rErrBins[0],  rErrBins[1]);
+  hWeirdDeltaPhi     = new TH1D("hWeirdDeltaPhi",     "Weird #phi \%-error",                  nErrBins,  rErrBins[0],  rErrBins[1]);
+  hWeirdDeltaPt      = new TH1D("hWeirdDeltaPt",      "Weird p_{T} \%-error",                 nErrBins,  rErrBins[0],  rErrBins[1]);
   // embed-only errors
   hTrackNMap         -> Sumw2();
   hTrackNInt         -> Sumw2();
@@ -534,6 +545,11 @@ void DoTrackCutStudy() {
   hWeirdEta          -> Sumw2();
   hWeirdPhi          -> Sumw2();
   hWeirdPt           -> Sumw2();
+  hWeirdDeltaDCAxy   -> Sumw2();
+  hWeirdDeltaDCAz    -> Sumw2();
+  hWeirdDeltaEta     -> Sumw2();
+  hWeirdDeltaPhi     -> Sumw2();
+  hWeirdDeltaPt      -> Sumw2();
   cout << "    Created output histograms." << endl;
 
   // prepare for entry loops
@@ -647,22 +663,27 @@ void DoTrackCutStudy() {
     hDeltaPtVsTruPt    -> Fill(gpt, deltaPt);
   
     // fill weird histograms
-    const Bool_t isWeirdTrack = ((ptFrac < weirdPtFracMin) || (ptFrac < weirdPtFracMax));
+    const Bool_t isWeirdTrack = ((ptFrac < weirdPtFracMin) || (ptFrac > weirdPtFracMax));
     if (isWeirdTrack) {
-      hWeirdNMap    -> Fill(nmaps);
-      hWeirdNInt    -> Fill(nintt);
-      hWeirdNTpc    -> Fill(ntpc);
-      hWeirdNTot    -> Fill(layers);
-      hWeirdPerMap  -> Fill(perMaps);
-      hWeirdPerInt  -> Fill(perIntt);
-      hWeirdPerTpc  -> Fill(perTpc);
-      hWeirdPerTot  -> Fill(perTot);
-      hWeirdQuality -> Fill(quality);
-      hWeirdDCAxy   -> Fill(mmDcaXY);
-      hWeirdDCAz    -> Fill(mmDcaZ);
-      hWeirdEta     -> Fill(eta);
-      hWeirdPhi     -> Fill(phi);
-      hWeirdPt      -> Fill(pt); 
+      hWeirdNMap       -> Fill(nmaps);
+      hWeirdNInt       -> Fill(nintt);
+      hWeirdNTpc       -> Fill(ntpc);
+      hWeirdNTot       -> Fill(layers);
+      hWeirdPerMap     -> Fill(perMaps);
+      hWeirdPerInt     -> Fill(perIntt);
+      hWeirdPerTpc     -> Fill(perTpc);
+      hWeirdPerTot     -> Fill(perTot);
+      hWeirdQuality    -> Fill(quality);
+      hWeirdDCAxy      -> Fill(mmDcaXY);
+      hWeirdDCAz       -> Fill(mmDcaZ);
+      hWeirdEta        -> Fill(eta);
+      hWeirdPhi        -> Fill(phi);
+      hWeirdPt         -> Fill(pt); 
+      hWeirdDeltaDCAxy -> Fill(deltaDcaXY);
+      hWeirdDeltaDCAz  -> Fill(deltaDcaZ);
+      hWeirdDeltaEta   -> Fill(deltaEta);
+      hWeirdDeltaPhi   -> Fill(deltaPhi);
+      hWeirdDeltaPt    -> Fill(deltaPt);
     }
   }  // end entry loop
   cout << "    Finished entry loop." << endl;
@@ -1630,11 +1651,11 @@ void DoTrackCutStudy() {
   hDeltaPtVsTruPt    -> GetZaxis() -> SetTitleFont(fTxt);
   hDeltaPtVsTruPt    -> GetZaxis() -> SetTitleOffset(fOffZ);
   // set embed-only weird histogram styles
-  hWeirdNMap         -> SetMarkerColor(fColTrk);
-  hWeirdNMap         -> SetMarkerStyle(fMarTrk);
-  hWeirdNMap         -> SetLineColor(fColTrk);
+  hWeirdNMap         -> SetMarkerColor(fColOdd);
+  hWeirdNMap         -> SetMarkerStyle(fMarOdd);
+  hWeirdNMap         -> SetLineColor(fColOdd);
   hWeirdNMap         -> SetLineStyle(fLin);
-  hWeirdNMap         -> SetFillColor(fColTrk);
+  hWeirdNMap         -> SetFillColor(fColOdd);
   hWeirdNMap         -> SetFillStyle(fFil);
   hWeirdNMap         -> SetTitleFont(fTxt);
   hWeirdNMap         -> GetXaxis() -> SetTitle(sTrkNMap.Data());
@@ -1643,11 +1664,11 @@ void DoTrackCutStudy() {
   hWeirdNMap         -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdNMap         -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdNMap         -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdNInt         -> SetMarkerColor(fColTrk);
-  hWeirdNInt         -> SetMarkerStyle(fMarTrk);
-  hWeirdNInt         -> SetLineColor(fColTrk);
+  hWeirdNInt         -> SetMarkerColor(fColOdd);
+  hWeirdNInt         -> SetMarkerStyle(fMarOdd);
+  hWeirdNInt         -> SetLineColor(fColOdd);
   hWeirdNInt         -> SetLineStyle(fLin);
-  hWeirdNInt         -> SetFillColor(fColTrk);
+  hWeirdNInt         -> SetFillColor(fColOdd);
   hWeirdNInt         -> SetFillStyle(fFil);
   hWeirdNInt         -> SetTitleFont(fTxt);
   hWeirdNInt         -> GetXaxis() -> SetTitle(sTrkNInt.Data());
@@ -1656,11 +1677,11 @@ void DoTrackCutStudy() {
   hWeirdNInt         -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdNInt         -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdNInt         -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdNTpc         -> SetMarkerColor(fColTrk);
-  hWeirdNTpc         -> SetMarkerStyle(fMarTrk);
-  hWeirdNTpc         -> SetLineColor(fColTrk);
+  hWeirdNTpc         -> SetMarkerColor(fColOdd);
+  hWeirdNTpc         -> SetMarkerStyle(fMarOdd);
+  hWeirdNTpc         -> SetLineColor(fColOdd);
   hWeirdNTpc         -> SetLineStyle(fLin);
-  hWeirdNTpc         -> SetFillColor(fColTrk);
+  hWeirdNTpc         -> SetFillColor(fColOdd);
   hWeirdNTpc         -> SetFillStyle(fFil);
   hWeirdNTpc         -> SetTitleFont(fTxt);
   hWeirdNTpc         -> GetXaxis() -> SetTitle(sTrkNTpc.Data());
@@ -1669,11 +1690,11 @@ void DoTrackCutStudy() {
   hWeirdNTpc         -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdNTpc         -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdNTpc         -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdNTot         -> SetMarkerColor(fColTrk);
-  hWeirdNTot         -> SetMarkerStyle(fMarTrk);
-  hWeirdNTot         -> SetLineColor(fColTrk);
+  hWeirdNTot         -> SetMarkerColor(fColOdd);
+  hWeirdNTot         -> SetMarkerStyle(fMarOdd);
+  hWeirdNTot         -> SetLineColor(fColOdd);
   hWeirdNTot         -> SetLineStyle(fLin);
-  hWeirdNTot         -> SetFillColor(fColTrk);
+  hWeirdNTot         -> SetFillColor(fColOdd);
   hWeirdNTot         -> SetFillStyle(fFil);
   hWeirdNTot         -> SetTitleFont(fTxt);
   hWeirdNTot         -> GetXaxis() -> SetTitle(sTrkNTot.Data());
@@ -1682,11 +1703,11 @@ void DoTrackCutStudy() {
   hWeirdNTot         -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdNTot         -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdNTot         -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdPerMap       -> SetMarkerColor(fColTrk);
-  hWeirdPerMap       -> SetMarkerStyle(fMarTrk);
-  hWeirdPerMap       -> SetLineColor(fColTrk);
+  hWeirdPerMap       -> SetMarkerColor(fColOdd);
+  hWeirdPerMap       -> SetMarkerStyle(fMarOdd);
+  hWeirdPerMap       -> SetLineColor(fColOdd);
   hWeirdPerMap       -> SetLineStyle(fLin);
-  hWeirdPerMap       -> SetFillColor(fColTrk);
+  hWeirdPerMap       -> SetFillColor(fColOdd);
   hWeirdPerMap       -> SetFillStyle(fFil);
   hWeirdPerMap       -> SetTitleFont(fTxt);
   hWeirdPerMap       -> GetXaxis() -> SetTitle(sPerMap.Data());
@@ -1695,11 +1716,11 @@ void DoTrackCutStudy() {
   hWeirdPerMap       -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdPerMap       -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdPerMap       -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdPerInt       -> SetMarkerColor(fColTrk);
-  hWeirdPerInt       -> SetMarkerStyle(fMarTrk);
-  hWeirdPerInt       -> SetLineColor(fColTrk);
+  hWeirdPerInt       -> SetMarkerColor(fColOdd);
+  hWeirdPerInt       -> SetMarkerStyle(fMarOdd);
+  hWeirdPerInt       -> SetLineColor(fColOdd);
   hWeirdPerInt       -> SetLineStyle(fLin);
-  hWeirdPerInt       -> SetFillColor(fColTrk);
+  hWeirdPerInt       -> SetFillColor(fColOdd);
   hWeirdPerInt       -> SetFillStyle(fFil);
   hWeirdPerInt       -> SetTitleFont(fTxt);
   hWeirdPerInt       -> GetXaxis() -> SetTitle(sPerInt.Data());
@@ -1708,11 +1729,11 @@ void DoTrackCutStudy() {
   hWeirdPerInt       -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdPerInt       -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdPerInt       -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdPerTpc       -> SetMarkerColor(fColTrk);
-  hWeirdPerTpc       -> SetMarkerStyle(fMarTrk);
-  hWeirdPerTpc       -> SetLineColor(fColTrk);
+  hWeirdPerTpc       -> SetMarkerColor(fColOdd);
+  hWeirdPerTpc       -> SetMarkerStyle(fMarOdd);
+  hWeirdPerTpc       -> SetLineColor(fColOdd);
   hWeirdPerTpc       -> SetLineStyle(fLin);
-  hWeirdPerTpc       -> SetFillColor(fColTrk);
+  hWeirdPerTpc       -> SetFillColor(fColOdd);
   hWeirdPerTpc       -> SetFillStyle(fFil);
   hWeirdPerTpc       -> SetTitleFont(fTxt);
   hWeirdPerTpc       -> GetXaxis() -> SetTitle(sPerTpc.Data());
@@ -1721,8 +1742,8 @@ void DoTrackCutStudy() {
   hWeirdPerTpc       -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdPerTpc       -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdPerTpc       -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdPerTot       -> SetMarkerColor(fColTrk);
-  hWeirdPerTot       -> SetMarkerStyle(fMarTrk);
+  hWeirdPerTot       -> SetMarkerColor(fColOdd);
+  hWeirdPerTot       -> SetMarkerStyle(fMarOdd);
   hWeirdPerTot       -> SetLineColor(fColTrk);
   hWeirdPerTot       -> SetLineStyle(fLin);
   hWeirdPerTot       -> SetFillColor(fColTrk);
@@ -1734,11 +1755,11 @@ void DoTrackCutStudy() {
   hWeirdPerTot       -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdPerTot       -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdPerTot       -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdQuality      -> SetMarkerColor(fColTrk);
-  hWeirdQuality      -> SetMarkerStyle(fMarTrk);
-  hWeirdQuality      -> SetLineColor(fColTrk);
+  hWeirdQuality      -> SetMarkerColor(fColOdd);
+  hWeirdQuality      -> SetMarkerStyle(fMarOdd);
+  hWeirdQuality      -> SetLineColor(fColOdd);
   hWeirdQuality      -> SetLineStyle(fLin);
-  hWeirdQuality      -> SetFillColor(fColTrk);
+  hWeirdQuality      -> SetFillColor(fColOdd);
   hWeirdQuality      -> SetFillStyle(fFil);
   hWeirdQuality      -> SetTitleFont(fTxt);
   hWeirdQuality      -> GetXaxis() -> SetTitle(sTrkQuality.Data());
@@ -1747,11 +1768,11 @@ void DoTrackCutStudy() {
   hWeirdQuality      -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdQuality      -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdQuality      -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdDCAxy        -> SetMarkerColor(fColTrk);
-  hWeirdDCAxy        -> SetMarkerStyle(fMarTrk);
-  hWeirdDCAxy        -> SetLineColor(fColTrk);
+  hWeirdDCAxy        -> SetMarkerColor(fColOdd);
+  hWeirdDCAxy        -> SetMarkerStyle(fMarOdd);
+  hWeirdDCAxy        -> SetLineColor(fColOdd);
   hWeirdDCAxy        -> SetLineStyle(fLin);
-  hWeirdDCAxy        -> SetFillColor(fColTrk);
+  hWeirdDCAxy        -> SetFillColor(fColOdd);
   hWeirdDCAxy        -> SetFillStyle(fFil);
   hWeirdDCAxy        -> SetTitleFont(fTxt);
   hWeirdDCAxy        -> GetXaxis() -> SetTitle(sTrkDCAxy.Data());
@@ -1760,11 +1781,11 @@ void DoTrackCutStudy() {
   hWeirdDCAxy        -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdDCAxy        -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdDCAxy        -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdDCAz         -> SetMarkerColor(fColTrk);
-  hWeirdDCAz         -> SetMarkerStyle(fMarTrk);
-  hWeirdDCAz         -> SetLineColor(fColTrk);
+  hWeirdDCAz         -> SetMarkerColor(fColOdd);
+  hWeirdDCAz         -> SetMarkerStyle(fMarOdd);
+  hWeirdDCAz         -> SetLineColor(fColOdd);
   hWeirdDCAz         -> SetLineStyle(fLin);
-  hWeirdDCAz         -> SetFillColor(fColTrk);
+  hWeirdDCAz         -> SetFillColor(fColOdd);
   hWeirdDCAz         -> SetFillStyle(fFil);
   hWeirdDCAz         -> SetTitleFont(fTxt);
   hWeirdDCAz         -> GetXaxis() -> SetTitle(sTrkDCAz.Data());
@@ -1773,11 +1794,11 @@ void DoTrackCutStudy() {
   hWeirdDCAz         -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdDCAz         -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdDCAz         -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdEta          -> SetMarkerColor(fColTrk);
-  hWeirdEta          -> SetMarkerStyle(fMarTrk);
-  hWeirdEta          -> SetLineColor(fColTrk);
+  hWeirdEta          -> SetMarkerColor(fColOdd);
+  hWeirdEta          -> SetMarkerStyle(fMarOdd);
+  hWeirdEta          -> SetLineColor(fColOdd);
   hWeirdEta          -> SetLineStyle(fLin);
-  hWeirdEta          -> SetFillColor(fColTrk);
+  hWeirdEta          -> SetFillColor(fColOdd);
   hWeirdEta          -> SetFillStyle(fFil);
   hWeirdEta          -> SetTitleFont(fTxt);
   hWeirdEta          -> GetXaxis() -> SetTitle(sTrkEta.Data());
@@ -1786,11 +1807,11 @@ void DoTrackCutStudy() {
   hWeirdEta          -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdEta          -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdEta          -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdPhi          -> SetMarkerColor(fColTrk);
-  hWeirdPhi          -> SetMarkerStyle(fMarTrk);
-  hWeirdPhi          -> SetLineColor(fColTrk);
+  hWeirdPhi          -> SetMarkerColor(fColOdd);
+  hWeirdPhi          -> SetMarkerStyle(fMarOdd);
+  hWeirdPhi          -> SetLineColor(fColOdd);
   hWeirdPhi          -> SetLineStyle(fLin);
-  hWeirdPhi          -> SetFillColor(fColTrk);
+  hWeirdPhi          -> SetFillColor(fColOdd);
   hWeirdPhi          -> SetFillStyle(fFil);
   hWeirdPhi          -> SetTitleFont(fTxt);
   hWeirdPhi          -> GetXaxis() -> SetTitle(sTrkPhi.Data());
@@ -1799,11 +1820,11 @@ void DoTrackCutStudy() {
   hWeirdPhi          -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdPhi          -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdPhi          -> GetYaxis() -> SetTitleOffset(fOffY);
-  hWeirdPt           -> SetMarkerColor(fColTrk);
-  hWeirdPt           -> SetMarkerStyle(fMarTrk);
-  hWeirdPt           -> SetLineColor(fColTrk);
+  hWeirdPt           -> SetMarkerColor(fColOdd);
+  hWeirdPt           -> SetMarkerStyle(fMarOdd);
+  hWeirdPt           -> SetLineColor(fColOdd);
   hWeirdPt           -> SetLineStyle(fLin);
-  hWeirdPt           -> SetFillColor(fColTrk);
+  hWeirdPt           -> SetFillColor(fColOdd);
   hWeirdPt           -> SetFillStyle(fFil);
   hWeirdPt           -> SetTitleFont(fTxt);
   hWeirdPt           -> GetXaxis() -> SetTitle(sTrkPt.Data());
@@ -1812,20 +1833,92 @@ void DoTrackCutStudy() {
   hWeirdPt           -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdPt           -> GetYaxis() -> SetTitleFont(fTxt);
   hWeirdPt           -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdDeltaDCAxy   -> SetMarkerColor(fColOdd);
+  hWeirdDeltaDCAxy   -> SetMarkerStyle(fMarOdd);
+  hWeirdDeltaDCAxy   -> SetLineColor(fColOdd);
+  hWeirdDeltaDCAxy   -> SetLineStyle(fLin);
+  hWeirdDeltaDCAxy   -> SetFillColor(fColOdd);
+  hWeirdDeltaDCAxy   -> SetFillStyle(fFil);
+  hWeirdDeltaDCAxy   -> SetTitleFont(fTxt);
+  hWeirdDeltaDCAxy   -> GetXaxis() -> SetTitle(sDeltaDCAxy.Data());
+  hWeirdDeltaDCAxy   -> GetXaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaDCAxy   -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdDeltaDCAxy   -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdDeltaDCAxy   -> GetYaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaDCAxy   -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdDeltaDCAz    -> SetMarkerColor(fColOdd);
+  hWeirdDeltaDCAz    -> SetMarkerStyle(fMarOdd);
+  hWeirdDeltaDCAz    -> SetLineColor(fColOdd);
+  hWeirdDeltaDCAz    -> SetLineStyle(fLin);
+  hWeirdDeltaDCAz    -> SetFillColor(fColOdd);
+  hWeirdDeltaDCAz    -> SetFillStyle(fFil);
+  hWeirdDeltaDCAz    -> SetTitleFont(fTxt);
+  hWeirdDeltaDCAz    -> GetXaxis() -> SetTitle(sDeltaDCAz.Data());
+  hWeirdDeltaDCAz    -> GetXaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaDCAz    -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdDeltaDCAz    -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdDeltaDCAz    -> GetYaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaDCAz    -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdDeltaEta     -> SetMarkerColor(fColOdd);
+  hWeirdDeltaEta     -> SetMarkerStyle(fMarOdd);
+  hWeirdDeltaEta     -> SetLineColor(fColOdd);
+  hWeirdDeltaEta     -> SetLineStyle(fLin);
+  hWeirdDeltaEta     -> SetFillColor(fColOdd);
+  hWeirdDeltaEta     -> SetFillStyle(fFil);
+  hWeirdDeltaEta     -> SetTitleFont(fTxt);
+  hWeirdDeltaEta     -> GetXaxis() -> SetTitle(sDeltaEta.Data());
+  hWeirdDeltaEta     -> GetXaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaEta     -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdDeltaEta     -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdDeltaEta     -> GetYaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaEta     -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdDeltaEta     -> SetMarkerColor(fColOdd);
+  hWeirdDeltaPhi     -> SetMarkerStyle(fMarOdd);
+  hWeirdDeltaPhi     -> SetLineColor(fColOdd);
+  hWeirdDeltaPhi     -> SetLineStyle(fLin);
+  hWeirdDeltaPhi     -> SetFillColor(fColOdd);
+  hWeirdDeltaPhi     -> SetFillStyle(fFil);
+  hWeirdDeltaPhi     -> SetTitleFont(fTxt);
+  hWeirdDeltaPhi     -> GetXaxis() -> SetTitle(sDeltaPhi.Data());
+  hWeirdDeltaPhi     -> GetXaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaPhi     -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdDeltaPhi     -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdDeltaPhi     -> GetYaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaPhi     -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdDeltaPt      -> SetMarkerStyle(fMarTrk);
+  hWeirdDeltaPt      -> SetLineColor(fColOdd);
+  hWeirdDeltaPt      -> SetLineStyle(fLin);
+  hWeirdDeltaPt      -> SetFillColor(fColOdd);
+  hWeirdDeltaPt      -> SetFillStyle(fFil);
+  hWeirdDeltaPt      -> SetTitleFont(fTxt);
+  hWeirdDeltaPt      -> GetXaxis() -> SetTitle(sDeltaPt.Data());
+  hWeirdDeltaPt      -> GetXaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaPt      -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdDeltaPt      -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdDeltaPt      -> GetYaxis() -> SetTitleFont(fTxt);
+  hWeirdDeltaPt      -> GetYaxis() -> SetTitleOffset(fOffY);
   cout << "    Set styles." << endl;
 
   // create legend and text box
-  const UInt_t  fAln(12);
-  const UInt_t  fFilL(0);
-  const UInt_t  fLinL(1);
-  const UInt_t  fTxtW(62);
-  const UInt_t  fColFilL(0);
-  const UInt_t  fColLinL(1);
-  const UInt_t  fColTxtL(1);
-  const UInt_t  fColTxtW(899);
-  const Float_t legXY[NVtx] = {0.1, 0.1, 0.3, 0.2};
-  const Float_t txtXY[NVtx] = {0.3, 0.1, 0.5, 0.2};
-  const Float_t oddXY[NVtx] = {0.5, 0.1, 0.7, 0.15};
+  const UInt_t  fAln        = 12;
+  const UInt_t  fFilL       = 0;
+  const UInt_t  fLinL       = 1;
+  const UInt_t  fColFilL    = 0;
+  const UInt_t  fColLinL    = 1;
+  const UInt_t  fColTxtL    = 1;
+  const UInt_t  nObjL       = NTyp - 1;
+  const UInt_t  nObjW       = NTyp;
+  const UInt_t  nObjT       = NTxt;
+  const Float_t hObj        = 0.05;
+  const Float_t hObjL       = nObjL * hObj;
+  const Float_t hObjW       = nObjW * hObj;
+  const Float_t hObjT       = nObjT * hObj;
+  const Float_t yLeg        = 0.1 + hObjL;
+  const Float_t yOdd        = 0.1 + hObjW;
+  const Float_t yTxt        = 0.1 + hObjT;
+  const Float_t legXY[NVtx] = {0.1, 0.1, 0.3, yLeg};
+  const Float_t oddXY[NVtx] = {0.1, 0.1, 0.3, yOdd};
+  const Float_t txtXY[NVtx] = {0.3, 0.1, 0.5, yTxt};
 
   TLegend *leg = new TLegend(legXY[0], legXY[1], legXY[2], legXY[3]);
   leg -> SetFillColor(fColFilL);
@@ -1838,6 +1931,29 @@ void DoTrackCutStudy() {
   leg -> AddEntry(hTrackPt, sLeg[0].Data(), "pf");
   leg -> AddEntry(hTruthPt, sLeg[1].Data(), "pf");
 
+  TLegend *odd = new TLegend(oddXY[0], oddXY[1], oddXY[2], oddXY[3]);
+  odd -> SetFillColor(fColFilL);
+  odd -> SetFillStyle(fFilL);
+  odd -> SetLineColor(fColLinL);
+  odd -> SetLineStyle(fLinL);
+  odd -> SetTextFont(fTxt);
+  odd -> SetTextAlign(fAln);
+  odd -> SetTextColor(fColTxtL);
+  odd -> AddEntry(hTrackPt, sLeg[0].Data(), "pf");
+  odd -> AddEntry(hTruthPt, sLeg[1].Data(), "pf");
+  odd -> AddEntry(hWeirdPt, sLeg[2].Data(), "pf");
+
+  TLegend *oddNT = new TLegend(legXY[0], legXY[1], legXY[2], legXY[3]);
+  oddNT -> SetFillColor(fColFilL);
+  oddNT -> SetFillStyle(fFilL);
+  oddNT -> SetLineColor(fColLinL);
+  oddNT -> SetLineStyle(fLinL);
+  oddNT -> SetTextFont(fTxt);
+  oddNT -> SetTextAlign(fAln);
+  oddNT -> SetTextColor(fColTxtL);
+  oddNT -> AddEntry(hTrackPt, sLeg[0].Data(), "pf");
+  oddNT -> AddEntry(hWeirdPt, sLeg[2].Data(), "pf");
+
   TPaveText *txt = new TPaveText(txtXY[0], txtXY[1], txtXY[2], txtXY[3], "NDC NB");
   txt -> SetFillColor(fColFilL);
   txt -> SetFillStyle(fFilL);
@@ -1849,16 +1965,6 @@ void DoTrackCutStudy() {
   for (UInt_t iTxt = 0; iTxt < NTxt; iTxt++) {
     txt -> AddText(sTxtEO[iTxt].Data());
   }
-
-  TPaveText *odd = new TPaveText(oddXY[0], oddXY[1], oddXY[2], oddXY[3], "NDC NB");
-  odd -> SetFillColor(fColFilL);
-  odd -> SetFillStyle(fFilL);
-  odd -> SetLineColor(fColLinL);
-  odd -> SetLineStyle(fLinL);
-  odd -> SetTextFont(fTxtW);
-  odd -> SetTextAlign(fAln);
-  odd -> SetTextColor(fColTxtW);
-  odd -> AddText(sOdd.Data());
   cout << "    Made legend and text boxes." << endl;
 
   // create plots
@@ -1875,7 +1981,8 @@ void DoTrackCutStudy() {
   cNMap      -> cd();
   hTrackNMap -> Draw();
   hTruthNMap -> Draw("same");
-  leg        -> Draw();
+  hWeirdNMap -> Draw("same");
+  odd        -> Draw();
   txt        -> Draw();
   fOut       -> cd();
   cNMap      -> Write();
@@ -1885,7 +1992,8 @@ void DoTrackCutStudy() {
   cNInt      -> cd();
   hTrackNInt -> Draw();
   hTruthNInt -> Draw("same");
-  leg        -> Draw();
+  hWeirdNInt -> Draw("same");
+  odd        -> Draw();
   txt        -> Draw();
   fOut       -> cd();
   cNInt      -> Write();
@@ -1895,7 +2003,8 @@ void DoTrackCutStudy() {
   cNTpc      -> cd();
   hTrackNTpc -> Draw();
   hTruthNTpc -> Draw("same");
-  leg        -> Draw();
+  hWeirdNTpc -> Draw("same");
+  odd        -> Draw();
   txt        -> Draw();
   fOut       -> cd();
   cNTpc      -> Write();
@@ -1905,17 +2014,39 @@ void DoTrackCutStudy() {
   cNTot      -> cd();
   hTrackNTot -> Draw();
   hTruthNTot -> Draw("same");
-  leg        -> Draw();
+  hWeirdNTot -> Draw("same");
+  odd        -> Draw();
   txt        -> Draw();
   fOut       -> cd();
   cNTot      -> Write();
   cNTot      -> Close();
 
+  TCanvas *cDcaXY1D = new TCanvas("cDcaXY1D", "", fWidth1P, fHeight1P);
+  cDcaXY1D    -> cd();
+  hTrackDCAxy -> Draw();
+  hWeirdDCAxy -> Draw("same");
+  odd         -> Draw();
+  txt         -> Draw();
+  fOut        -> cd();
+  cDcaXY1D    -> Write();
+  cDcaXY1D    -> Close();
+
+  TCanvas *cDcaZ1D = new TCanvas("cDcaZ1D", "", fWidth1P, fHeight1P);
+  cDcaZ1D    -> cd();
+  hTrackDCAz -> Draw();
+  hWeirdDCAz -> Draw("same");
+  oddNT      -> Draw();
+  txt        -> Draw();
+  fOut       -> cd();
+  cDcaZ1D    -> Write();
+  cDcaZ1D    -> Close();
+
   TCanvas *cEta = new TCanvas("cEta", "", fWidth1P, fHeight1P);
   cEta      -> cd();
   hTrackEta -> Draw();
   hTruthEta -> Draw("same");
-  leg       -> Draw();
+  hWeirdEta -> Draw("same");
+  oddNT     -> Draw();
   txt       -> Draw();
   fOut      -> cd();
   cEta      -> Write();
@@ -1925,7 +2056,8 @@ void DoTrackCutStudy() {
   cPhi      -> cd();
   hTrackPhi -> Draw();
   hTruthPhi -> Draw("same");
-  leg       -> Draw();
+  hWeirdPhi -> Draw("same");
+  odd       -> Draw();
   txt       -> Draw();
   fOut      -> cd();
   cPhi      -> Write();
@@ -1935,11 +2067,62 @@ void DoTrackCutStudy() {
   cPt      -> cd();
   hTrackPt -> Draw();
   hTruthPt -> Draw("same");
-  leg      -> Draw();
+  hWeirdPt -> Draw("same");
+  odd      -> Draw();
   txt      -> Draw();
   fOut     -> cd();
   cPt      -> Write();
   cPt      -> Close();
+
+  TCanvas *cDeltaDcaXY = new TCanvas("cDeltaDcaXY", "", fWidth1P, fHeight1P);
+  cDeltaDcaXY      -> cd();
+  hDeltaDCAxy      -> Draw();
+  hWeirdDeltaDCAxy -> Draw("same");
+  oddNT            -> Draw();
+  txt              -> Draw();
+  fOut             -> cd();
+  cDeltaDcaXY      -> Write();
+  cDeltaDcaXY      -> Close();
+
+  TCanvas *cDeltaDcaZ = new TCanvas("cDeltaDcaZ", "", fWidth1P, fHeight1P);
+  cDeltaDcaZ      -> cd();
+  hDeltaDCAz      -> Draw();
+  hWeirdDeltaDCAz -> Draw("same");
+  oddNT           -> Draw();
+  txt             -> Draw();
+  fOut            -> cd();
+  cDeltaDcaZ      -> Write();
+  cDeltaDcaZ      -> Close();
+
+  TCanvas *cDeltaEta = new TCanvas("cDeltaEta", "", fWidth1P, fHeight1P);
+  cDeltaEta      -> cd();
+  hDeltaEta      -> Draw();
+  hWeirdDeltaEta -> Draw("same");
+  oddNT          -> Draw();
+  txt            -> Draw();
+  fOut           -> cd();
+  cDeltaEta      -> Write();
+  cDeltaEta      -> Close();
+  
+  TCanvas *cDeltaPhi = new TCanvas("cDeltaPhi", "", fWidth1P, fHeight1P);
+  cDeltaPhi      -> cd();
+  hDeltaPhi      -> Draw();
+  hWeirdDeltaPhi -> Draw("same");
+  oddNT          -> Draw();
+  txt            -> Draw();
+  fOut           -> cd();
+  cDeltaPhi      -> Write();
+  cDeltaPhi      -> Close();
+
+  TCanvas *cDeltaPt = new TCanvas("cDeltaPt", "", fWidth1P, fHeight1P);
+  cDeltaPt      -> cd();
+  hDeltaPt      -> Draw();
+  hWeirdDeltaPt -> Draw("same");
+  oddNT         -> Draw();
+  txt           -> Draw();
+  fOut          -> cd();
+  cDeltaPt      -> Write();
+  cDeltaPt      -> Close();
 
   // make embed-only 2d plots
   TCanvas *cPerMap   = new TCanvas("cPerMap", "", fWidth2P, fHeight2P);
@@ -2045,7 +2228,7 @@ void DoTrackCutStudy() {
   hTrackPtVsDCAz -> Draw("colz");
   fOut           -> cd();
   cDCAz          -> Write();
-  cDCAxy         -> Close();
+  cDCAz         -> Close();
 
   TCanvas *cDeltaDCAxyVsTrkPt   = new TCanvas("cDeltaDCAxyVsTrkPt", "", fWidth2P, fHeight2P);
   TPad    *pDeltaDCAxyVsTrkPt1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
@@ -2399,8 +2582,8 @@ void DoTrackCutStudy() {
   cout << "    Made plots." << endl;
 
   // create output directories
-  TDirectory *dOut[NDir];
-  for (UInt_t iDir = 0; iDir < NDir; iDir++) {
+  TDirectory *dOut[NTyp];
+  for (UInt_t iDir = 0; iDir < NTyp; iDir++) {
     fOut       -> cd();
     dOut[iDir] = (TDirectory*) fOut -> mkdir(sOutDir[iDir].Data());
   }
@@ -2487,6 +2670,11 @@ void DoTrackCutStudy() {
   hWeirdEta          -> Write();
   hWeirdPhi          -> Write();
   hWeirdPt           -> Write();
+  hWeirdDeltaDCAxy   -> Write();
+  hWeirdDeltaDCAz    -> Write();
+  hWeirdDeltaEta     -> Write();
+  hWeirdDeltaPhi     -> Write();
+  hWeirdDeltaPt      -> Write();
   cout << "    Saved histograms." << endl;
 
   // close files

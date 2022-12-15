@@ -1,3 +1,1 @@
-A simple macro (DoTrackCutStudy.C) which reads in the output of the SVtxEvaluator class and studies the impact of various cuts on track populations. Additional scripts and macros which may be useful can be found in the `macros` and `scripts` directories.
-
-TODO: subsume and refactor macro into a class...
+A simple class (STrackCutStudy) which reads in the output of the SVtxEvaluator class and studies the impact of various cuts on track populations. Use the DoTrackCutStudy.C macro to run the class. Additional scripts and macros which may be useful can be found in the `macros` and `scripts` directories.

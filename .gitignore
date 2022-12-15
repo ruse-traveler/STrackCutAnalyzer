@@ -6,7 +6,7 @@ lists/
 input/
 backup/
 submit/
-src/
+src/*
 !src/STrackCutStudy.cc
 !src/STrackCutStudy.h
 !src/autogen.sh

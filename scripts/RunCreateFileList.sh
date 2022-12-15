@@ -7,7 +7,7 @@
 # with specified arguments.
 
 # output parameter
-NAME="test"
+NAME="crossCheck_forTrackCutStudy"
 
 # CreateFileList.pl args
 TYPE=4

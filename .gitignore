@@ -6,3 +6,9 @@ lists/
 input/
 backup/
 submit/
+src/
+!src/STrackCutStudy.cc
+!src/STrackCutStudy.h
+!src/autogen.sh
+!src/configure.ac
+!src/Makefile.am

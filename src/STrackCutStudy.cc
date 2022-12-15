@@ -31,7 +31,6 @@ STrackCutStudy::STrackCutStudy() {
 
 STrackCutStudy::~STrackCutStudy() {
 
-/*
   const bool doTuplesExist = (ntTrkEO || ntTrkPU);
   if (!doTuplesExist) {
     return;
@@ -39,7 +38,6 @@ STrackCutStudy::~STrackCutStudy() {
     delete ntTrkEO -> GetCurrentFile();
     delete ntTrkPU -> GetCurrentFile();
   }
-*/
 
 }  // end dtor
 
@@ -113,7 +111,8 @@ void STrackCutStudy::Analyze() {
   cout << "    Analyzing:" <<endl;
 
   // prepare for embed-only entry loop
-  Long64_t nEntriesEO = ntTrkEO -> GetEntries();
+  //Long64_t nEntriesEO = ntTrkEO -> GetEntries();
+  Long64_t nEntriesEO = 1000;
   cout << "      Beginning embed-only entry loop: " << nEntriesEO << " entries to process..." << endl;
 
   // loop over embed-only tuple entries
@@ -137,10 +136,11 @@ void STrackCutStudy::Analyze() {
     }
 
     // perform calculations
-    const Float_t  glayers    = gnmaps + gnintt + gntpc;
-    const Double_t perMaps    = (Double_t) nmaps / (Double_t) gnmaps;
-    const Double_t perIntt    = (Double_t) nintt / (Double_t) gnintt;
-    const Double_t perTpc     = (Double_t) ntpc / (Double_t) gntpc;
+    const Float_t  glayers    = gnlmms + gnlmaps + gnlintt + gnltpc;
+    const Double_t perMms     = (Double_t) nlmms / (Double_t) gnlmms;
+    const Double_t perMaps    = (Double_t) nlmaps / (Double_t) gnlmaps;
+    const Double_t perIntt    = (Double_t) nlintt / (Double_t) gnlintt;
+    const Double_t perTpc     = (Double_t) nltpc / (Double_t) gnltpc;
     const Double_t perTot     = (Double_t) layers / (Double_t) glayers;
     const Double_t mmDcaXY    = dca3dxy * 10000;
     const Double_t mmDcaZ     = dca3dz * 10000;
@@ -154,10 +154,12 @@ void STrackCutStudy::Analyze() {
     const Double_t ptFrac     = pt / gpt;
 
     // fill embed-only track histograms
-    hTrackNMap         -> Fill(nmaps);
-    hTrackNInt         -> Fill(nintt);
-    hTrackNTpc         -> Fill(ntpc);
+    hTrackNMap         -> Fill(nlmms);
+    hTrackNMap         -> Fill(nlmaps);
+    hTrackNInt         -> Fill(nlintt);
+    hTrackNTpc         -> Fill(nltpc);
     hTrackNTot         -> Fill(layers);
+    hTrackPerMms       -> Fill(perMms);
     hTrackPerMap       -> Fill(perMaps);
     hTrackPerInt       -> Fill(perIntt);
     hTrackPerTpc       -> Fill(perTpc);
@@ -173,10 +175,12 @@ void STrackCutStudy::Analyze() {
     hDeltaEta          -> Fill(deltaEta);
     hDeltaPhi          -> Fill(deltaPhi);
     hDeltaPt           -> Fill(deltaPt);
-    hTrackPtVsNMap     -> Fill(nmaps, pt);
-    hTrackPtVsNInt     -> Fill(nintt, pt);
-    hTrackPtVsNTpc     -> Fill(ntpc, pt);
+    hTrackPtVsNMms     -> Fill(nlmms, pt);
+    hTrackPtVsNMap     -> Fill(nlmaps, pt);
+    hTrackPtVsNInt     -> Fill(nlintt, pt);
+    hTrackPtVsNTpc     -> Fill(nltpc, pt);
     hTrackPtVsNTot     -> Fill(layers, pt);
+    hTrackPtVsPerMms   -> Fill(perMms, pt);
     hTrackPtVsPerMap   -> Fill(perMaps, pt);
     hTrackPtVsPerInt   -> Fill(perIntt, pt);
     hTrackPtVsPerTpc   -> Fill(perTpc, pt);
@@ -191,9 +195,9 @@ void STrackCutStudy::Analyze() {
     hDeltaPtVsTrkPt    -> Fill(pt, deltaPt);
 
     // fill embed-only truth histograms
-    hTruthNMap         -> Fill(gnmaps);
-    hTruthNInt         -> Fill(gnintt);
-    hTruthNTpc         -> Fill(gntpc);
+    hTruthNMap         -> Fill(gnlmaps);
+    hTruthNInt         -> Fill(gnlintt);
+    hTruthNTpc         -> Fill(gnltpc);
     hTruthNTot         -> Fill(glayers);
     hTruthEta          -> Fill(geta);
     hTruthPhi          -> Fill(gphi);
@@ -207,11 +211,11 @@ void STrackCutStudy::Analyze() {
     hFracVsTruthEta    -> Fill(geta, etaFrac);
     hFracVsTruthPhi    -> Fill(gphi, phiFrac);
     hFracVsTruthPt     -> Fill(gpt, ptFrac);
-    hTruthPtVsNMap     -> Fill(gnmaps, gpt);
-    hTruthPtVsNInt     -> Fill(gnintt, gpt);
-    hTruthPtVsNTpc     -> Fill(gntpc, gpt);
+    hTruthPtVsNMap     -> Fill(gnlmaps, gpt);
+    hTruthPtVsNInt     -> Fill(gnlintt, gpt);
+    hTruthPtVsNTpc     -> Fill(gnltpc, gpt);
     hTruthPtVsNTot     -> Fill(glayers, gpt);
-    hTruthPtVsNTpc     -> Fill(nhits, gpt);
+    hTruthPtVsNTpc     -> Fill(nltpc, gpt);
     hTruthPtVsQuality  -> Fill(quality, gpt);
     hTruthPtVsDCAxy    -> Fill(mmDcaXY, gpt);
     hTruthPtVsDCAz     -> Fill(mmDcaZ, gpt);
@@ -224,10 +228,12 @@ void STrackCutStudy::Analyze() {
     // fill embed_only weird histograms
     const Bool_t isWeirdTrack = ((ptFrac < weirdPtFracMin) || (ptFrac > weirdPtFracMax));
     if (isWeirdTrack) {
-      hWeirdNMap       -> Fill(nmaps);
-      hWeirdNInt       -> Fill(nintt);
-      hWeirdNTpc       -> Fill(ntpc);
+      hWeirdNMms       -> Fill(nlmms);
+      hWeirdNMap       -> Fill(nlmaps);
+      hWeirdNInt       -> Fill(nlintt);
+      hWeirdNTpc       -> Fill(nltpc);
       hWeirdNTot       -> Fill(layers);
+      hWeirdPerMms     -> Fill(perMms);
       hWeirdPerMap     -> Fill(perMaps);
       hWeirdPerInt     -> Fill(perIntt);
       hWeirdPerTpc     -> Fill(perTpc);
@@ -248,7 +254,8 @@ void STrackCutStudy::Analyze() {
   cout << "      Finished embed-only entry loop." << endl;
 
   // prepare for embed-only entry loop
-  Long64_t nEntriesPU = ntTrkPU -> GetEntries();
+  //Long64_t nEntriesPU = ntTrkPU -> GetEntries();
+  Long64_t nEntriesPU = 1000;
   cout << "      Beginning with-pileup entry loop: " << nEntriesPU << " entries to process..." << endl;
 
   // loop over embed-only tuple entries
@@ -272,10 +279,11 @@ void STrackCutStudy::Analyze() {
     }
 
     // perform calculations
-    const Float_t  pu_glayers = pu_gnmaps + pu_gnintt + pu_gntpc;
-    const Double_t perMaps    = (Double_t) pu_nmaps / (Double_t) pu_gnmaps;
-    const Double_t perIntt    = (Double_t) pu_nintt / (Double_t) pu_gnintt;
-    const Double_t perTpc     = (Double_t) pu_ntpc / (Double_t) pu_gntpc;
+    const Float_t  pu_glayers = pu_gnlmms + pu_gnlmaps + pu_gnlintt + pu_gnltpc;
+    const Double_t perMms     = (Double_t) pu_nlmms / (Double_t) pu_gnlmms;
+    const Double_t perMaps    = (Double_t) pu_nlmaps / (Double_t) pu_gnlmaps;
+    const Double_t perIntt    = (Double_t) pu_nlintt / (Double_t) pu_gnlintt;
+    const Double_t perTpc     = (Double_t) pu_nltpc / (Double_t) pu_gnltpc;
     const Double_t perTot     = (Double_t) pu_layers / (Double_t) pu_glayers;
     const Double_t mmDcaXY    = pu_dca3dxy * 10000;
     const Double_t mmDcaZ     = pu_dca3dz * 10000;
@@ -290,10 +298,12 @@ void STrackCutStudy::Analyze() {
     if (thereAreNans) continue;
 
     // fill with-pileup track histograms
-    hTrackNMap_PU         -> Fill(pu_nmaps);
-    hTrackNInt_PU         -> Fill(pu_nintt);
-    hTrackNTpc_PU         -> Fill(pu_ntpc);
+    hTrackNMms_PU         -> Fill(pu_nlmms);
+    hTrackNMap_PU         -> Fill(pu_nlmaps);
+    hTrackNInt_PU         -> Fill(pu_nlintt);
+    hTrackNTpc_PU         -> Fill(pu_nltpc);
     hTrackNTot_PU         -> Fill(pu_layers);
+    hTrackPerMms_PU       -> Fill(perMms);
     hTrackPerMap_PU       -> Fill(perMaps);
     hTrackPerInt_PU       -> Fill(perIntt);
     hTrackPerTpc_PU       -> Fill(perTpc);
@@ -309,10 +319,12 @@ void STrackCutStudy::Analyze() {
     hDeltaEta_PU          -> Fill(deltaEta);
     hDeltaPhi_PU          -> Fill(deltaPhi);
     hDeltaPt_PU           -> Fill(deltaPt);
-    hTrackPtVsNMap_PU     -> Fill(pu_nmaps, pu_pt);
-    hTrackPtVsNInt_PU     -> Fill(pu_nintt, pu_pt);
-    hTrackPtVsNTpc_PU     -> Fill(pu_ntpc, pu_pt);
+    hTrackPtVsNMms_PU     -> Fill(pu_nlmaps, pu_pt);
+    hTrackPtVsNMap_PU     -> Fill(pu_nlmaps, pu_pt);
+    hTrackPtVsNInt_PU     -> Fill(pu_nlintt, pu_pt);
+    hTrackPtVsNTpc_PU     -> Fill(pu_nltpc, pu_pt);
     hTrackPtVsNTot_PU     -> Fill(pu_layers, pu_pt);
+    hTrackPtVsPerMms_PU   -> Fill(perMms, pu_pt);
     hTrackPtVsPerMap_PU   -> Fill(perMaps, pu_pt);
     hTrackPtVsPerInt_PU   -> Fill(perIntt, pu_pt);
     hTrackPtVsPerTpc_PU   -> Fill(perTpc, pu_pt);
@@ -607,7 +619,7 @@ void STrackCutStudy::InitHists() {
   const UInt_t  nPhiBins(60);
   const UInt_t  nPtBins(100);
   const UInt_t  nFracBins(300);
-  const UInt_t  nErrBins(10000);
+  const UInt_t  nErrBins(5000);
   const Float_t rNHitBins[NRange] = {0,     100};
   const Float_t rQualBins[NRange] = {0.,    10.};
   const Float_t rDcaBins[NRange]  = {-10.,  10.};
@@ -618,10 +630,12 @@ void STrackCutStudy::InitHists() {
   const Float_t rFracBins[NRange] = {0.,    3.};
   const Float_t rErrBins[NRange]  = {0.,    100.};
   // embed-only track histograms
-  hTrackNMap            = new TH1D("hTrackNMap",            "Track N_{hit}^{MAPS}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTrackNInt            = new TH1D("hTrackNInt",            "Track N_{hit}^{INTT}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTrackNTpc            = new TH1D("hTrackNTpc",            "Track N_{hit}^{TPC}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTrackNTot            = new TH1D("hTrackNTot",            "Track N_{hit}^{tot}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNMms            = new TH1D("hTrackNMms",            "Track N_{layer}^{MMS}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNMap            = new TH1D("hTrackNMap",            "Track N_{layer}^{MAPS}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNInt            = new TH1D("hTrackNInt",            "Track N_{layer}^{INTT}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNTpc            = new TH1D("hTrackNTpc",            "Track N_{layer}^{TPC}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNTot            = new TH1D("hTrackNTot",            "Track N_{layer}^{tot}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackPerMms          = new TH1D("hTrackPerMms",          "Track r_{MMS}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerMap          = new TH1D("hTrackPerMap",          "Track r_{MAPS}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerInt          = new TH1D("hTrackPerInt",          "Track r_{INTT}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerTpc          = new TH1D("hTrackPerTpc",          "Track r_{TPC}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
@@ -637,10 +651,12 @@ void STrackCutStudy::InitHists() {
   hDeltaEta             = new TH1D("hDeltaEta",             "#eta \%-error",                        nErrBins,  rErrBins[0],  rErrBins[1]);
   hDeltaPhi             = new TH1D("hDeltaPhi",             "#phi \%-error",                        nErrBins,  rErrBins[0],  rErrBins[1]);
   hDeltaPt              = new TH1D("hDeltaPt",              "p_{T} \%-error",                       nErrBins,  rErrBins[0],  rErrBins[1]);
-  hTrackPtVsNMap        = new TH2D("hTrackPtVsNMap",        "Track p_{T} vs. N_{hit}^{MAPS}",       nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTrackPtVsNInt        = new TH2D("hTrackPtVsNInt",        "Track p_{T} vs. N_{hit}^{INTT}",       nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTrackPtVsNTpc        = new TH2D("hTrackPtVsNTpc",        "Track p_{T} vs. N_{hit}^{TPC}",        nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTrackPtVsNTot        = new TH2D("hTrackPtVsNTot",        "Track p_{T} vs. N_{hit}^{tot}",        nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNMms        = new TH2D("hTrackPtVsNMms",        "Track p_{T} vs. N_{layer}^{MMS}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNMap        = new TH2D("hTrackPtVsNMap",        "Track p_{T} vs. N_{layer}^{MAPS}",     nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNInt        = new TH2D("hTrackPtVsNInt",        "Track p_{T} vs. N_{layer}^{INTT}",     nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNTpc        = new TH2D("hTrackPtVsNTpc",        "Track p_{T} vs. N_{layer}^{TPC}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNTot        = new TH2D("hTrackPtVsNTot",        "Track p_{T} vs. N_{layer}^{tot}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsPerMms      = new TH2D("hTrackPtVsPerMms",      "Track p_{T} vs. r_{MMS}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerMap      = new TH2D("hTrackPtVsPerMap",      "Track p_{T} vs. r_{MAPS}",             nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerInt      = new TH2D("hTrackPtVsPerInt",      "Track p_{T} vs. r_{INTT}",             nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerTpc      = new TH2D("hTrackPtVsPerTpc",      "Track p_{T} vs. r_{TPC}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -654,10 +670,11 @@ void STrackCutStudy::InitHists() {
   hDeltaPhiVsTrkPt      = new TH2D("hDeltaPhiVsTrkPt",      "#phi^{trk} \%-error vs. track p_{T}",  nPtBins,   rPtBins[0],   rPtBins[1],   nErrBins,  rErrBins[0],  rErrBins[1]);
   hDeltaPtVsTrkPt       = new TH2D("hDeltaPtVsTrkPt",       "p_{T}^{trk} \%-error vs. track p_{T}", nPtBins,   rPtBins[0],   rPtBins[1],   nErrBins,  rErrBins[0],  rErrBins[1]);
   // embed-only truth histograms
-  hTruthNMap            = new TH1D("hTruthNMap",            "Truth N_{hit}^{MAPS}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTruthNInt            = new TH1D("hTruthNInt",            "Truth N_{hit}^{INTT}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTruthNTpc            = new TH1D("hTruthNTpc",            "Truth N_{hit}^{TPC}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTruthNTot            = new TH1D("hTruthNTot",            "Truth N_{hit}^{tot}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTruthNMms            = new TH1D("hTruthNMms",            "Truth N_{layer}^{MMS}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTruthNMap            = new TH1D("hTruthNMap",            "Truth N_{layer}^{MAPS}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTruthNInt            = new TH1D("hTruthNInt",            "Truth N_{layer}^{INTT}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTruthNTpc            = new TH1D("hTruthNTpc",            "Truth N_{layer}^{TPC}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTruthNTot            = new TH1D("hTruthNTot",            "Truth N_{layer}^{tot}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
   hTruthEta             = new TH1D("hTruthEta",             "Truth #eta",                           nEtaBins,  rEtaBins[0],  rEtaBins[1]);
   hTruthPhi             = new TH1D("hTruthPhi",             "Truth #phi",                           nPhiBins,  rPhiBins[0],  rPhiBins[1]);
   hTruthPt              = new TH1D("hTruthPt",              "Truth p_{T}",                          nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -670,10 +687,11 @@ void STrackCutStudy::InitHists() {
   hFracVsTruthEta       = new TH2D("hFracVsTruthEta",       "#delta#eta^{trk} vs. #eta^{truth}",    nEtaBins,  rEtaBins[0],  rEtaBins[1],  nFracBins, rFracBins[0], rFracBins[1]);
   hFracVsTruthPhi       = new TH2D("hFracVsTruthPhi",       "#delta#phi^{trk} vs. #phi^{truth}",    nPhiBins,  rPhiBins[0],  rPhiBins[1],  nFracBins, rFracBins[0], rFracBins[1]);
   hFracVsTruthPt        = new TH2D("hFracVsTruthPt",        "#deltap_{T}^{trk} vs. truth p_{T}",    nPtBins,   rPtBins[0],   rPtBins[1],   nFracBins, rFracBins[0], rFracBins[1]);
-  hTruthPtVsNMap        = new TH2D("hTruthPtVsNMap",        "Truth p_{T} vs. N_{hit}^{MAPS}",       nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTruthPtVsNInt        = new TH2D("hTruthPtVsNInt",        "Truth p_{T} vs. N_{hit}^{INTT}",       nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTruthPtVsNTpc        = new TH2D("hTruthPtVsNTpc",        "Truth p_{T} vs. N_{hit}^{TPC}",        nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTruthPtVsNTot        = new TH2D("hTruthPtVsNTot",        "Truth p_{T} vs. N_{hit}^{tot}",        nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTruthPtVsNMms        = new TH2D("hTruthPtVsNMms",        "Truth p_{T} vs. N_{layer}^{MMS}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTruthPtVsNMap        = new TH2D("hTruthPtVsNMap",        "Truth p_{T} vs. N_{layer}^{MAPS}",     nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTruthPtVsNInt        = new TH2D("hTruthPtVsNInt",        "Truth p_{T} vs. N_{layer}^{INTT}",     nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTruthPtVsNTpc        = new TH2D("hTruthPtVsNTpc",        "Truth p_{T} vs. N_{layer}^{TPC}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTruthPtVsNTot        = new TH2D("hTruthPtVsNTot",        "Truth p_{T} vs. N_{layer}^{tot}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsQuality     = new TH2D("hTruthPtVsQuality",     "Truth p_{T} vs. Track #chi^{2}/ndf",   nQualBins, rQualBins[0], rQualBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsDCAxy       = new TH2D("hTruthPtVsDCAxy",       "Truth p_{T} vs. Track DCA_{xy}",       nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsDCAz        = new TH2D("hTruthPtVsDCAz",        "Truth p_{T} vs. Track DCA_{z}",        nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -683,10 +701,12 @@ void STrackCutStudy::InitHists() {
   hDeltaPhiVsTruPt      = new TH2D("hDeltaPhiVsTruPt",      "Scaled #phi^{trk} vs. truth p_{T}",    nPtBins,   rPtBins[0],   rPtBins[1],   nPhiBins,  rPhiBins[0],  rPhiBins[1]);
   hDeltaPtVsTruPt       = new TH2D("hDeltaPtVsTruPt",       "Scaled p_{T}^{trk} vs. truth p_{T}",   nPtBins,   rPtBins[0],   rPtBins[1],   nPtBins,   rPtBins[0],   rPtBins[1]);
   // embed-only weird histograms
-  hWeirdNMap            = new TH1D("hWeirdNMap",            "Weird N_{hit}^{MAPS}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hWeirdNInt            = new TH1D("hWeirdNInt",            "Weird N_{hit}^{INTT}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hWeirdNTpc            = new TH1D("hWeirdNTpc",            "Weird N_{hit}^{TPC}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hWeirdNTot            = new TH1D("hWeirdNTot",            "Weird N_{hit}^{tot}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hWeirdNMms            = new TH1D("hWeirdNMms",            "Weird N_{layer}^{MMS}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hWeirdNMap            = new TH1D("hWeirdNMap",            "Weird N_{layer}^{MAPS}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hWeirdNInt            = new TH1D("hWeirdNInt",            "Weird N_{layer}^{INTT}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hWeirdNTpc            = new TH1D("hWeirdNTpc",            "Weird N_{layer}^{TPC}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hWeirdNTot            = new TH1D("hWeirdNTot",            "Weird N_{layer}^{tot}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hWeirdPerMms          = new TH1D("hWeirdPerMms",          "Weird r_{MMS}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
   hWeirdPerMap          = new TH1D("hWeirdPerMap",          "Weird r_{MAPS}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hWeirdPerInt          = new TH1D("hWeirdPerInt",          "Weird r_{INTT}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hWeirdPerTpc          = new TH1D("hWeirdPerTpc",          "Weird r_{TPC}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
@@ -703,10 +723,12 @@ void STrackCutStudy::InitHists() {
   hWeirdDeltaPhi        = new TH1D("hWeirdDeltaPhi",        "Weird #phi \%-error",                  nErrBins,  rErrBins[0],  rErrBins[1]);
   hWeirdDeltaPt         = new TH1D("hWeirdDeltaPt",         "Weird p_{T} \%-error",                 nErrBins,  rErrBins[0],  rErrBins[1]);
   // with-pileup track histograms
-  hTrackNMap_PU         = new TH1D("hTrackNMap_PU",         "Track N_{hit}^{MAPS}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTrackNInt_PU         = new TH1D("hTrackNInt_PU",         "Track N_{hit}^{INTT}",                 nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTrackNTpc_PU         = new TH1D("hTrackNTpc_PU",         "Track N_{hit}^{TPC}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
-  hTrackNTot_PU         = new TH1D("hTrackNTot_PU",         "Track N_{hit}^{tot}",                  nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNMms_PU         = new TH1D("hTrackNMms_PU",         "Track N_{layer}^{MMS}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNMap_PU         = new TH1D("hTrackNMap_PU",         "Track N_{layer}^{MAPS}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNInt_PU         = new TH1D("hTrackNInt_PU",         "Track N_{layer}^{INTT}",               nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNTpc_PU         = new TH1D("hTrackNTpc_PU",         "Track N_{layer}^{TPC}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackNTot_PU         = new TH1D("hTrackNTot_PU",         "Track N_{layer}^{tot}",                nNHitBins, rNHitBins[0], rNHitBins[1]);
+  hTrackPerMms_PU       = new TH1D("hTrackPerMms_PU",       "Track r_{MMS}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerMap_PU       = new TH1D("hTrackPerMap_PU",       "Track r_{MAPS}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerInt_PU       = new TH1D("hTrackPerInt_PU",       "Track r_{INTT}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerTpc_PU       = new TH1D("hTrackPerTpc_PU",       "Track r_{TPC}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
@@ -722,10 +744,12 @@ void STrackCutStudy::InitHists() {
   hDeltaEta_PU          = new TH1D("hDeltaEta_PU",          "#eta \%-error",                        nErrBins,  rErrBins[0],  rErrBins[1]);
   hDeltaPhi_PU          = new TH1D("hDeltaPhi_PU",          "#phi \%-error",                        nErrBins,  rErrBins[0],  rErrBins[1]);
   hDeltaPt_PU           = new TH1D("hDeltaPt_PU",           "p_{T} \%-error",                       nErrBins,  rErrBins[0],  rErrBins[1]);
-  hTrackPtVsNMap_PU     = new TH2D("hTrackPtVsNMap_PU",     "Track p_{T} vs. N_{hit}^{MAPS}",       nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTrackPtVsNInt_PU     = new TH2D("hTrackPtVsNInt_PU",     "Track p_{T} vs. N_{hit}^{INTT}",       nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTrackPtVsNTpc_PU     = new TH2D("hTrackPtVsNTpc_PU",     "Track p_{T} vs. N_{hit}^{TPC}",        nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
-  hTrackPtVsNTot_PU     = new TH2D("hTrackPtVsNTot_PU",     "Track p_{T} vs. N_{hit}^{tot}",        nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNMms_PU     = new TH2D("hTrackPtVsNMms_PU",     "Track p_{T} vs. N_{layer}^{MMS}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNMap_PU     = new TH2D("hTrackPtVsNMap_PU",     "Track p_{T} vs. N_{layer}^{MAPS}",     nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNInt_PU     = new TH2D("hTrackPtVsNInt_PU",     "Track p_{T} vs. N_{layer}^{INTT}",     nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNTpc_PU     = new TH2D("hTrackPtVsNTpc_PU",     "Track p_{T} vs. N_{layer}^{TPC}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNTot_PU     = new TH2D("hTrackPtVsNTot_PU",     "Track p_{T} vs. N_{layer}^{tot}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsPerMms_PU   = new TH2D("hTrackPtVsPerMms_PU",   "Track p_{T} vs. r_{MMS}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerMap_PU   = new TH2D("hTrackPtVsPerMap_PU",   "Track p_{T} vs. r_{MAPS}",             nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerInt_PU   = new TH2D("hTrackPtVsPerInt_PU",   "Track p_{T} vs. r_{INTT}",             nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerTpc_PU   = new TH2D("hTrackPtVsPerTpc_PU",   "Track p_{T} vs. r_{TPC}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -739,10 +763,12 @@ void STrackCutStudy::InitHists() {
   hDeltaPhiVsTrkPt_PU   = new TH2D("hDeltaPhiVsTrkPt_PU",   "#phi^{trk} \%-error vs. track p_{T}",  nPtBins,   rPtBins[0],   rPtBins[1],   nErrBins,  rErrBins[0],  rErrBins[1]);
   hDeltaPtVsTrkPt_PU    = new TH2D("hDeltaPtVsTrkPt_PU",    "p_{T}^{trk} \%-error vs. track p_{T}", nPtBins,   rPtBins[0],   rPtBins[1],   nErrBins,  rErrBins[0],  rErrBins[1]);
   // embed-only errors
+  hTrackNMms            -> Sumw2();
   hTrackNMap            -> Sumw2();
   hTrackNInt            -> Sumw2();
   hTrackNTpc            -> Sumw2();
   hTrackNTot            -> Sumw2();
+  hTrackPerMms          -> Sumw2();
   hTrackPerMap          -> Sumw2();
   hTrackPerInt          -> Sumw2();
   hTrackPerTpc          -> Sumw2();
@@ -758,10 +784,12 @@ void STrackCutStudy::InitHists() {
   hDeltaEta             -> Sumw2();
   hDeltaPhi             -> Sumw2();
   hDeltaPt              -> Sumw2();
+  hTrackPtVsNMms        -> Sumw2();
   hTrackPtVsNMap        -> Sumw2();
   hTrackPtVsNInt        -> Sumw2();
   hTrackPtVsNTpc        -> Sumw2();
   hTrackPtVsNTot        -> Sumw2();
+  hTrackPtVsPerMms      -> Sumw2();
   hTrackPtVsPerMap      -> Sumw2();
   hTrackPtVsPerInt      -> Sumw2();
   hTrackPtVsPerTpc      -> Sumw2();
@@ -774,6 +802,7 @@ void STrackCutStudy::InitHists() {
   hDeltaEtaVsTrkPt      -> Sumw2();
   hDeltaPhiVsTrkPt      -> Sumw2();
   hDeltaPtVsTrkPt       -> Sumw2();
+  hTruthNMms            -> Sumw2();
   hTruthNMap            -> Sumw2();
   hTruthNInt            -> Sumw2();
   hTruthNTpc            -> Sumw2();
@@ -790,6 +819,7 @@ void STrackCutStudy::InitHists() {
   hFracVsTruthEta       -> Sumw2();
   hFracVsTruthPhi       -> Sumw2();
   hFracVsTruthPt        -> Sumw2();
+  hTruthPtVsNMms        -> Sumw2();
   hTruthPtVsNMap        -> Sumw2();
   hTruthPtVsNInt        -> Sumw2();
   hTruthPtVsNTpc        -> Sumw2();
@@ -802,6 +832,7 @@ void STrackCutStudy::InitHists() {
   hDeltaEtaVsTruPt      -> Sumw2();
   hDeltaPhiVsTruPt      -> Sumw2();
   hDeltaPtVsTruPt       -> Sumw2();
+  hWeirdNMms            -> Sumw2();
   hWeirdNMap            -> Sumw2();
   hWeirdNInt            -> Sumw2();
   hWeirdNTpc            -> Sumw2();
@@ -822,10 +853,12 @@ void STrackCutStudy::InitHists() {
   hWeirdDeltaPhi        -> Sumw2();
   hWeirdDeltaPt         -> Sumw2();
   // with-pileup errors
+  hTrackNMms_PU         -> Sumw2();
   hTrackNMap_PU         -> Sumw2();
   hTrackNInt_PU         -> Sumw2();
   hTrackNTpc_PU         -> Sumw2();
   hTrackNTot_PU         -> Sumw2();
+  hTrackPerMms_PU       -> Sumw2();
   hTrackPerMap_PU       -> Sumw2();
   hTrackPerInt_PU       -> Sumw2();
   hTrackPerTpc_PU       -> Sumw2();
@@ -841,10 +874,12 @@ void STrackCutStudy::InitHists() {
   hDeltaEta_PU          -> Sumw2();
   hDeltaPhi_PU          -> Sumw2();
   hDeltaPt_PU           -> Sumw2();
+  hTrackPtVsNMms_PU     -> Sumw2();
   hTrackPtVsNMap_PU     -> Sumw2();
   hTrackPtVsNInt_PU     -> Sumw2();
   hTrackPtVsNTpc_PU     -> Sumw2();
   hTrackPtVsNTot_PU     -> Sumw2();
+  hTrackPtVsPerMms_PU   -> Sumw2();
   hTrackPtVsPerMap_PU   -> Sumw2();
   hTrackPtVsPerInt_PU   -> Sumw2();
   hTrackPtVsPerTpc_PU   -> Sumw2();
@@ -880,15 +915,17 @@ void STrackCutStudy::SetHistStyles() {
 
   // generic axis titles
   TString sCount("counts");
-  TString sPerMap("r_{MAPS} = N_{hit/trk}^{MAPS} / N_{hit/truth}^{MAPS}");
-  TString sPerInt("r_{INTT} = N_{hit/trk}^{INTT} / N_{hit/truth}^{INTT}");
-  TString sPerTpc("r_{TPC} = N_{hit/trk}^{TPC} / N_{hit/truth}^{TPC}");
-  TString sPerTot("r_{tot} = N_{hit/trk}^{tot} / N_{hit/truth}^{tot}");
+  TString sPerMms("r_{MMS} = N_{layer/trk}^{MMS} / N_{layer/truth}^{MMS}");
+  TString sPerMap("r_{MAPS} = N_{layer/trk}^{MAPS} / N_{layer/truth}^{MAPS}");
+  TString sPerInt("r_{INTT} = N_{layer/trk}^{INTT} / N_{layer/truth}^{INTT}");
+  TString sPerTpc("r_{TPC} = N_{layer/trk}^{TPC} / N_{layer/truth}^{TPC}");
+  TString sPerTot("r_{tot} = N_{layer/trk}^{tot} / N_{layer/truth}^{tot}");
   // track specific axis titles
-  TString sTrkNMap("N_{hit}^{MAPS}");
-  TString sTrkNInt("N_{hit}^{INTT}");
-  TString sTrkNTpc("N_{hit}^{TPC}");
-  TString sTrkNTot("N_{hit}^{tot}");
+  TString sTrkNMms("N_{layer}^{MMS}");
+  TString sTrkNMap("N_{layer}^{MAPS}");
+  TString sTrkNInt("N_{layer}^{INTT}");
+  TString sTrkNTpc("N_{layer}^{TPC}");
+  TString sTrkNTot("N_{layer}^{tot}");
   TString sTrkQuality("#chi^{2}/ndf");
   TString sTrkDCAxy("DCA_{xy} [mm]");
   TString sTrkDCAz("DCA_{z} [mm]");
@@ -901,10 +938,11 @@ void STrackCutStudy::SetHistStyles() {
   TString sDeltaPhi("#Delta#phi^{trk} / #phi^{trk}");
   TString sDeltaPt("#Deltap_{T}^{trk} / p_{T}^{trk}");
   // truth specific axis titles
-  TString sTruNMap("N_{hit}^{MAPS}");
-  TString sTruNInt("N_{hit}^{INTT}");
-  TString sTruNTpc("N_{hit}^{TPC}");
-  TString sTruNTot("N_{hit}^{tot}");
+  TString sTruNMms("N_{layer}^{MMS}");
+  TString sTruNMap("N_{layer}^{MAPS}");
+  TString sTruNInt("N_{layer}^{INTT}");
+  TString sTruNTpc("N_{layer}^{TPC}");
+  TString sTruNTot("N_{layer}^{tot}");
   TString sTruEta("#eta^{truth}");
   TString sTruPhi("#phi^{truth}");
   TString sTruPt("p_{T}^{truth} [GeV/c]");
@@ -913,6 +951,19 @@ void STrackCutStudy::SetHistStyles() {
   TString sFracPt("#deltap_{T}^{trk} = p_{T}^{trk} / p_{T}^{truth}");
 
   // set embed-only track histogram styles
+  hTrackNMms            -> SetMarkerColor(fColTrk);
+  hTrackNMms            -> SetMarkerStyle(fMarTrk);
+  hTrackNMms            -> SetLineColor(fColTrk);
+  hTrackNMms            -> SetLineStyle(fLin);
+  hTrackNMms            -> SetFillColor(fColTrk);
+  hTrackNMms            -> SetFillStyle(fFil);
+  hTrackNMms            -> SetTitleFont(FTxt);
+  hTrackNMms            -> GetXaxis() -> SetTitle(sTrkNMms.Data());
+  hTrackNMms            -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackNMms            -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackNMms            -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackNMms            -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackNMms            -> GetYaxis() -> SetTitleOffset(fOffY);
   hTrackNMap            -> SetMarkerColor(fColTrk);
   hTrackNMap            -> SetMarkerStyle(fMarTrk);
   hTrackNMap            -> SetLineColor(fColTrk);
@@ -965,6 +1016,19 @@ void STrackCutStudy::SetHistStyles() {
   hTrackNTot            -> GetYaxis() -> SetTitle(sCount.Data());
   hTrackNTot            -> GetYaxis() -> SetTitleFont(FTxt);
   hTrackNTot            -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPerMms          -> SetMarkerColor(fColTrk);
+  hTrackPerMms          -> SetMarkerStyle(fMarTrk);
+  hTrackPerMms          -> SetLineColor(fColTrk);
+  hTrackPerMms          -> SetLineStyle(fLin);
+  hTrackPerMms          -> SetFillColor(fColTrk);
+  hTrackPerMms          -> SetFillStyle(fFil);
+  hTrackPerMms          -> SetTitleFont(FTxt);
+  hTrackPerMms          -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPerMms          -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPerMms          -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPerMms          -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackPerMms          -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPerMms          -> GetYaxis() -> SetTitleOffset(fOffY);
   hTrackPerMap          -> SetMarkerColor(fColTrk);
   hTrackPerMap          -> SetMarkerStyle(fMarTrk);
   hTrackPerMap          -> SetLineColor(fColTrk);
@@ -1159,6 +1223,22 @@ void STrackCutStudy::SetHistStyles() {
   hDeltaPt              -> GetYaxis() -> SetTitle(sCount.Data());
   hDeltaPt              -> GetYaxis() -> SetTitleFont(FTxt);
   hDeltaPt              -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsNMms        -> SetMarkerColor(fColTrk);
+  hTrackPtVsNMms        -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsNMms        -> SetLineColor(fColTrk);
+  hTrackPtVsNMms        -> SetLineStyle(fLin);
+  hTrackPtVsNMms        -> SetFillColor(fColTrk);
+  hTrackPtVsNMms        -> SetFillStyle(fFil);
+  hTrackPtVsNMms        -> SetTitleFont(FTxt);
+  hTrackPtVsNMms        -> GetXaxis() -> SetTitle(sTrkNMms.Data());
+  hTrackPtVsNMms        -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNMms        -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsNMms        -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsNMms        -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNMms        -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsNMms        -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsNMms        -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNMms        -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTrackPtVsNMap        -> SetMarkerColor(fColTrk);
   hTrackPtVsNMap        -> SetMarkerStyle(fMarTrk);
   hTrackPtVsNMap        -> SetLineColor(fColTrk);
@@ -1223,6 +1303,22 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsNTot        -> GetZaxis() -> SetTitle(sCount.Data());
   hTrackPtVsNTot        -> GetZaxis() -> SetTitleFont(FTxt);
   hTrackPtVsNTot        -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTrackPtVsPerMms      -> SetMarkerColor(fColTrk);
+  hTrackPtVsPerMms      -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsPerMms      -> SetLineColor(fColTrk);
+  hTrackPtVsPerMms      -> SetLineStyle(fLin);
+  hTrackPtVsPerMms      -> SetFillColor(fColTrk);
+  hTrackPtVsPerMms      -> SetFillStyle(fFil);
+  hTrackPtVsPerMms      -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms      -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPtVsPerMms      -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms      -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsPerMms      -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsPerMms      -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms      -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsPerMms      -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsPerMms      -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms      -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTrackPtVsPerMap      -> SetMarkerColor(fColTrk);
   hTrackPtVsPerMap      -> SetMarkerStyle(fMarTrk);
   hTrackPtVsPerMap      -> SetLineColor(fColTrk);
@@ -1416,6 +1512,19 @@ void STrackCutStudy::SetHistStyles() {
   hDeltaPtVsTrkPt       -> GetZaxis() -> SetTitleFont(FTxt);
   hDeltaPtVsTrkPt       -> GetZaxis() -> SetTitleOffset(fOffZ);
   // set embed-only truth histogram styles
+  hTruthNMms            -> SetMarkerColor(fColTru);
+  hTruthNMms            -> SetMarkerStyle(fMarTru);
+  hTruthNMms            -> SetLineColor(fColTru);
+  hTruthNMms            -> SetLineStyle(fLin);
+  hTruthNMms            -> SetFillColor(fColTru);
+  hTruthNMms            -> SetFillStyle(fFil);
+  hTruthNMms            -> SetTitleFont(FTxt);
+  hTruthNMms            -> GetXaxis() -> SetTitle(sTruNMms.Data());
+  hTruthNMms            -> GetXaxis() -> SetTitleFont(FTxt);
+  hTruthNMms            -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTruthNMms            -> GetYaxis() -> SetTitle(sCount.Data());
+  hTruthNMms            -> GetYaxis() -> SetTitleFont(FTxt);
+  hTruthNMms            -> GetYaxis() -> SetTitleOffset(fOffY);
   hTruthNMap            -> SetMarkerColor(fColTru);
   hTruthNMap            -> SetMarkerStyle(fMarTru);
   hTruthNMap            -> SetLineColor(fColTru);
@@ -1642,6 +1751,22 @@ void STrackCutStudy::SetHistStyles() {
   hFracVsTruthPt        -> GetZaxis() -> SetTitle(sCount.Data());
   hFracVsTruthPt        -> GetZaxis() -> SetTitleFont(FTxt);
   hFracVsTruthPt        -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTruthPtVsNMms        -> SetMarkerColor(fColTru);
+  hTruthPtVsNMms        -> SetMarkerStyle(fMarTru);
+  hTruthPtVsNMms        -> SetLineColor(fColTru);
+  hTruthPtVsNMms        -> SetLineStyle(fLin);
+  hTruthPtVsNMms        -> SetFillColor(fColTru);
+  hTruthPtVsNMms        -> SetFillStyle(fFil);
+  hTruthPtVsNMms        -> SetTitleFont(FTxt);
+  hTruthPtVsNMms        -> GetXaxis() -> SetTitle(sTruNMms.Data());
+  hTruthPtVsNMms        -> GetXaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsNMms        -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTruthPtVsNMms        -> GetYaxis() -> SetTitle(sTruPt.Data());
+  hTruthPtVsNMms        -> GetYaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsNMms        -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTruthPtVsNMms        -> GetZaxis() -> SetTitle(sCount.Data());
+  hTruthPtVsNMms        -> GetZaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsNMms        -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTruthPtVsNMap        -> SetMarkerColor(fColTru);
   hTruthPtVsNMap        -> SetMarkerStyle(fMarTru);
   hTruthPtVsNMap        -> SetLineColor(fColTru);
@@ -1835,6 +1960,19 @@ void STrackCutStudy::SetHistStyles() {
   hDeltaPtVsTruPt       -> GetZaxis() -> SetTitleFont(FTxt);
   hDeltaPtVsTruPt       -> GetZaxis() -> SetTitleOffset(fOffZ);
   // set embed-only weird histogram styles
+  hWeirdNMms            -> SetMarkerColor(fColOdd);
+  hWeirdNMms            -> SetMarkerStyle(fMarOdd);
+  hWeirdNMms            -> SetLineColor(fColOdd);
+  hWeirdNMms            -> SetLineStyle(fLin);
+  hWeirdNMms            -> SetFillColor(fColOdd);
+  hWeirdNMms            -> SetFillStyle(fFil);
+  hWeirdNMms            -> SetTitleFont(FTxt);
+  hWeirdNMms            -> GetXaxis() -> SetTitle(sTrkNMms.Data());
+  hWeirdNMms            -> GetXaxis() -> SetTitleFont(FTxt);
+  hWeirdNMms            -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdNMms            -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdNMms            -> GetYaxis() -> SetTitleFont(FTxt);
+  hWeirdNMms            -> GetYaxis() -> SetTitleOffset(fOffY);
   hWeirdNMap            -> SetMarkerColor(fColOdd);
   hWeirdNMap            -> SetMarkerStyle(fMarOdd);
   hWeirdNMap            -> SetLineColor(fColOdd);
@@ -1887,6 +2025,19 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdNTot            -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdNTot            -> GetYaxis() -> SetTitleFont(FTxt);
   hWeirdNTot            -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdPerMms          -> SetMarkerColor(fColOdd);
+  hWeirdPerMms          -> SetMarkerStyle(fMarOdd);
+  hWeirdPerMms          -> SetLineColor(fColOdd);
+  hWeirdPerMms          -> SetLineStyle(fLin);
+  hWeirdPerMms          -> SetFillColor(fColOdd);
+  hWeirdPerMms          -> SetFillStyle(fFil);
+  hWeirdPerMms          -> SetTitleFont(FTxt);
+  hWeirdPerMms          -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hWeirdPerMms          -> GetXaxis() -> SetTitleFont(FTxt);
+  hWeirdPerMms          -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdPerMms          -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdPerMms          -> GetYaxis() -> SetTitleFont(FTxt);
+  hWeirdPerMms          -> GetYaxis() -> SetTitleOffset(fOffY);
   hWeirdPerMap          -> SetMarkerColor(fColOdd);
   hWeirdPerMap          -> SetMarkerStyle(fMarOdd);
   hWeirdPerMap          -> SetLineColor(fColOdd);
@@ -2082,6 +2233,19 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdDeltaPt         -> GetYaxis() -> SetTitleFont(FTxt);
   hWeirdDeltaPt         -> GetYaxis() -> SetTitleOffset(fOffY);
   // set with-pileup track histogram styles
+  hTrackNMms_PU         -> SetMarkerColor(fColTrk);
+  hTrackNMms_PU         -> SetMarkerStyle(fMarTrk);
+  hTrackNMms_PU         -> SetLineColor(fColTrk);
+  hTrackNMms_PU         -> SetLineStyle(fLin);
+  hTrackNMms_PU         -> SetFillColor(fColTrk);
+  hTrackNMms_PU         -> SetFillStyle(fFil);
+  hTrackNMms_PU         -> SetTitleFont(FTxt);
+  hTrackNMms_PU         -> GetXaxis() -> SetTitle(sTrkNMms.Data());
+  hTrackNMms_PU         -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackNMms_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackNMms_PU         -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackNMms_PU         -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackNMms_PU         -> GetYaxis() -> SetTitleOffset(fOffY);
   hTrackNMap_PU         -> SetMarkerColor(fColTrk);
   hTrackNMap_PU         -> SetMarkerStyle(fMarTrk);
   hTrackNMap_PU         -> SetLineColor(fColTrk);
@@ -2134,6 +2298,19 @@ void STrackCutStudy::SetHistStyles() {
   hTrackNTot_PU         -> GetYaxis() -> SetTitle(sCount.Data());
   hTrackNTot_PU         -> GetYaxis() -> SetTitleFont(FTxt);
   hTrackNTot_PU         -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPerMms_PU       -> SetMarkerColor(fColTrk);
+  hTrackPerMms_PU       -> SetMarkerStyle(fMarTrk);
+  hTrackPerMms_PU       -> SetLineColor(fColTrk);
+  hTrackPerMms_PU       -> SetLineStyle(fLin);
+  hTrackPerMms_PU       -> SetFillColor(fColTrk);
+  hTrackPerMms_PU       -> SetFillStyle(fFil);
+  hTrackPerMms_PU       -> SetTitleFont(FTxt);
+  hTrackPerMms_PU       -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPerMms_PU       -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPerMms_PU       -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPerMms_PU       -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackPerMms_PU       -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPerMms_PU       -> GetYaxis() -> SetTitleOffset(fOffY);
   hTrackPerMap_PU       -> SetMarkerColor(fColTrk);
   hTrackPerMap_PU       -> SetMarkerStyle(fMarTrk);
   hTrackPerMap_PU       -> SetLineColor(fColTrk);
@@ -2328,6 +2505,22 @@ void STrackCutStudy::SetHistStyles() {
   hDeltaPt_PU           -> GetYaxis() -> SetTitle(sCount.Data());
   hDeltaPt_PU           -> GetYaxis() -> SetTitleFont(FTxt);
   hDeltaPt_PU           -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsNMms_PU     -> SetMarkerColor(fColTrk);
+  hTrackPtVsNMms_PU     -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsNMms_PU     -> SetLineColor(fColTrk);
+  hTrackPtVsNMms_PU     -> SetLineStyle(fLin);
+  hTrackPtVsNMms_PU     -> SetFillColor(fColTrk);
+  hTrackPtVsNMms_PU     -> SetFillStyle(fFil);
+  hTrackPtVsNMms_PU     -> SetTitleFont(FTxt);
+  hTrackPtVsNMms_PU     -> GetXaxis() -> SetTitle(sTrkNMms.Data());
+  hTrackPtVsNMms_PU     -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNMms_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsNMms_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsNMms_PU     -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNMms_PU     -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsNMms_PU     -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsNMms_PU     -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNMms_PU     -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTrackPtVsNMap_PU     -> SetMarkerColor(fColTrk);
   hTrackPtVsNMap_PU     -> SetMarkerStyle(fMarTrk);
   hTrackPtVsNMap_PU     -> SetLineColor(fColTrk);
@@ -2392,6 +2585,22 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsNTot_PU     -> GetZaxis() -> SetTitle(sCount.Data());
   hTrackPtVsNTot_PU     -> GetZaxis() -> SetTitleFont(FTxt);
   hTrackPtVsNTot_PU     -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTrackPtVsPerMms_PU   -> SetMarkerColor(fColTrk);
+  hTrackPtVsPerMms_PU   -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsPerMms_PU   -> SetLineColor(fColTrk);
+  hTrackPtVsPerMms_PU   -> SetLineStyle(fLin);
+  hTrackPtVsPerMms_PU   -> SetFillColor(fColTrk);
+  hTrackPtVsPerMms_PU   -> SetFillStyle(fFil);
+  hTrackPtVsPerMms_PU   -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms_PU   -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPtVsPerMms_PU   -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms_PU   -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsPerMms_PU   -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsPerMms_PU   -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms_PU   -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsPerMms_PU   -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsPerMms_PU   -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsPerMms_PU   -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTrackPtVsPerMap_PU   -> SetMarkerColor(fColTrk);
   hTrackPtVsPerMap_PU   -> SetMarkerStyle(fMarTrk);
   hTrackPtVsPerMap_PU   -> SetLineColor(fColTrk);
@@ -2687,6 +2896,18 @@ void STrackCutStudy::CreatePlots(){
   const TString sTrkVsTruPanels[NPanel]    = {"pTrack",  "pTruth"};
 
   // make embed-only 1d plots
+  TCanvas *cNMms = new TCanvas("cNMms", "", fWidth1P, fHeight1P);
+  cNMms      -> cd();
+  hTrackNMms -> Draw();
+  hTruthNMms -> Draw("same");
+  hWeirdNMms -> Draw("same");
+  odd        -> Draw();
+  txtEO      -> Draw();
+  fOut       -> cd();
+  cNMms      -> Write();
+  cNMms      -> Close();
+
+  // make embed-only 1d plots
   TCanvas *cNMap = new TCanvas("cNMap", "", fWidth1P, fHeight1P);
   cNMap      -> cd();
   hTrackNMap -> Draw();
@@ -2835,6 +3056,21 @@ void STrackCutStudy::CreatePlots(){
   cDeltaPt      -> Close();
 
   // make embed-only 2d plots
+  TCanvas *cPerMms   = new TCanvas("cPerMms", "", fWidth2P, fHeight2P);
+  TPad    *pPerMms1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pPerMms2D = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cPerMms          -> cd();
+  pPerMms1D        -> Draw();
+  pPerMms2D        -> Draw();
+  pPerMms1D        -> cd();
+  hTrackPerMms     -> Draw();
+  txtEO            -> Draw();
+  pPerMms2D        -> cd();
+  hTrackPtVsPerMms -> Draw("colz");
+  fOut             -> cd();
+  cPerMms          -> Write();
+  cPerMms          -> Close();
+
   TCanvas *cPerMap   = new TCanvas("cPerMap", "", fWidth2P, fHeight2P);
   TPad    *pPerMap1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
   TPad    *pPerMap2D = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
@@ -3140,6 +3376,21 @@ void STrackCutStudy::CreatePlots(){
   cTruPtVsDCAz   -> Write();
   cTruPtVsDCAz   -> Close();
 
+  TCanvas *cTruPtVsNMms   = new TCanvas("cTruPtVsNMms", "", fWidth2P, fHeight2P);
+  TPad    *pTruPtVsNMms1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pTruPtVsNMms2D = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cTruPtVsNMms   -> cd();
+  pTruPtVsNMms1D -> Draw();
+  pTruPtVsNMms2D -> Draw();
+  pTruPtVsNMms1D -> cd();
+  hTrackNMms     -> Draw();
+  txtEO          -> Draw();
+  pTruPtVsNMms2D -> cd();
+  hTruthPtVsNMms -> Draw("colz");
+  fOut           -> cd();
+  cTruPtVsNMms   -> Write();
+  cTruPtVsNMms   -> Close();
+
   TCanvas *cTruPtVsNMap   = new TCanvas("cTruPtVsNMap", "", fWidth2P, fHeight2P);
   TPad    *pTruPtVsNMap1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
   TPad    *pTruPtVsNMap2D = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
@@ -3291,6 +3542,14 @@ void STrackCutStudy::CreatePlots(){
   cDeltaPtVsTruPt   -> Close();
 
   // make with-pileup 1d plots
+  TCanvas *cNMms_PU = new TCanvas("cNMmsWithPileup", "", fWidth1P, fHeight1P);
+  cNMms_PU      -> cd();
+  hTrackNMms_PU -> Draw();
+  txtPU         -> Draw();
+  fOut          -> cd();
+  cNMms_PU      -> Write();
+  cNMms_PU      -> Close();
+
   TCanvas *cNMap_PU = new TCanvas("cNMapWithPileup", "", fWidth1P, fHeight1P);
   cNMap_PU      -> cd();
   hTrackNMap_PU -> Draw();
@@ -3404,6 +3663,21 @@ void STrackCutStudy::CreatePlots(){
   cDeltaPt_PU -> Close();
 
   // make embed-only 2d plots
+  TCanvas *cPerMms_PU   = new TCanvas("cPerMmsWithPileup", "", fWidth2P, fHeight2P);
+  TPad    *pPerMms1D_PU = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pPerMms2D_PU = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cPerMms_PU          -> cd();
+  pPerMms1D_PU        -> Draw();
+  pPerMms2D_PU        -> Draw();
+  pPerMms1D_PU        -> cd();
+  hTrackPerMms_PU     -> Draw();
+  txtPU               -> Draw();
+  pPerMms2D_PU        -> cd();
+  hTrackPtVsPerMms_PU -> Draw("colz");
+  fOut                -> cd();
+  cPerMms_PU          -> Write();
+  cPerMms_PU          -> Close();
+
   TCanvas *cPerMap_PU   = new TCanvas("cPerMapWithPileup", "", fWidth2P, fHeight2P);
   TPad    *pPerMap1D_PU = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
   TPad    *pPerMap2D_PU = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 

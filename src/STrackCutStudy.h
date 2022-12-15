@@ -99,10 +99,12 @@ class STrackCutStudy {
     TNtuple *ntTrkPU;
 
     // embed-only track output histograms
+    TH1D *hTrackNMms;
     TH1D *hTrackNMap;
     TH1D *hTrackNInt;
     TH1D *hTrackNTpc;
     TH1D *hTrackNTot;
+    TH1D *hTrackPerMms;
     TH1D *hTrackPerMap;
     TH1D *hTrackPerInt;
     TH1D *hTrackPerTpc;
@@ -118,10 +120,12 @@ class STrackCutStudy {
     TH1D *hDeltaEta;
     TH1D *hDeltaPhi;
     TH1D *hDeltaPt;
+    TH2D *hTrackPtVsNMms;
     TH2D *hTrackPtVsNMap;
     TH2D *hTrackPtVsNInt;
     TH2D *hTrackPtVsNTpc;
     TH2D *hTrackPtVsNTot;
+    TH2D *hTrackPtVsPerMms;
     TH2D *hTrackPtVsPerMap;
     TH2D *hTrackPtVsPerInt;
     TH2D *hTrackPtVsPerTpc;
@@ -136,6 +140,7 @@ class STrackCutStudy {
     TH2D *hDeltaPtVsTrkPt;
 
     // embed-only truth output histograms
+    TH1D *hTruthNMms;
     TH1D *hTruthNMap;
     TH1D *hTruthNInt;
     TH1D *hTruthNTpc;
@@ -152,6 +157,7 @@ class STrackCutStudy {
     TH2D *hFracVsTruthEta;
     TH2D *hFracVsTruthPhi;
     TH2D *hFracVsTruthPt;
+    TH2D *hTruthPtVsNMms;
     TH2D *hTruthPtVsNMap;
     TH2D *hTruthPtVsNInt;
     TH2D *hTruthPtVsNTpc;
@@ -166,10 +172,12 @@ class STrackCutStudy {
     TH2D *hDeltaPtVsTruPt;
 
     // embed-only weird output histograms
+    TH1D *hWeirdNMms;
     TH1D *hWeirdNMap;
     TH1D *hWeirdNInt;
     TH1D *hWeirdNTpc;
     TH1D *hWeirdNTot;
+    TH1D *hWeirdPerMms;
     TH1D *hWeirdPerMap;
     TH1D *hWeirdPerInt;
     TH1D *hWeirdPerTpc;
@@ -187,10 +195,12 @@ class STrackCutStudy {
     TH1D *hWeirdDeltaPt;
 
     // declare with-pileup track histograms
+    TH1D *hTrackNMms_PU;
     TH1D *hTrackNMap_PU;
     TH1D *hTrackNInt_PU;
     TH1D *hTrackNTpc_PU;
     TH1D *hTrackNTot_PU;
+    TH1D *hTrackPerMms_PU;
     TH1D *hTrackPerMap_PU;
     TH1D *hTrackPerInt_PU;
     TH1D *hTrackPerTpc_PU;
@@ -206,10 +216,12 @@ class STrackCutStudy {
     TH1D *hDeltaEta_PU;
     TH1D *hDeltaPhi_PU;
     TH1D *hDeltaPt_PU;
+    TH2D *hTrackPtVsNMms_PU;
     TH2D *hTrackPtVsNMap_PU;
     TH2D *hTrackPtVsNInt_PU;
     TH2D *hTrackPtVsNTpc_PU;
     TH2D *hTrackPtVsNTot_PU;
+    TH2D *hTrackPtVsPerMms_PU;
     TH2D *hTrackPtVsPerMap_PU;
     TH2D *hTrackPtVsPerInt_PU;
     TH2D *hTrackPtVsPerTpc_PU;

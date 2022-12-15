@@ -86,7 +86,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_EmbedScanOff(
   // Further choose to embed newly simulated events to a previous simulation. Not compatible with `readhits = true`
   // In case embedding into a production output, please double check your G4Setup_sPHENIX.C and G4_*.C consistent with those in the production macro folder
   // E.g. /sphenix/sim//sim01/production/2016-07-21/single_particle/spacal2d/
-  //  Input::EMBED = true;
+  Input::EMBED = true;
   INPUTEMBED::filename[0] = embed_input_file;
   // if you use a filelist
   //INPUTEMBED::listfile[0] = embed_input_file;
@@ -556,7 +556,6 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_EmbedScanOff(
 
     // create output name
     const std::string svtxOutput = outputroot + "_g4svtx_eval.root";
-    std::cout << "CHECK0: output = " << svtxOutput << std::endl; 
 
     // instantiate tracking evaluator
     SvtxEvaluator* eval;
@@ -567,8 +566,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_EmbedScanOff(
                              G4MICROMEGAS::n_micromegas_layer);
 
     // turn on evaluations
-    eval -> do_cluster_eval(true);
-    eval -> do_g4hit_eval(true);
+    eval -> do_cluster_eval(false);
+    eval -> do_g4hit_eval(false);
     eval -> do_hit_eval(true);  // enable to see the hits that includes the chamber physics...
     eval -> do_gpoint_eval(true);
     eval -> do_vtx_eval_light(true);
@@ -582,7 +581,6 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_EmbedScanOff(
     }
     eval -> scan_for_embedded(embed_scan);   // take all tracks if false - take only embedded tracks if true
     eval -> scan_for_primaries(embed_scan);  // defaults to only thrown particles for ntp_gtrack
-    cout << "CHECK1: embed_scan = " << embed_scan << endl;
 
     // announce pp mode selection
     std::cout << "SvtxEvaluator: pp_mode set to " << TRACKING::pp_mode << " and scan_for_embedded set to " << embed_scan << std::endl;

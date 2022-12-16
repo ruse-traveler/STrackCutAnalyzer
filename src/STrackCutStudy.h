@@ -34,8 +34,8 @@ using namespace std;
 // global constants
 static const Ssiz_t NVtx(4);
 static const Ssiz_t NTxt(3);
-static const Ssiz_t NTyp(4);
-static const Ssiz_t NVar(18);
+static const Ssiz_t NTyp(6);
+static const Ssiz_t NVar(24);
 static const Ssiz_t NRange(2);
 static const Ssiz_t NPanel(2);
 static const UInt_t FTxt(42);
@@ -49,30 +49,38 @@ class STrackCutStudy {
     // enums
     // TODO: streamline histogram declarations, styling, and saving
     enum VARIABLE {
-      NMMS  = 0,
-      NMAP  = 1,
-      NINT  = 2,
-      NTPC  = 3,
-      NTOT  = 4,
-      CHISQ = 5,
-      NDF   = 6,
-      QUAL  = 7,
-      DCAT  = 8,
-      DCAZ  = 9,
-      PHI   = 10,
-      ETA   = 11,
-      PT    = 12,
-      DDCAT = 13,
-      DDCAZ = 14,
-      DPHI  = 15,
-      DETA  = 16,
-      DPT   = 17
+      NMMS    = 0,
+      NMAP    = 1,
+      NINT    = 2,
+      NTPC    = 3,
+      NTOT    = 4,
+      CHISQ   = 5,
+      NDF     = 6,
+      QUAL    = 7,
+      DCAXY   = 8,
+      DCAZ    = 9,
+      PHI     = 10,
+      ETA     = 11,
+      PT      = 12,
+      DDCAXY  = 13,
+      DDCAZ   = 14,
+      DPHI    = 15,
+      DETA    = 16,
+      DPT     = 17,
+      PHIFRAC = 18,
+      ETAFRAC = 19,
+      PTFRAC  = 20,
+      PHIDIFF = 21,
+      ETADIFF = 22,
+      PTDIFF  = 23
     };
     enum TYPE {
-      TRACK  = 0,
-      TRUTH  = 1,
-      WEIRD  = 2,
-      PILEUP = 3
+      TRACK   = 0,
+      TRUTH   = 1,
+      WEIRD   = 2,
+      PILEUP  = 3,
+      PRIMARY = 4,
+      NONPRIM = 5
     };
 
     // ctor/dtor
@@ -211,7 +219,7 @@ class STrackCutStudy {
     TH1D *hWeirdDeltaPhi;
     TH1D *hWeirdDeltaPt;
 
-    // declare with-pileup track histograms
+    // with-pileup track histograms
     TH1D *hTrackNMms_PU;
     TH1D *hTrackNMap_PU;
     TH1D *hTrackNInt_PU;
@@ -255,6 +263,96 @@ class STrackCutStudy {
     TH2D *hDeltaEtaVsTrkPt_PU;
     TH2D *hDeltaPhiVsTrkPt_PU;
     TH2D *hDeltaPtVsTrkPt_PU;
+
+    // with-pileup primary histograms
+    TH1D *hPrimaryNMms_PU;
+    TH1D *hPrimaryNMap_PU;
+    TH1D *hPrimaryNInt_PU;
+    TH1D *hPrimaryNTpc_PU;
+    TH1D *hPrimaryNTot_PU;
+    TH1D *hPrimaryPerMms_PU;
+    TH1D *hPrimaryPerMap_PU;
+    TH1D *hPrimaryPerInt_PU;
+    TH1D *hPrimaryPerTpc_PU;
+    TH1D *hPrimaryPerTot_PU;
+    TH1D *hPrimaryChi2_PU;
+    TH1D *hPrimaryNDF_PU;
+    TH1D *hPrimaryQuality_PU;
+    TH1D *hPrimaryDCAxy_PU;
+    TH1D *hPrimaryDCAz_PU;
+    TH1D *hPrimaryEta_PU;
+    TH1D *hPrimaryPhi_PU;
+    TH1D *hPrimaryPt_PU;
+    TH1D *hDeltaPrimDCAxy_PU;
+    TH1D *hDeltaPrimDCAz_PU;
+    TH1D *hDeltaPrimEta_PU;
+    TH1D *hDeltaPrimPhi_PU;
+    TH1D *hDeltaPrimPt_PU;
+    TH2D *hPrimaryPtVsNMms_PU;
+    TH2D *hPrimaryPtVsNMap_PU;
+    TH2D *hPrimaryPtVsNInt_PU;
+    TH2D *hPrimaryPtVsNTpc_PU;
+    TH2D *hPrimaryPtVsNTot_PU;
+    TH2D *hPrimaryPtVsPerMms_PU;
+    TH2D *hPrimaryPtVsPerMap_PU;
+    TH2D *hPrimaryPtVsPerInt_PU;
+    TH2D *hPrimaryPtVsPerTpc_PU;
+    TH2D *hPrimaryPtVsPerTot_PU;
+    TH2D *hPrimaryPtVsChi2_PU;
+    TH2D *hPrimaryPtVsNDF_PU;
+    TH2D *hPrimaryPtVsQuality_PU;
+    TH2D *hPrimaryPtVsDCAxy_PU;
+    TH2D *hPrimaryPtVsDCAz_PU;
+    TH2D *hDeltaDCAxyVsPrimPt_PU;
+    TH2D *hDeltaDCAzVsPrimPt_PU;
+    TH2D *hDeltaEtaVsPrimPt_PU;
+    TH2D *hDeltaPhiVsPrimPt_PU;
+    TH2D *hDeltaPtVsPrimPt_PU;
+
+    // with-pileup non-primary histograms
+    TH1D *hNonPrimNMms_PU;
+    TH1D *hNonPrimNMap_PU;
+    TH1D *hNonPrimNInt_PU;
+    TH1D *hNonPrimNTpc_PU;
+    TH1D *hNonPrimNTot_PU;
+    TH1D *hNonPrimPerMms_PU;
+    TH1D *hNonPrimPerMap_PU;
+    TH1D *hNonPrimPerInt_PU;
+    TH1D *hNonPrimPerTpc_PU;
+    TH1D *hNonPrimPerTot_PU;
+    TH1D *hNonPrimChi2_PU;
+    TH1D *hNonPrimNDF_PU;
+    TH1D *hNonPrimQuality_PU;
+    TH1D *hNonPrimDCAxy_PU;
+    TH1D *hNonPrimDCAz_PU;
+    TH1D *hNonPrimEta_PU;
+    TH1D *hNonPrimPhi_PU;
+    TH1D *hNonPrimPt_PU;
+    TH1D *hDeltaNoPrDCAxy_PU;
+    TH1D *hDeltaNoPrDCAz_PU;
+    TH1D *hDeltaNoPrEta_PU;
+    TH1D *hDeltaNoPrPhi_PU;
+    TH1D *hDeltaNoPrPt_PU;
+    TH2D *hNonPrimPtVsNMms_PU;
+    TH2D *hNonPrimPtVsNMap_PU;
+    TH2D *hNonPrimPtVsNInt_PU;
+    TH2D *hNonPrimPtVsNTpc_PU;
+    TH2D *hNonPrimPtVsNTot_PU;
+    TH2D *hNonPrimPtVsPerMms_PU;
+    TH2D *hNonPrimPtVsPerMap_PU;
+    TH2D *hNonPrimPtVsPerInt_PU;
+    TH2D *hNonPrimPtVsPerTpc_PU;
+    TH2D *hNonPrimPtVsPerTot_PU;
+    TH2D *hNonPrimPtVsChi2_PU;
+    TH2D *hNonPrimPtVsNDF_PU;
+    TH2D *hNonPrimPtVsQuality_PU;
+    TH2D *hNonPrimPtVsDCAxy_PU;
+    TH2D *hNonPrimPtVsDCAz_PU;
+    TH2D *hDeltaDCAxyVsNoPrPt_PU;
+    TH2D *hDeltaDCAzVsNoPrPt_PU;
+    TH2D *hDeltaEtaVsNoPrPt_PU;
+    TH2D *hDeltaPhiVsNoPrPt_PU;
+    TH2D *hDeltaPtVsNoPrPt_PU;
 
     // calculation parameters
     Double_t weirdPtFracMin;

@@ -36,6 +36,8 @@ void DoTrackCutStudy() {
   const Double_t weirdPtFracMin(0.20);
   const Double_t weirdPtFracMax(1.20);
 
+  // TODO: add functions to specify applied cuts
+
   // run track cut study
   STrackCutStudy *study = new STrackCutStudy();
   study -> SetInputOutputFiles(sInFileEO, sInFilePU, sOutFile);

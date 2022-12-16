@@ -25,13 +25,14 @@ void DoTrackCutStudy() {
   gErrorIgnoreLevel = kWarning;
 
   // i/o parameters
-  const TString sOutFile("trackCutStudy.withPileup_hijing50khz.d5m12y2022.root");
+  const TString sOutFile("trackCutStudy.onlySinglePiM.d16m12y2022.root");
   const TString sInFileEO("input/merge/sPhenixG4_forTrackCutStudy_embedOnly0t199_g4svtxeval.d5m12y2022.root");
   const TString sInFilePU("input/merge/sPhenixG4_forTrackCutStudy_withPileup0t99_g4svtxeval.d5m12y2022.root");
   const TString sInTupleEO("ntp_track");
   const TString sInTuplePU("ntp_gtrack");
 
   // calculation parameters
+  // TODO: rename these to be more accurate
   const Double_t weirdPtFracMin(0.20);
   const Double_t weirdPtFracMax(1.20);
 

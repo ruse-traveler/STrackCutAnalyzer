@@ -35,7 +35,7 @@ using namespace std;
 static const Ssiz_t NVtx(4);
 static const Ssiz_t NTxt(3);
 static const Ssiz_t NTyp(4);
-static const Ssiz_t NVar(15);
+static const Ssiz_t NVar(18);
 static const Ssiz_t NRange(2);
 static const Ssiz_t NPanel(2);
 static const UInt_t FTxt(42);
@@ -49,21 +49,24 @@ class STrackCutStudy {
     // enums
     // TODO: streamline histogram declarations, styling, and saving
     enum VARIABLE {
-      NMAP  = 0,
-      NINT  = 1,
-      NTPC  = 2,
-      NTOT  = 3,
-      QUAL  = 4,
-      DCAT  = 5,
-      DCAZ  = 6,
-      PHI   = 7,
-      ETA   = 8,
-      PT    = 9,
-      DDCAT = 10,
-      DDCAZ = 11,
-      DPHI  = 12,
-      DETA  = 13,
-      DPT   = 14
+      NMMS  = 0,
+      NMAP  = 1,
+      NINT  = 2,
+      NTPC  = 3,
+      NTOT  = 4,
+      CHISQ = 5,
+      NDF   = 6,
+      QUAL  = 7,
+      DCAT  = 8,
+      DCAZ  = 9,
+      PHI   = 10,
+      ETA   = 11,
+      PT    = 12,
+      DDCAT = 13,
+      DDCAZ = 14,
+      DPHI  = 15,
+      DETA  = 16,
+      DPT   = 17
     };
     enum TYPE {
       TRACK  = 0,
@@ -155,12 +158,18 @@ class STrackCutStudy {
     TH1D *hTruthEtaFrac;
     TH1D *hTruthPhiFrac;
     TH1D *hTruthPtFrac;
+    TH1D *hTruthEtaDiff;
+    TH1D *hTruthPhiDiff;
+    TH1D *hTruthPtDiff;
     TH2D *hTruthVsTrackEta;
     TH2D *hTruthVsTrackPhi;
     TH2D *hTruthVsTrackPt;
     TH2D *hFracVsTruthEta;
     TH2D *hFracVsTruthPhi;
     TH2D *hFracVsTruthPt;
+    TH2D *hDiffVsTruthEta;
+    TH2D *hDiffVsTruthPhi;
+    TH2D *hDiffVsTruthPt;
     TH2D *hTruthPtVsNMms;
     TH2D *hTruthPtVsNMap;
     TH2D *hTruthPtVsNInt;

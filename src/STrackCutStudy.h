@@ -109,6 +109,8 @@ class STrackCutStudy {
     TH1D *hTrackPerInt;
     TH1D *hTrackPerTpc;
     TH1D *hTrackPerTot;
+    TH1D *hTrackChi2;
+    TH1D *hTrackNDF;
     TH1D *hTrackQuality;
     TH1D *hTrackDCAxy;
     TH1D *hTrackDCAz;
@@ -130,6 +132,8 @@ class STrackCutStudy {
     TH2D *hTrackPtVsPerInt;
     TH2D *hTrackPtVsPerTpc;
     TH2D *hTrackPtVsPerTot;
+    TH2D *hTrackPtVsChi2;
+    TH2D *hTrackPtVsNDF;
     TH2D *hTrackPtVsQuality;
     TH2D *hTrackPtVsDCAxy;
     TH2D *hTrackPtVsDCAz;
@@ -162,6 +166,8 @@ class STrackCutStudy {
     TH2D *hTruthPtVsNInt;
     TH2D *hTruthPtVsNTpc;
     TH2D *hTruthPtVsNTot;
+    TH2D *hTruthPtVsChi2;
+    TH2D *hTruthPtVsNDF;
     TH2D *hTruthPtVsQuality;
     TH2D *hTruthPtVsDCAxy;
     TH2D *hTruthPtVsDCAz;
@@ -182,6 +188,8 @@ class STrackCutStudy {
     TH1D *hWeirdPerInt;
     TH1D *hWeirdPerTpc;
     TH1D *hWeirdPerTot;
+    TH1D *hWeirdChi2;
+    TH1D *hWeirdNDF;
     TH1D *hWeirdQuality;
     TH1D *hWeirdDCAxy;
     TH1D *hWeirdDCAz;
@@ -205,6 +213,8 @@ class STrackCutStudy {
     TH1D *hTrackPerInt_PU;
     TH1D *hTrackPerTpc_PU;
     TH1D *hTrackPerTot_PU;
+    TH1D *hTrackChi2_PU;
+    TH1D *hTrackNDF_PU;
     TH1D *hTrackQuality_PU;
     TH1D *hTrackDCAxy_PU;
     TH1D *hTrackDCAz_PU;
@@ -226,6 +236,8 @@ class STrackCutStudy {
     TH2D *hTrackPtVsPerInt_PU;
     TH2D *hTrackPtVsPerTpc_PU;
     TH2D *hTrackPtVsPerTot_PU;
+    TH2D *hTrackPtVsChi2_PU;
+    TH2D *hTrackPtVsNDF_PU;
     TH2D *hTrackPtVsQuality_PU;
     TH2D *hTrackPtVsDCAxy_PU;
     TH2D *hTrackPtVsDCAz_PU;

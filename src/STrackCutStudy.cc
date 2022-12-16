@@ -130,9 +130,9 @@ void STrackCutStudy::Analyze() {
     // announce progress
     const Long64_t iProg = iEntry + 1;
     if (iProg == nEntriesEO) {
-      cout << "          Processing embed-only entry " << iProg << "/" << nEntriesEO << "..." << endl;
+      cout << "        Processing embed-only entry " << iProg << "/" << nEntriesEO << "..." << endl;
     } else {
-      cout << "          Processing embed-only entry " << iProg << "/" << nEntriesEO << "...\r" << flush;
+      cout << "        Processing embed-only entry " << iProg << "/" << nEntriesEO << "...\r" << flush;
     }
 
     // perform calculations
@@ -142,8 +142,8 @@ void STrackCutStudy::Analyze() {
     const Double_t perIntt    = (Double_t) nlintt / (Double_t) gnlintt;
     const Double_t perTpc     = (Double_t) nltpc / (Double_t) gnltpc;
     const Double_t perTot     = (Double_t) layers / (Double_t) glayers;
-    const Double_t mmDcaXY    = dca3dxy * 10000;
-    const Double_t mmDcaZ     = dca3dz * 10000;
+    const Double_t umDcaXY    = dca3dxy * 10000;
+    const Double_t umDcaZ     = dca3dz * 10000;
     const Double_t deltaDcaXY = abs(dca3dxysigma / dca3dxy);
     const Double_t deltaDcaZ  = abs(dca3dzsigma / dca3dz);
     const Double_t deltaEta   = abs(deltaeta / eta);
@@ -154,7 +154,7 @@ void STrackCutStudy::Analyze() {
     const Double_t ptFrac     = pt / gpt;
 
     // fill embed-only track histograms
-    hTrackNMap         -> Fill(nlmms);
+    hTrackNMms         -> Fill(nlmms);
     hTrackNMap         -> Fill(nlmaps);
     hTrackNInt         -> Fill(nlintt);
     hTrackNTpc         -> Fill(nltpc);
@@ -164,9 +164,11 @@ void STrackCutStudy::Analyze() {
     hTrackPerInt       -> Fill(perIntt);
     hTrackPerTpc       -> Fill(perTpc);
     hTrackPerTot       -> Fill(perTot);
+    hTrackChi2         -> Fill(chisq);
+    hTrackNDF          -> Fill(ndf);
     hTrackQuality      -> Fill(quality);
-    hTrackDCAxy        -> Fill(mmDcaXY);
-    hTrackDCAz         -> Fill(mmDcaZ);
+    hTrackDCAxy        -> Fill(umDcaXY);
+    hTrackDCAz         -> Fill(umDcaZ);
     hTrackEta          -> Fill(eta);
     hTrackPhi          -> Fill(phi);
     hTrackPt           -> Fill(pt);
@@ -185,9 +187,11 @@ void STrackCutStudy::Analyze() {
     hTrackPtVsPerInt   -> Fill(perIntt, pt);
     hTrackPtVsPerTpc   -> Fill(perTpc, pt);
     hTrackPtVsPerTot   -> Fill(perTot, pt);
+    hTrackPtVsChi2     -> Fill(chisq, pt);
+    hTrackPtVsNDF      -> Fill(ndf, pt);
     hTrackPtVsQuality  -> Fill(quality, pt);
-    hTrackPtVsDCAxy    -> Fill(mmDcaXY, pt);
-    hTrackPtVsDCAz     -> Fill(mmDcaZ, pt);
+    hTrackPtVsDCAxy    -> Fill(umDcaXY, pt);
+    hTrackPtVsDCAz     -> Fill(umDcaZ, pt);
     hDeltaDCAxyVsTrkPt -> Fill(pt, deltaDcaXY);
     hDeltaDCAzVsTrkPt  -> Fill(pt, deltaDcaZ);
     hDeltaEtaVsTrkPt   -> Fill(pt, deltaEta);
@@ -195,6 +199,7 @@ void STrackCutStudy::Analyze() {
     hDeltaPtVsTrkPt    -> Fill(pt, deltaPt);
 
     // fill embed-only truth histograms
+    hTruthNMms         -> Fill(gnlmms);
     hTruthNMap         -> Fill(gnlmaps);
     hTruthNInt         -> Fill(gnlintt);
     hTruthNTpc         -> Fill(gnltpc);
@@ -216,9 +221,11 @@ void STrackCutStudy::Analyze() {
     hTruthPtVsNTpc     -> Fill(gnltpc, gpt);
     hTruthPtVsNTot     -> Fill(glayers, gpt);
     hTruthPtVsNTpc     -> Fill(nltpc, gpt);
+    hTruthPtVsChi2     -> Fill(chisq, gpt);
+    hTruthPtVsNDF      -> Fill(ndf, gpt);
     hTruthPtVsQuality  -> Fill(quality, gpt);
-    hTruthPtVsDCAxy    -> Fill(mmDcaXY, gpt);
-    hTruthPtVsDCAz     -> Fill(mmDcaZ, gpt);
+    hTruthPtVsDCAxy    -> Fill(umDcaXY, gpt);
+    hTruthPtVsDCAz     -> Fill(umDcaZ, gpt);
     hDeltaDCAxyVsTruPt -> Fill(gpt, deltaDcaXY);
     hDeltaDCAzVsTruPt  -> Fill(gpt, deltaDcaZ);
     hDeltaEtaVsTruPt   -> Fill(gpt, deltaEta);
@@ -238,9 +245,11 @@ void STrackCutStudy::Analyze() {
       hWeirdPerInt     -> Fill(perIntt);
       hWeirdPerTpc     -> Fill(perTpc);
       hWeirdPerTot     -> Fill(perTot);
+      hWeirdChi2       -> Fill(chisq);
+      hWeirdNDF        -> Fill(ndf);
       hWeirdQuality    -> Fill(quality);
-      hWeirdDCAxy      -> Fill(mmDcaXY);
-      hWeirdDCAz       -> Fill(mmDcaZ);
+      hWeirdDCAxy      -> Fill(umDcaXY);
+      hWeirdDCAz       -> Fill(umDcaZ);
       hWeirdEta        -> Fill(eta);
       hWeirdPhi        -> Fill(phi);
       hWeirdPt         -> Fill(pt); 
@@ -285,8 +294,8 @@ void STrackCutStudy::Analyze() {
     const Double_t perIntt    = (Double_t) pu_nlintt / (Double_t) pu_gnlintt;
     const Double_t perTpc     = (Double_t) pu_nltpc / (Double_t) pu_gnltpc;
     const Double_t perTot     = (Double_t) pu_layers / (Double_t) pu_glayers;
-    const Double_t mmDcaXY    = pu_dca3dxy * 10000;
-    const Double_t mmDcaZ     = pu_dca3dz * 10000;
+    const Double_t umDcaXY    = pu_dca3dxy * 10000;
+    const Double_t umDcaZ     = pu_dca3dz * 10000;
     const Double_t deltaDcaXY = abs(pu_dca3dxysigma / pu_dca3dxy);
     const Double_t deltaDcaZ  = abs(pu_dca3dzsigma / pu_dca3dz);
     const Double_t deltaEta   = abs(pu_deltaeta / pu_eta);
@@ -308,9 +317,11 @@ void STrackCutStudy::Analyze() {
     hTrackPerInt_PU       -> Fill(perIntt);
     hTrackPerTpc_PU       -> Fill(perTpc);
     hTrackPerTot_PU       -> Fill(perTot);
+    hTrackChi2_PU         -> Fill(pu_chisq);
+    hTrackNDF_PU          -> Fill(pu_ndf);
     hTrackQuality_PU      -> Fill(pu_quality);
-    hTrackDCAxy_PU        -> Fill(mmDcaXY);
-    hTrackDCAz_PU         -> Fill(mmDcaZ);
+    hTrackDCAxy_PU        -> Fill(umDcaXY);
+    hTrackDCAz_PU         -> Fill(umDcaZ);
     hTrackEta_PU          -> Fill(pu_eta);
     hTrackPhi_PU          -> Fill(pu_phi);
     hTrackPt_PU           -> Fill(pu_pt);
@@ -329,9 +340,11 @@ void STrackCutStudy::Analyze() {
     hTrackPtVsPerInt_PU   -> Fill(perIntt, pu_pt);
     hTrackPtVsPerTpc_PU   -> Fill(perTpc, pu_pt);
     hTrackPtVsPerTot_PU   -> Fill(perTot, pu_pt);
-    hTrackPtVsQuality_PU  -> Fill(quality, pu_pt);
-    hTrackPtVsDCAxy_PU    -> Fill(mmDcaXY, pu_pt);
-    hTrackPtVsDCAz_PU     -> Fill(mmDcaZ, pu_pt);
+    hTrackPtVsChi2_PU     -> Fill(pu_chisq, pu_pt);
+    hTrackPtVsNDF_PU      -> Fill(pu_ndf, pu_pt);
+    hTrackPtVsQuality_PU  -> Fill(pu_quality, pu_pt);
+    hTrackPtVsDCAxy_PU    -> Fill(umDcaXY, pu_pt);
+    hTrackPtVsDCAz_PU     -> Fill(umDcaZ, pu_pt);
     hDeltaDCAxyVsTrkPt_PU -> Fill(pu_pt, deltaDcaXY);
     hDeltaDCAzVsTrkPt_PU  -> Fill(pu_pt, deltaDcaZ);
     hDeltaEtaVsTrkPt_PU   -> Fill(pu_pt, deltaEta);
@@ -612,6 +625,7 @@ void STrackCutStudy::InitTuples() {
 void STrackCutStudy::InitHists() {
 
   const UInt_t  nNHitBins(100);
+  const UInt_t  nChiBins(100);
   const UInt_t  nQualBins(20);
   const UInt_t  nDcaBins(200);
   const UInt_t  nPerBins(200);
@@ -621,6 +635,7 @@ void STrackCutStudy::InitHists() {
   const UInt_t  nFracBins(300);
   const UInt_t  nErrBins(5000);
   const Float_t rNHitBins[NRange] = {0,     100};
+  const Float_t rChiBins[NRange]  = {0.,    1000.};
   const Float_t rQualBins[NRange] = {0.,    10.};
   const Float_t rDcaBins[NRange]  = {-10.,  10.};
   const Float_t rPerBins[NRange]  = {0.,    2.};
@@ -640,6 +655,8 @@ void STrackCutStudy::InitHists() {
   hTrackPerInt          = new TH1D("hTrackPerInt",          "Track r_{INTT}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerTpc          = new TH1D("hTrackPerTpc",          "Track r_{TPC}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerTot          = new TH1D("hTrackPerTot",          "Track r_{tot}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
+  hTrackChi2            = new TH1D("hTrackChi2",            "Track #chi^{2}",                       nChiBins,  rChiBins[0],  rChiBins[1]);
+  hTrackNDF             = new TH1D("hTrackNDF",             "Track ndf",                            nNHitBins, rNHitBins[0], rNHitBins[1]);
   hTrackQuality         = new TH1D("hTrackQuality",         "Track #chi^{2}/ndf",                   nQualBins, rQualBins[0], rQualBins[1]);
   hTrackDCAxy           = new TH1D("hTrackDCAxy",           "Track DCA_{xy}",                       nDcaBins,  rDcaBins[0],  rDcaBins[1]);
   hTrackDCAz            = new TH1D("hTrackDCAz",            "Track DCA_{z}",                        nDcaBins,  rDcaBins[0],  rDcaBins[1]);
@@ -661,6 +678,8 @@ void STrackCutStudy::InitHists() {
   hTrackPtVsPerInt      = new TH2D("hTrackPtVsPerInt",      "Track p_{T} vs. r_{INTT}",             nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerTpc      = new TH2D("hTrackPtVsPerTpc",      "Track p_{T} vs. r_{TPC}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerTot      = new TH2D("hTrackPtVsPerTot",      "Track p_{T} vs. r_{tot}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsChi2        = new TH2D("hTrackPtVsChi2",        "Track p_{T} vs. #chi^{2}",             nChiBins,  rChiBins[0],  rChiBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNDF         = new TH2D("hTrackPtVsNDF",         "Track p_{T} vs. ndf",                  nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsQuality     = new TH2D("hTrackPtVsQuality",     "Track p_{T} vs. #chi^{2}/ndf",         nQualBins, rQualBins[0], rQualBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsDCAxy       = new TH2D("hTrackPtVsDCAxy",       "Track p_{T} vs. DCA_{xy}",             nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsDCAz        = new TH2D("hTrackPtVsDCAz",        "Track p_{T} vs. DCA_{z}",              nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -692,6 +711,8 @@ void STrackCutStudy::InitHists() {
   hTruthPtVsNInt        = new TH2D("hTruthPtVsNInt",        "Truth p_{T} vs. N_{layer}^{INTT}",     nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsNTpc        = new TH2D("hTruthPtVsNTpc",        "Truth p_{T} vs. N_{layer}^{TPC}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsNTot        = new TH2D("hTruthPtVsNTot",        "Truth p_{T} vs. N_{layer}^{tot}",      nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTruthPtVsChi2        = new TH2D("hTruthPtVsChi2",        "Truth p_{T} vs. #chi^{2}",             nChiBins,  rChiBins[0],  rChiBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTruthPtVsNDF         = new TH2D("hTruthPtVsNDF",         "Truth p_{T} vs. ndf",                  nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsQuality     = new TH2D("hTruthPtVsQuality",     "Truth p_{T} vs. Track #chi^{2}/ndf",   nQualBins, rQualBins[0], rQualBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsDCAxy       = new TH2D("hTruthPtVsDCAxy",       "Truth p_{T} vs. Track DCA_{xy}",       nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTruthPtVsDCAz        = new TH2D("hTruthPtVsDCAz",        "Truth p_{T} vs. Track DCA_{z}",        nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -711,6 +732,8 @@ void STrackCutStudy::InitHists() {
   hWeirdPerInt          = new TH1D("hWeirdPerInt",          "Weird r_{INTT}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hWeirdPerTpc          = new TH1D("hWeirdPerTpc",          "Weird r_{TPC}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
   hWeirdPerTot          = new TH1D("hWeirdPerTot",          "Weird r_{tot}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
+  hWeirdChi2            = new TH1D("hWeirdChi2",            "Weird #chi^{2}",                       nChiBins,  rChiBins[0],  rChiBins[1]);
+  hWeirdNDF             = new TH1D("hWeirdNDF",             "Weird ndf",                            nNHitBins, rNHitBins[0], rNHitBins[1]);
   hWeirdQuality         = new TH1D("hWeirdQuality",         "Weird #chi^{2}/ndf",                   nQualBins, rQualBins[0], rQualBins[1]);
   hWeirdDCAxy           = new TH1D("hWeirdDCAxy",           "Weird DCA_{xy}",                       nDcaBins,  rDcaBins[0],  rDcaBins[1]);
   hWeirdDCAz            = new TH1D("hWeirdDCAz",            "Weird DCA_{z}",                        nDcaBins,  rDcaBins[0],  rDcaBins[1]);
@@ -733,6 +756,8 @@ void STrackCutStudy::InitHists() {
   hTrackPerInt_PU       = new TH1D("hTrackPerInt_PU",       "Track r_{INTT}",                       nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerTpc_PU       = new TH1D("hTrackPerTpc_PU",       "Track r_{TPC}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
   hTrackPerTot_PU       = new TH1D("hTrackPerTot_PU",       "Track r_{tot}",                        nPerBins,  rPerBins[0],  rPerBins[1]);
+  hTrackChi2_PU         = new TH1D("hTrackChi2_PU",         "Track #chi^{2}",                       nChiBins,  rChiBins[0],  rChiBins[1]);
+  hTrackNDF_PU          = new TH1D("hTrackNDF_PU",          "Track ndf",                            nNHitBins, rNHitBins[0], rNHitBins[1]);
   hTrackQuality_PU      = new TH1D("hTrackQuality_PU",      "Track #chi^{2}/ndf",                   nQualBins, rQualBins[0], rQualBins[1]);
   hTrackDCAxy_PU        = new TH1D("hTrackDCAxy_PU",        "Track DCA_{xy}",                       nDcaBins,  rDcaBins[0],  rDcaBins[1]);
   hTrackDCAz_PU         = new TH1D("hTrackDCAz_PU",         "Track DCA_{z}",                        nDcaBins,  rDcaBins[0],  rDcaBins[1]);
@@ -754,6 +779,8 @@ void STrackCutStudy::InitHists() {
   hTrackPtVsPerInt_PU   = new TH2D("hTrackPtVsPerInt_PU",   "Track p_{T} vs. r_{INTT}",             nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerTpc_PU   = new TH2D("hTrackPtVsPerTpc_PU",   "Track p_{T} vs. r_{TPC}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsPerTot_PU   = new TH2D("hTrackPtVsPerTot_PU",   "Track p_{T} vs. r_{tot}",              nPerBins,  rPerBins[0],  rPerBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsChi2_PU     = new TH2D("hTrackPtVsChi2_PU",     "Track p_{T} vs. #chi^{2}",             nChiBins,  rChiBins[0],  rChiBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
+  hTrackPtVsNDF_PU      = new TH2D("hTrackPtVsNDF_PU",      "Track p_{T} vs. ndf",                  nNHitBins, rNHitBins[0], rNHitBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsQuality_PU  = new TH2D("hTrackPtVsQuality_PU",  "Track p_{T} vs. #chi^{2}/ndf",         nQualBins, rQualBins[0], rQualBins[1], nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsDCAxy_PU    = new TH2D("hTrackPtVsDCAxy_PU",    "Track p_{T} vs. DCA_{xy}",             nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
   hTrackPtVsDCAz_PU     = new TH2D("hTrackPtVsDCAz_PU",     "Track p_{T} vs. DCA_{z}",              nDcaBins,  rDcaBins[0],  rDcaBins[1],  nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -773,6 +800,8 @@ void STrackCutStudy::InitHists() {
   hTrackPerInt          -> Sumw2();
   hTrackPerTpc          -> Sumw2();
   hTrackPerTot          -> Sumw2();
+  hTrackChi2            -> Sumw2();
+  hTrackNDF             -> Sumw2();
   hTrackQuality         -> Sumw2();
   hTrackDCAxy           -> Sumw2();
   hTrackDCAz            -> Sumw2();
@@ -794,6 +823,8 @@ void STrackCutStudy::InitHists() {
   hTrackPtVsPerInt      -> Sumw2();
   hTrackPtVsPerTpc      -> Sumw2();
   hTrackPtVsPerTot      -> Sumw2();
+  hTrackPtVsChi2        -> Sumw2();
+  hTrackPtVsNDF         -> Sumw2();
   hTrackPtVsQuality     -> Sumw2();
   hTrackPtVsDCAxy       -> Sumw2();
   hTrackPtVsDCAz        -> Sumw2();
@@ -824,6 +855,8 @@ void STrackCutStudy::InitHists() {
   hTruthPtVsNInt        -> Sumw2();
   hTruthPtVsNTpc        -> Sumw2();
   hTruthPtVsNTot        -> Sumw2();
+  hTruthPtVsChi2        -> Sumw2();
+  hTruthPtVsNDF         -> Sumw2();
   hTruthPtVsQuality     -> Sumw2();
   hTruthPtVsDCAxy       -> Sumw2();
   hTruthPtVsDCAz        -> Sumw2();
@@ -841,6 +874,8 @@ void STrackCutStudy::InitHists() {
   hWeirdPerInt          -> Sumw2();
   hWeirdPerTpc          -> Sumw2();
   hWeirdPerTot          -> Sumw2();
+  hWeirdChi2            -> Sumw2();
+  hWeirdNDF             -> Sumw2();
   hWeirdQuality         -> Sumw2();
   hWeirdDCAxy           -> Sumw2();
   hWeirdDCAz            -> Sumw2();
@@ -863,6 +898,8 @@ void STrackCutStudy::InitHists() {
   hTrackPerInt_PU       -> Sumw2();
   hTrackPerTpc_PU       -> Sumw2();
   hTrackPerTot_PU       -> Sumw2();
+  hTrackChi2_PU         -> Sumw2();
+  hTrackNDF_PU          -> Sumw2();
   hTrackQuality_PU      -> Sumw2();
   hTrackDCAxy_PU        -> Sumw2();
   hTrackDCAz_PU         -> Sumw2();
@@ -884,6 +921,8 @@ void STrackCutStudy::InitHists() {
   hTrackPtVsPerInt_PU   -> Sumw2();
   hTrackPtVsPerTpc_PU   -> Sumw2();
   hTrackPtVsPerTot_PU   -> Sumw2();
+  hTrackPtVsChi2_PU     -> Sumw2();
+  hTrackPtVsNDF_PU      -> Sumw2();
   hTrackPtVsQuality_PU  -> Sumw2();
   hTrackPtVsDCAxy_PU    -> Sumw2();
   hTrackPtVsDCAz_PU     -> Sumw2();
@@ -926,9 +965,11 @@ void STrackCutStudy::SetHistStyles() {
   TString sTrkNInt("N_{layer}^{INTT}");
   TString sTrkNTpc("N_{layer}^{TPC}");
   TString sTrkNTot("N_{layer}^{tot}");
+  TString sTrkChi2("#chi^{2}");
+  TString sTrkNDF("ndf");
   TString sTrkQuality("#chi^{2}/ndf");
-  TString sTrkDCAxy("DCA_{xy} [mm]");
-  TString sTrkDCAz("DCA_{z} [mm]");
+  TString sTrkDCAxy("DCA_{xy} [#mum]");
+  TString sTrkDCAz("DCA_{z} [#mum]");
   TString sTrkEta("#eta^{trk}");
   TString sTrkPhi("#phi^{trk}");
   TString sTrkPt("p_{T}^{trk} [GeV/c]");
@@ -1081,6 +1122,32 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerTot          -> GetYaxis() -> SetTitle(sCount.Data());
   hTrackPerTot          -> GetYaxis() -> SetTitleFont(FTxt);
   hTrackPerTot          -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackChi2            -> SetMarkerColor(fColTrk);
+  hTrackChi2            -> SetMarkerStyle(fMarTrk);
+  hTrackChi2            -> SetLineColor(fColTrk);
+  hTrackChi2            -> SetLineStyle(fLin);
+  hTrackChi2            -> SetFillColor(fColTrk);
+  hTrackChi2            -> SetFillStyle(fFil);
+  hTrackChi2            -> SetTitleFont(FTxt);
+  hTrackChi2            -> GetXaxis() -> SetTitle(sTrkChi2.Data());
+  hTrackChi2            -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackChi2            -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackChi2            -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackChi2            -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackChi2            -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackNDF             -> SetMarkerColor(fColTrk);
+  hTrackNDF             -> SetMarkerStyle(fMarTrk);
+  hTrackNDF             -> SetLineColor(fColTrk);
+  hTrackNDF             -> SetLineStyle(fLin);
+  hTrackNDF             -> SetFillColor(fColTrk);
+  hTrackNDF             -> SetFillStyle(fFil);
+  hTrackNDF             -> SetTitleFont(FTxt);
+  hTrackNDF             -> GetXaxis() -> SetTitle(sTrkNDF.Data());
+  hTrackNDF             -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackNDF             -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackNDF             -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackNDF             -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackNDF             -> GetYaxis() -> SetTitleOffset(fOffY);
   hTrackQuality         -> SetMarkerColor(fColTrk);
   hTrackQuality         -> SetMarkerStyle(fMarTrk);
   hTrackQuality         -> SetLineColor(fColTrk);
@@ -1383,6 +1450,38 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerTot      -> GetZaxis() -> SetTitle(sCount.Data());
   hTrackPtVsPerTot      -> GetZaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerTot      -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTrackPtVsChi2        -> SetMarkerColor(fColTrk);
+  hTrackPtVsChi2        -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsChi2        -> SetLineColor(fColTrk);
+  hTrackPtVsChi2        -> SetLineStyle(fLin);
+  hTrackPtVsChi2        -> SetFillColor(fColTrk);
+  hTrackPtVsChi2        -> SetFillStyle(fFil);
+  hTrackPtVsChi2        -> SetTitleFont(FTxt);
+  hTrackPtVsChi2        -> GetXaxis() -> SetTitle(sTrkChi2.Data());
+  hTrackPtVsChi2        -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsChi2        -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsChi2        -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsChi2        -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsChi2        -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsChi2        -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsChi2        -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsChi2        -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTrackPtVsNDF         -> SetMarkerColor(fColTrk);
+  hTrackPtVsNDF         -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsNDF         -> SetLineColor(fColTrk);
+  hTrackPtVsNDF         -> SetLineStyle(fLin);
+  hTrackPtVsNDF         -> SetFillColor(fColTrk);
+  hTrackPtVsNDF         -> SetFillStyle(fFil);
+  hTrackPtVsNDF         -> SetTitleFont(FTxt);
+  hTrackPtVsNDF         -> GetXaxis() -> SetTitle(sTrkNDF.Data());
+  hTrackPtVsNDF         -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNDF         -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsNDF         -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsNDF         -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNDF         -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsNDF         -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsNDF         -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNDF         -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTrackPtVsQuality     -> SetMarkerColor(fColTrk);
   hTrackPtVsQuality     -> SetMarkerStyle(fMarTrk);
   hTrackPtVsQuality     -> SetLineColor(fColTrk);
@@ -1831,6 +1930,38 @@ void STrackCutStudy::SetHistStyles() {
   hTruthPtVsNTot        -> GetZaxis() -> SetTitle(sCount.Data());
   hTruthPtVsNTot        -> GetZaxis() -> SetTitleFont(FTxt);
   hTruthPtVsNTot        -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTruthPtVsChi2        -> SetMarkerColor(fColTru);
+  hTruthPtVsChi2        -> SetMarkerStyle(fMarTru);
+  hTruthPtVsChi2        -> SetLineColor(fColTru);
+  hTruthPtVsChi2        -> SetLineStyle(fLin);
+  hTruthPtVsChi2        -> SetFillColor(fColTru);
+  hTruthPtVsChi2        -> SetFillStyle(fFil);
+  hTruthPtVsChi2        -> SetTitleFont(FTxt);
+  hTruthPtVsChi2        -> GetXaxis() -> SetTitle(sTrkChi2.Data());
+  hTruthPtVsChi2        -> GetXaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsChi2        -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTruthPtVsChi2        -> GetYaxis() -> SetTitle(sTruPt.Data());
+  hTruthPtVsChi2        -> GetYaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsChi2        -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTruthPtVsChi2        -> GetZaxis() -> SetTitle(sCount.Data());
+  hTruthPtVsChi2        -> GetZaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsChi2        -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTruthPtVsNDF         -> SetMarkerColor(fColTru);
+  hTruthPtVsNDF         -> SetMarkerStyle(fMarTru);
+  hTruthPtVsNDF         -> SetLineColor(fColTru);
+  hTruthPtVsNDF         -> SetLineStyle(fLin);
+  hTruthPtVsNDF         -> SetFillColor(fColTru);
+  hTruthPtVsNDF         -> SetFillStyle(fFil);
+  hTruthPtVsNDF         -> SetTitleFont(FTxt);
+  hTruthPtVsNDF         -> GetXaxis() -> SetTitle(sTrkNDF.Data());
+  hTruthPtVsNDF         -> GetXaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsNDF         -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTruthPtVsNDF         -> GetYaxis() -> SetTitle(sTruPt.Data());
+  hTruthPtVsNDF         -> GetYaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsNDF         -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTruthPtVsNDF         -> GetZaxis() -> SetTitle(sCount.Data());
+  hTruthPtVsNDF         -> GetZaxis() -> SetTitleFont(FTxt);
+  hTruthPtVsNDF         -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTruthPtVsQuality     -> SetMarkerColor(fColTru);
   hTruthPtVsQuality     -> SetMarkerStyle(fMarTru);
   hTruthPtVsQuality     -> SetLineColor(fColTru);
@@ -2090,6 +2221,32 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerTot          -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdPerTot          -> GetYaxis() -> SetTitleFont(FTxt);
   hWeirdPerTot          -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdChi2            -> SetMarkerColor(fColOdd);
+  hWeirdChi2            -> SetMarkerStyle(fMarOdd);
+  hWeirdChi2            -> SetLineColor(fColOdd);
+  hWeirdChi2            -> SetLineStyle(fLin);
+  hWeirdChi2            -> SetFillColor(fColOdd);
+  hWeirdChi2            -> SetFillStyle(fFil);
+  hWeirdChi2            -> SetTitleFont(FTxt);
+  hWeirdChi2            -> GetXaxis() -> SetTitle(sTrkChi2.Data());
+  hWeirdChi2            -> GetXaxis() -> SetTitleFont(FTxt);
+  hWeirdChi2            -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdChi2            -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdChi2            -> GetYaxis() -> SetTitleFont(FTxt);
+  hWeirdChi2            -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdNDF             -> SetMarkerColor(fColOdd);
+  hWeirdNDF             -> SetMarkerStyle(fMarOdd);
+  hWeirdNDF             -> SetLineColor(fColOdd);
+  hWeirdNDF             -> SetLineStyle(fLin);
+  hWeirdNDF             -> SetFillColor(fColOdd);
+  hWeirdNDF             -> SetFillStyle(fFil);
+  hWeirdNDF             -> SetTitleFont(FTxt);
+  hWeirdNDF             -> GetXaxis() -> SetTitle(sTrkNDF.Data());
+  hWeirdNDF             -> GetXaxis() -> SetTitleFont(FTxt);
+  hWeirdNDF             -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdNDF             -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdNDF             -> GetYaxis() -> SetTitleFont(FTxt);
+  hWeirdNDF             -> GetYaxis() -> SetTitleOffset(fOffY);
   hWeirdQuality         -> SetMarkerColor(fColOdd);
   hWeirdQuality         -> SetMarkerStyle(fMarOdd);
   hWeirdQuality         -> SetLineColor(fColOdd);
@@ -2363,6 +2520,32 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerTot_PU       -> GetYaxis() -> SetTitle(sCount.Data());
   hTrackPerTot_PU       -> GetYaxis() -> SetTitleFont(FTxt);
   hTrackPerTot_PU       -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackChi2_PU         -> SetMarkerColor(fColTrk);
+  hTrackChi2_PU         -> SetMarkerStyle(fMarTrk);
+  hTrackChi2_PU         -> SetLineColor(fColTrk);
+  hTrackChi2_PU         -> SetLineStyle(fLin);
+  hTrackChi2_PU         -> SetFillColor(fColTrk);
+  hTrackChi2_PU         -> SetFillStyle(fFil);
+  hTrackChi2_PU         -> SetTitleFont(FTxt);
+  hTrackChi2_PU         -> GetXaxis() -> SetTitle(sTrkChi2.Data());
+  hTrackChi2_PU         -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackChi2_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackChi2_PU         -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackChi2_PU         -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackChi2_PU         -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackNDF_PU          -> SetMarkerColor(fColTrk);
+  hTrackNDF_PU          -> SetMarkerStyle(fMarTrk);
+  hTrackNDF_PU          -> SetLineColor(fColTrk);
+  hTrackNDF_PU          -> SetLineStyle(fLin);
+  hTrackNDF_PU          -> SetFillColor(fColTrk);
+  hTrackNDF_PU          -> SetFillStyle(fFil);
+  hTrackNDF_PU          -> SetTitleFont(FTxt);
+  hTrackNDF_PU          -> GetXaxis() -> SetTitle(sTrkNDF.Data());
+  hTrackNDF_PU          -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackNDF_PU          -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackNDF_PU          -> GetYaxis() -> SetTitle(sCount.Data());
+  hTrackNDF_PU          -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackNDF_PU          -> GetYaxis() -> SetTitleOffset(fOffY);
   hTrackQuality_PU      -> SetMarkerColor(fColTrk);
   hTrackQuality_PU      -> SetMarkerStyle(fMarTrk);
   hTrackQuality_PU      -> SetLineColor(fColTrk);
@@ -2665,6 +2848,38 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerTot_PU   -> GetZaxis() -> SetTitle(sCount.Data());
   hTrackPtVsPerTot_PU   -> GetZaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerTot_PU   -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTrackPtVsChi2_PU     -> SetMarkerColor(fColTrk);
+  hTrackPtVsChi2_PU     -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsChi2_PU     -> SetLineColor(fColTrk);
+  hTrackPtVsChi2_PU     -> SetLineStyle(fLin);
+  hTrackPtVsChi2_PU     -> SetFillColor(fColTrk);
+  hTrackPtVsChi2_PU     -> SetFillStyle(fFil);
+  hTrackPtVsChi2_PU     -> SetTitleFont(FTxt);
+  hTrackPtVsChi2_PU     -> GetXaxis() -> SetTitle(sTrkChi2.Data());
+  hTrackPtVsChi2_PU     -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsChi2_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsChi2_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsChi2_PU     -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsChi2_PU     -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsChi2_PU     -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsChi2_PU     -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsChi2_PU     -> GetZaxis() -> SetTitleOffset(fOffZ);
+  hTrackPtVsNDF_PU      -> SetMarkerColor(fColTrk);
+  hTrackPtVsNDF_PU      -> SetMarkerStyle(fMarTrk);
+  hTrackPtVsNDF_PU      -> SetLineColor(fColTrk);
+  hTrackPtVsNDF_PU      -> SetLineStyle(fLin);
+  hTrackPtVsNDF_PU      -> SetFillColor(fColTrk);
+  hTrackPtVsNDF_PU      -> SetFillStyle(fFil);
+  hTrackPtVsNDF_PU      -> SetTitleFont(FTxt);
+  hTrackPtVsNDF_PU      -> GetXaxis() -> SetTitle(sTrkNDF.Data());
+  hTrackPtVsNDF_PU      -> GetXaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNDF_PU      -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTrackPtVsNDF_PU      -> GetYaxis() -> SetTitle(sTrkPt.Data());
+  hTrackPtVsNDF_PU      -> GetYaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNDF_PU      -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTrackPtVsNDF_PU      -> GetZaxis() -> SetTitle(sCount.Data());
+  hTrackPtVsNDF_PU      -> GetZaxis() -> SetTitleFont(FTxt);
+  hTrackPtVsNDF_PU      -> GetZaxis() -> SetTitleOffset(fOffZ);
   hTrackPtVsQuality_PU  -> SetMarkerColor(fColTrk);
   hTrackPtVsQuality_PU  -> SetMarkerStyle(fMarTrk);
   hTrackPtVsQuality_PU  -> SetLineColor(fColTrk);
@@ -2952,6 +3167,36 @@ void STrackCutStudy::CreatePlots(){
   cNTot      -> Write();
   cNTot      -> Close();
 
+  TCanvas *cChi21D = new TCanvas("cChi21D", "", fWidth1P, fHeight1P);
+  cChi21D    -> cd();
+  hTrackChi2 -> Draw();
+  hWeirdChi2 -> Draw("same");
+  oddNT      -> Draw();
+  txtEO      -> Draw();
+  fOut       -> cd();
+  cChi21D    -> Write();
+  cChi21D    -> Close();
+
+  TCanvas *cNDF1D = new TCanvas("cNDF1D", "", fWidth1P, fHeight1P);
+  cNDF1D    -> cd();
+  hTrackNDF -> Draw();
+  hWeirdNDF -> Draw("same");
+  oddNT     -> Draw();
+  txtEO     -> Draw();
+  fOut      -> cd();
+  cNDF1D    -> Write();
+  cNDF1D    -> Close();
+
+  TCanvas *cQuality1D = new TCanvas("cQuality1D", "", fWidth1P, fHeight1P);
+  cQuality1D    -> cd();
+  hTrackQuality -> Draw();
+  hWeirdQuality -> Draw("same");
+  oddNT         -> Draw();
+  txtEO         -> Draw();
+  fOut          -> cd();
+  cQuality1D    -> Write();
+  cQuality1D    -> Close();
+
   TCanvas *cDcaXY1D = new TCanvas("cDcaXY1D", "", fWidth1P, fHeight1P);
   cDcaXY1D    -> cd();
   hTrackDCAxy -> Draw();
@@ -2999,8 +3244,8 @@ void STrackCutStudy::CreatePlots(){
   hTrackPt -> Draw();
   hTruthPt -> Draw("same");
   hWeirdPt -> Draw("same");
-  odd    -> Draw();
-  txtEO      -> Draw();
+  odd      -> Draw();
+  txtEO    -> Draw();
   fOut     -> cd();
   cPt      -> Write();
   cPt      -> Close();
@@ -3064,6 +3309,8 @@ void STrackCutStudy::CreatePlots(){
   pPerMms2D        -> Draw();
   pPerMms1D        -> cd();
   hTrackPerMms     -> Draw();
+  hWeirdPerMms     -> Draw("same");
+  oddNT            -> Draw();
   txtEO            -> Draw();
   pPerMms2D        -> cd();
   hTrackPtVsPerMms -> Draw("colz");
@@ -3079,6 +3326,8 @@ void STrackCutStudy::CreatePlots(){
   pPerMap2D        -> Draw();
   pPerMap1D        -> cd();
   hTrackPerMap     -> Draw();
+  hWeirdPerMap     -> Draw("same");
+  oddNT            -> Draw();
   txtEO            -> Draw();
   pPerMap2D        -> cd();
   hTrackPtVsPerMap -> Draw("colz");
@@ -3094,6 +3343,8 @@ void STrackCutStudy::CreatePlots(){
   pPerInt2D        -> Draw();
   pPerInt1D        -> cd();
   hTrackPerInt     -> Draw();
+  hWeirdPerInt     -> Draw("same");
+  oddNT            -> Draw();
   txtEO            -> Draw();
   pPerInt2D        -> cd();
   hTrackPtVsPerInt -> Draw("colz");
@@ -3109,6 +3360,8 @@ void STrackCutStudy::CreatePlots(){
   pPerTpc2D        -> Draw();
   pPerTpc1D        -> cd();
   hTrackPerTpc     -> Draw();
+  hWeirdPerTpc     -> Draw("same");
+  oddNT            -> Draw();
   txtEO            -> Draw();
   pPerTpc2D        -> cd();
   hTrackPtVsPerTpc -> Draw("colz");
@@ -3124,12 +3377,31 @@ void STrackCutStudy::CreatePlots(){
   pPerTot2D        -> Draw();
   pPerTot1D        -> cd();
   hTrackPerTot     -> Draw();
+  hWeirdPerTot     -> Draw("same");
+  oddNT            -> Draw();
   txtEO            -> Draw();
   pPerTot2D        -> cd();
   hTrackPtVsPerTot -> Draw("colz");
   fOut             -> cd();
   cPerTot          -> Write();
   cPerTot          -> Close();
+
+  TCanvas *cChi2   = new TCanvas("cChi2", "", fWidth2P, fHeight2P);
+  TPad    *pChi21D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pChi22D = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cChi2          -> cd();
+  pChi21D        -> Draw();
+  pChi22D        -> Draw();
+  pChi21D        -> cd();
+  hTrackChi2     -> Draw();
+  hWeirdChi2     -> Draw("same");
+  oddNT          -> Draw();
+  txtEO          -> Draw();
+  pChi22D        -> cd();
+  hTrackPtVsChi2 -> Draw("colz");
+  fOut           -> cd();
+  cChi2          -> Write();
+  cChi2          -> Close();
 
   TCanvas *cQuality   = new TCanvas("cQuality", "", fWidth2P, fHeight2P);
   TPad    *pQuality1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
@@ -3139,6 +3411,8 @@ void STrackCutStudy::CreatePlots(){
   pQuality2D        -> Draw();
   pQuality1D        -> cd();
   hTrackQuality     -> Draw();
+  hWeirdQuality     -> Draw("same");
+  oddNT             -> Draw();
   txtEO             -> Draw();
   pQuality2D        -> cd();
   hTrackPtVsQuality -> Draw("colz");
@@ -3154,6 +3428,8 @@ void STrackCutStudy::CreatePlots(){
   pDCAxy2D        -> Draw();
   pDCAxy1D        -> cd();
   hTrackDCAxy     -> Draw();
+  hWeirdDCAxy     -> Draw("same");
+  oddNT           -> Draw();
   txtEO           -> Draw();
   pDCAxy2D        -> cd();
   hTrackPtVsDCAxy -> Draw("colz");
@@ -3169,6 +3445,8 @@ void STrackCutStudy::CreatePlots(){
   pDCAz2D        -> Draw();
   pDCAz1D        -> cd();
   hTrackDCAz     -> Draw();
+  hWeirdDCAz     -> Draw("same");
+  oddNT          -> Draw();
   txtEO          -> Draw();
   pDCAz2D        -> cd();
   hTrackPtVsDCAz -> Draw("colz");
@@ -3184,6 +3462,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaDCAxyVsTrkPt2D -> Draw();
   pDeltaDCAxyVsTrkPt1D -> cd();
   hDeltaDCAxy          -> Draw();
+  hWeirdDeltaDCAxy     -> Draw("same");
+  oddNT                -> Draw();
   txtEO                -> Draw();
   pDeltaDCAxyVsTrkPt2D -> cd();
   hDeltaDCAxyVsTrkPt   -> Draw("colz");
@@ -3199,6 +3479,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaDCAzVsTrkPt2D -> Draw();
   pDeltaDCAzVsTrkPt1D -> cd();
   hDeltaDCAz          -> Draw();
+  hWeirdDeltaDCAz     -> Draw("same");
+  oddNT               -> Draw();
   txtEO               -> Draw();
   pDeltaDCAzVsTrkPt2D -> cd();
   hDeltaDCAzVsTrkPt   -> Draw("colz");
@@ -3214,6 +3496,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaEtaVsTrkPt2D -> Draw();
   pDeltaEtaVsTrkPt1D -> cd();
   hDeltaEta          -> Draw();
+  hWeirdDeltaEta     -> Draw("same");
+  oddNT              -> Draw();
   txtEO              -> Draw();
   pDeltaEtaVsTrkPt2D -> cd();
   hDeltaEtaVsTrkPt   -> Draw("colz");
@@ -3229,6 +3513,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaPhiVsTrkPt2D -> Draw();
   pDeltaPhiVsTrkPt1D -> cd();
   hDeltaPhi          -> Draw();
+  hWeirdDeltaPhi     -> Draw("same");
+  oddNT              -> Draw();
   txtEO              -> Draw();
   pDeltaPhiVsTrkPt2D -> cd();
   hDeltaPhiVsTrkPt   -> Draw("colz");
@@ -3244,6 +3530,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaPtVsTrkPt2D -> Draw();
   pDeltaPtVsTrkPt1D -> cd();
   hDeltaPt          -> Draw();
+  hWeirdDeltaPt     -> Draw("same");
+  oddNT             -> Draw();
   txtEO             -> Draw();
   pDeltaPtVsTrkPt2D -> cd();
   hDeltaPtVsTrkPt   -> Draw("colz");
@@ -3260,7 +3548,8 @@ void STrackCutStudy::CreatePlots(){
   pTrkVsTruEta1D   -> cd();
   hTrackEta        -> Draw();
   hTruthEta        -> Draw("same");
-  leg              -> Draw();
+  hWeirdEta        -> Draw("same");
+  odd              -> Draw();
   txtEO            -> Draw();
   pTrkVsTruEta2D   -> cd();
   hTruthVsTrackEta -> Draw("colz");
@@ -3277,7 +3566,8 @@ void STrackCutStudy::CreatePlots(){
   pTrkVsTruPhi1D   -> cd();
   hTrackPhi        -> Draw();
   hTruthPhi        -> Draw("same");
-  leg              -> Draw();
+  hWeirdPhi        -> Draw("same");
+  odd              -> Draw();
   txtEO            -> Draw();
   pTrkVsTruPhi2D   -> cd();
   hTruthVsTrackPhi -> Draw("colz");
@@ -3293,7 +3583,8 @@ void STrackCutStudy::CreatePlots(){
   pTrkVsTruPt1D   -> cd();
   hTrackPt        -> Draw();
   hTruthPt        -> Draw("same");
-  leg             -> Draw();
+  hWeirdPt        -> Draw("same");
+  odd             -> Draw();
   txtEO           -> Draw();
   pTrkVsTruPt2D   -> cd();
   hTruthVsTrackPt -> Draw("colz");
@@ -3354,6 +3645,8 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsDCAxy2D -> Draw();
   pTruPtVsDCAxy1D -> cd();
   hTrackDCAxy     -> Draw();
+  hWeirdDCAxy     -> Draw("same");
+  oddNT           -> Draw();
   txtEO           -> Draw();
   pTruPtVsDCAxy2D -> cd();
   hTruthPtVsDCAxy -> Draw("colz");
@@ -3369,6 +3662,8 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsDCAz2D -> Draw();
   pTruPtVsDCAz1D -> cd();
   hTrackDCAz     -> Draw();
+  hWeirdDCAz     -> Draw("same");
+  oddNT          -> Draw();
   txtEO          -> Draw();
   pTruPtVsDCAz2D -> cd();
   hTruthPtVsDCAz -> Draw("colz");
@@ -3384,6 +3679,9 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsNMms2D -> Draw();
   pTruPtVsNMms1D -> cd();
   hTrackNMms     -> Draw();
+  hTruthNMms     -> Draw("same");
+  hWeirdNMms     -> Draw("same");
+  odd            -> Draw();
   txtEO          -> Draw();
   pTruPtVsNMms2D -> cd();
   hTruthPtVsNMms -> Draw("colz");
@@ -3399,6 +3697,9 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsNMap2D -> Draw();
   pTruPtVsNMap1D -> cd();
   hTrackNMap     -> Draw();
+  hTruthNMap     -> Draw("same");
+  hWeirdNMap     -> Draw("same");
+  odd            -> Draw();
   txtEO          -> Draw();
   pTruPtVsNMap2D -> cd();
   hTruthPtVsNMap -> Draw("colz");
@@ -3414,6 +3715,9 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsNInt2D -> Draw();
   pTruPtVsNInt1D -> cd();
   hTrackNInt     -> Draw();
+  hTruthNInt     -> Draw("same");
+  hWeirdNInt     -> Draw("same");
+  odd            -> Draw();
   txtEO          -> Draw();
   pTruPtVsNInt2D -> cd();
   hTruthPtVsNInt -> Draw("colz");
@@ -3429,6 +3733,9 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsNTpc2D -> Draw();
   pTruPtVsNTpc1D -> cd();
   hTrackNTpc     -> Draw();
+  hTruthNTpc     -> Draw("same");
+  hWeirdNTpc     -> Draw("same");
+  odd            -> Draw();
   txtEO          -> Draw();
   pTruPtVsNTpc2D -> cd();
   hTruthPtVsNTpc -> Draw("colz");
@@ -3444,12 +3751,49 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsNTot2D -> Draw();
   pTruPtVsNTot1D -> cd();
   hTrackNTot     -> Draw();
+  hTruthNTot     -> Draw("same");
+  hWeirdNTot     -> Draw("same");
+  odd            -> Draw();
   txtEO          -> Draw();
   pTruPtVsNTot2D -> cd();
   hTruthPtVsNTot -> Draw("colz");
   fOut           -> cd();
   cTruPtVsNTot   -> Write();
   cTruPtVsNTot   -> Close();
+
+  TCanvas *cTruPtVsChi2   = new TCanvas("cTruPtVsChi2", "", fWidth2P, fHeight2P);
+  TPad    *pTruPtVsChi21D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pTruPtVsChi22D = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cTruPtVsChi2   -> cd();
+  pTruPtVsChi21D -> Draw();
+  pTruPtVsChi22D -> Draw();
+  pTruPtVsChi21D -> cd();
+  hTrackChi2     -> Draw();
+  hWeirdChi2     -> Draw("same");
+  oddNT          -> Draw();
+  txtEO          -> Draw();
+  pTruPtVsChi22D -> cd();
+  hTruthPtVsChi2 -> Draw("colz");
+  fOut           -> cd();
+  cTruPtVsChi2   -> Write();
+  cTruPtVsChi2   -> Close();
+
+  TCanvas *cTruPtVsNDF   = new TCanvas("cTruPtVsNDF", "", fWidth2P, fHeight2P);
+  TPad    *pTruPtVsNDF1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pTruPtVsNDF2D = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cTruPtVsNDF   -> cd();
+  pTruPtVsNDF1D -> Draw();
+  pTruPtVsNDF2D -> Draw();
+  pTruPtVsNDF1D -> cd();
+  hTrackNDF     -> Draw();
+  hWeirdNDF     -> Draw("same");
+  oddNT         -> Draw();
+  txtEO         -> Draw();
+  pTruPtVsNDF2D -> cd();
+  hTruthPtVsNDF -> Draw("colz");
+  fOut          -> cd();
+  cTruPtVsNDF   -> Write();
+  cTruPtVsNDF   -> Close();
 
   TCanvas *cTruPtVsQuality   = new TCanvas("cTruPtVsQuality", "", fWidth2P, fHeight2P);
   TPad    *pTruPtVsQuality1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
@@ -3459,6 +3803,8 @@ void STrackCutStudy::CreatePlots(){
   pTruPtVsQuality2D -> Draw();
   pTruPtVsQuality1D -> cd();
   hTrackQuality     -> Draw();
+  hWeirdQuality     -> Draw("same");
+  oddNT             -> Draw();
   txtEO             -> Draw();
   pTruPtVsQuality2D -> cd();
   hTruthPtVsQuality -> Draw("colz");
@@ -3474,6 +3820,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaDCAxyVsTruPt2D -> Draw();
   pDeltaDCAxyVsTruPt1D -> cd();
   hDeltaDCAxy          -> Draw();
+  hWeirdDeltaDCAxy     -> Draw("same");
+  oddNT                -> Draw();
   txtEO                -> Draw();
   pDeltaDCAxyVsTruPt2D -> cd();
   hDeltaDCAxyVsTruPt   -> Draw("colz");
@@ -3489,6 +3837,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaDCAzVsTruPt2D -> Draw();
   pDeltaDCAzVsTruPt1D -> cd();
   hDeltaDCAz          -> Draw();
+  hWeirdDeltaDCAz     -> Draw("same");
+  oddNT               -> Draw();
   txtEO               -> Draw();
   pDeltaDCAzVsTruPt2D -> cd();
   hDeltaDCAzVsTruPt   -> Draw("colz");
@@ -3504,6 +3854,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaEtaVsTruPt2D -> Draw();
   pDeltaEtaVsTruPt1D -> cd();
   hDeltaEta          -> Draw();
+  hWeirdDeltaEta     -> Draw("same");
+  oddNT              -> Draw();
   txtEO              -> Draw();
   pDeltaEtaVsTruPt2D -> cd();
   hDeltaEtaVsTruPt   -> Draw("colz");
@@ -3519,6 +3871,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaPhiVsTruPt2D -> Draw();
   pDeltaPhiVsTruPt1D -> cd();
   hDeltaPhi          -> Draw();
+  hWeirdDeltaPhi     -> Draw("same");
+  oddNT              -> Draw();
   txtEO              -> Draw();
   pDeltaPhiVsTruPt2D -> cd();
   hDeltaPhiVsTruPt   -> Draw("colz");
@@ -3534,6 +3888,8 @@ void STrackCutStudy::CreatePlots(){
   pDeltaPtVsTruPt2D -> Draw();
   pDeltaPtVsTruPt1D -> cd();
   hDeltaPt          -> Draw();
+  hWeirdDeltaPt     -> Draw("same");
+  oddNT             -> Draw();
   txtEO             -> Draw();
   pDeltaPtVsTruPt2D -> cd();
   hDeltaPtVsTruPt   -> Draw("colz");
@@ -3581,6 +3937,22 @@ void STrackCutStudy::CreatePlots(){
   fOut         -> cd();
   cNTot_PU      -> Write();
   cNTot_PU      -> Close();
+
+  TCanvas *cChi21D_PU = new TCanvas("cChi21DwithPileup", "", fWidth1P, fHeight1P);
+  cChi21D_PU    -> cd();
+  hTrackChi2_PU -> Draw();
+  txtPU         -> Draw();
+  fOut          -> cd();
+  cChi21D_PU    -> Write();
+  cChi21D_PU    -> Close();
+
+  TCanvas *cNDF1D_PU = new TCanvas("cNDF1DwithPileup", "", fWidth1P, fHeight1P);
+  cNDF1D_PU    -> cd();
+  hTrackNDF_PU -> Draw();
+  txtPU        -> Draw();
+  fOut         -> cd();
+  cNDF1D_PU    -> Write();
+  cNDF1D_PU    -> Close();
 
   TCanvas *cDcaXY1D_PU = new TCanvas("cDcaXY1DwithPileup", "", fWidth1P, fHeight1P);
   cDcaXY1D_PU    -> cd();
@@ -3738,6 +4110,36 @@ void STrackCutStudy::CreatePlots(){
   cPerTot_PU          -> Write();
   cPerTot_PU          -> Close();
 
+  TCanvas *cChi2_PU   = new TCanvas("cChi2WithPileup", "", fWidth2P, fHeight2P);
+  TPad    *pChi21D_PU = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pChi22D_PU = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cChi2_PU          -> cd();
+  pChi21D_PU        -> Draw();
+  pChi22D_PU        -> Draw();
+  pChi21D_PU        -> cd();
+  hTrackChi2_PU     -> Draw();
+  txtPU             -> Draw();
+  pChi22D_PU        -> cd();
+  hTrackPtVsChi2_PU -> Draw("colz");
+  fOut              -> cd();
+  cChi2_PU          -> Write();
+  cChi2_PU          -> Close();
+
+  TCanvas *cNDF_PU   = new TCanvas("cNDFWithPileup", "", fWidth2P, fHeight2P);
+  TPad    *pNDF1D_PU = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
+  TPad    *pNDF2D_PU = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
+  cNDF_PU          -> cd();
+  pNDF1D_PU        -> Draw();
+  pNDF2D_PU        -> Draw();
+  pNDF1D_PU        -> cd();
+  hTrackNDF_PU     -> Draw();
+  txtPU            -> Draw();
+  pNDF2D_PU        -> cd();
+  hTrackPtVsNDF_PU -> Draw("colz");
+  fOut             -> cd();
+  cNDF_PU          -> Write();
+  cNDF_PU          -> Close();
+
   TCanvas *cQuality_PU   = new TCanvas("cQualityWithPileup", "", fWidth2P, fHeight2P);
   TPad    *pQuality1D_PU = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
   TPad    *pQuality2D_PU = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]); 
@@ -3878,6 +4280,7 @@ void STrackCutStudy::SaveHists() {
 
   // save histograms
   dOut[0]               -> cd();
+  hTrackNMms            -> Write();
   hTrackNMap            -> Write();
   hTrackNInt            -> Write();
   hTrackNTpc            -> Write();
@@ -3886,6 +4289,8 @@ void STrackCutStudy::SaveHists() {
   hTrackPerInt          -> Write();
   hTrackPerTpc          -> Write();
   hTrackPerTot          -> Write();
+  hTrackChi2            -> Write();
+  hTrackNDF             -> Write();
   hTrackQuality         -> Write();
   hTrackDCAxy           -> Write();
   hTrackDCAz            -> Write();
@@ -3897,6 +4302,7 @@ void STrackCutStudy::SaveHists() {
   hDeltaEta             -> Write();
   hDeltaPhi             -> Write();
   hDeltaPt              -> Write();
+  hTrackPtVsNMms        -> Write();
   hTrackPtVsNMap        -> Write();
   hTrackPtVsNInt        -> Write();
   hTrackPtVsNTpc        -> Write();
@@ -3905,6 +4311,8 @@ void STrackCutStudy::SaveHists() {
   hTrackPtVsPerInt      -> Write();
   hTrackPtVsPerTpc      -> Write();
   hTrackPtVsPerTot      -> Write();
+  hTrackPtVsChi2        -> Write();
+  hTrackPtVsNDF         -> Write();
   hTrackPtVsQuality     -> Write();
   hTrackPtVsDCAxy       -> Write();
   hTrackPtVsDCAz        -> Write();
@@ -3914,6 +4322,7 @@ void STrackCutStudy::SaveHists() {
   hDeltaPhiVsTrkPt      -> Write();
   hDeltaPtVsTrkPt       -> Write();
   dOut[1]               -> cd();
+  hTruthNMms            -> Write();
   hTruthNMap            -> Write();
   hTruthNInt            -> Write();
   hTruthNTpc            -> Write();
@@ -3930,10 +4339,13 @@ void STrackCutStudy::SaveHists() {
   hFracVsTruthEta       -> Write();
   hFracVsTruthPhi       -> Write();
   hFracVsTruthPt        -> Write();
+  hTruthPtVsNMms        -> Write();
   hTruthPtVsNMap        -> Write();
   hTruthPtVsNInt        -> Write();
   hTruthPtVsNTpc        -> Write();
   hTruthPtVsNTot        -> Write();
+  hTruthPtVsChi2        -> Write();
+  hTruthPtVsNDF         -> Write();
   hTruthPtVsQuality     -> Write();
   hTruthPtVsDCAxy       -> Write();
   hTruthPtVsDCAz        -> Write();
@@ -3943,6 +4355,7 @@ void STrackCutStudy::SaveHists() {
   hDeltaPhiVsTruPt      -> Write();
   hDeltaPtVsTruPt       -> Write();
   dOut[2]               -> cd();
+  hWeirdNMms            -> Write();
   hWeirdNMap            -> Write();
   hWeirdNInt            -> Write();
   hWeirdNTpc            -> Write();
@@ -3951,6 +4364,8 @@ void STrackCutStudy::SaveHists() {
   hWeirdPerInt          -> Write();
   hWeirdPerTpc          -> Write();
   hWeirdPerTot          -> Write();
+  hWeirdChi2            -> Write();
+  hWeirdNDF             -> Write();
   hWeirdQuality         -> Write();
   hWeirdDCAxy           -> Write();
   hWeirdDCAz            -> Write();
@@ -3963,6 +4378,7 @@ void STrackCutStudy::SaveHists() {
   hWeirdDeltaPhi        -> Write();
   hWeirdDeltaPt         -> Write();
   dOut[3]               -> cd();
+  hTrackNMms_PU         -> Write();
   hTrackNMap_PU         -> Write();
   hTrackNInt_PU         -> Write();
   hTrackNTpc_PU         -> Write();
@@ -3971,6 +4387,8 @@ void STrackCutStudy::SaveHists() {
   hTrackPerInt_PU       -> Write();
   hTrackPerTpc_PU       -> Write();
   hTrackPerTot_PU       -> Write();
+  hTrackChi2_PU         -> Write();
+  hTrackNDF_PU          -> Write();
   hTrackQuality_PU      -> Write();
   hTrackDCAxy_PU        -> Write();
   hTrackDCAz_PU         -> Write();
@@ -3982,6 +4400,7 @@ void STrackCutStudy::SaveHists() {
   hDeltaEta_PU          -> Write();
   hDeltaPhi_PU          -> Write();
   hDeltaPt_PU           -> Write();
+  hTrackPtVsNMms_PU     -> Write();
   hTrackPtVsNMap_PU     -> Write();
   hTrackPtVsNInt_PU     -> Write();
   hTrackPtVsNTpc_PU     -> Write();
@@ -3990,6 +4409,8 @@ void STrackCutStudy::SaveHists() {
   hTrackPtVsPerInt_PU   -> Write();
   hTrackPtVsPerTpc_PU   -> Write();
   hTrackPtVsPerTot_PU   -> Write();
+  hTrackPtVsChi2_PU     -> Write();
+  hTrackPtVsNDF_PU      -> Write();
   hTrackPtVsQuality_PU  -> Write();
   hTrackPtVsDCAxy_PU    -> Write();
   hTrackPtVsDCAz_PU     -> Write();

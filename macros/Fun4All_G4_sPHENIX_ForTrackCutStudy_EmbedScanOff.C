@@ -568,8 +568,8 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_EmbedScanOff(
     // turn on evaluations
     eval -> do_cluster_eval(false);
     eval -> do_g4hit_eval(false);
-    eval -> do_hit_eval(true);  // enable to see the hits that includes the chamber physics...
-    eval -> do_gpoint_eval(true);
+    eval -> do_hit_eval(false);  // enable to see the hits that includes the chamber physics...
+    eval -> do_gpoint_eval(false);
     eval -> do_vtx_eval_light(true);
     eval -> do_eval_light(true);
     eval -> set_use_initial_vertex(G4TRACKING::g4eval_use_initial_vertex);

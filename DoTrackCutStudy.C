@@ -31,10 +31,10 @@ void DoTrackCutStudy() {
   const TString sInTupleEO("ntp_track");
   const TString sInTuplePU("ntp_gtrack");
 
-  // calculation parameters
-  // TODO: rename these to be more accurate
-  const Double_t weirdPtFracMin(0.20);
-  const Double_t weirdPtFracMax(1.20);
+  // study parameters
+  const Bool_t   doIntNorm(true);
+  const Double_t normalPtFracMin(0.20);
+  const Double_t normalPtFracMax(1.20);
 
   /* TODO: add functions to specify applied cuts */
 
@@ -42,7 +42,7 @@ void DoTrackCutStudy() {
   STrackCutStudy *study = new STrackCutStudy();
   study -> SetInputOutputFiles(sInFileEO, sInFilePU, sOutFile);
   study -> SetInputTuples(sInTupleEO, sInTuplePU);
-  study -> SetWeirdFractionCuts(weirdPtFracMin, weirdPtFracMax);
+  study -> SetStudyParameters(doIntNorm, normalPtFracMin, normalPtFracMax);
   study -> Init();
   study -> Analyze();
   study -> End();

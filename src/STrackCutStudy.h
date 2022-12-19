@@ -96,7 +96,7 @@ class STrackCutStudy {
     // public methods
     void SetInputOutputFiles(const TString sEmbedOnlyInput, const TString sPileupInput, const TString sOutput);
     void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple);
-    void SetWeirdFractionCuts(const Double_t weirdFracMin, const Double_t weirdFracMax);
+    void SetStudyParameters(const Bool_t intNorm, const Double_t weirdFracMin, const Double_t weirdFracMax);
     void Init();
     void Analyze();
     void End();
@@ -388,9 +388,10 @@ class STrackCutStudy {
     TH2D *hDeltaPhiVsNoPrPt_PU;
     TH2D *hDeltaPtVsNoPrPt_PU;
 
-    // calculation parameters
-    Double_t weirdPtFracMin;
-    Double_t weirdPtFracMax;
+    // study parameters
+    Bool_t   doIntNorm;
+    Double_t normalPtFracMin;
+    Double_t normalPtFracMax;
 
     // embed-only leaves
     Float_t event;

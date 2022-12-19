@@ -20,8 +20,9 @@ using namespace std;
 
 STrackCutStudy::STrackCutStudy() {
 
-  weirdPtFracMin = 0.;
-  weirdPtFracMax = 9999.;
+  doIntNorm       = false;
+  normalPtFracMin = 0.;
+  normalPtFracMax = 9999.;
   cout << "\n  Beginning track cut study."  << endl;
 
 }  // end ctor
@@ -73,15 +74,22 @@ void STrackCutStudy::SetInputTuples(const TString sEmbedOnlyTuple, const TString
 
 
 
-void STrackCutStudy::SetWeirdFractionCuts(const Double_t weirdFracMin, const Double_t weirdFracMax) {
+void STrackCutStudy::SetStudyParameters(const Bool_t intNorm, const Double_t normalFracMin, const Double_t normalFracMax) {
 
-  weirdPtFracMin = weirdFracMin;
-  weirdPtFracMax = weirdFracMax;
-  cout << "    Set weird pT fraction:\n"
-       << "      Weird Pt Fraction = (" << weirdPtFracMin << ", " << weirdPtFracMax << ")"
+  doIntNorm       = intNorm;
+  normalPtFracMin = normalFracMin;
+  normalPtFracMax = normalFracMax;
+  cout << "    Set normal pT fraction:\n"
+       << "      Normal Pt Fraction = (" << normalPtFracMin << ", " << normalPtFracMax << ")"
        << endl;
 
-}  // end 'SetWeirdFractionCuts(double, double)'
+  if (doIntNorm) {
+    cout << "    Normalizing by integral." << endl;
+  } else {
+    cout << "    No normalization." << endl;
+  }
+
+}  // end 'SetStudyParameters(double, double)'
 
 
 
@@ -111,8 +119,7 @@ void STrackCutStudy::Analyze() {
   cout << "    Analyzing:" <<endl;
 
   // prepare for embed-only entry loop
-  //Long64_t nEntriesEO = ntTrkEO -> GetEntries();
-  Long64_t nEntriesEO = 1000;
+  Long64_t nEntriesEO = ntTrkEO -> GetEntries();
   cout << "      Beginning embed-only entry loop: " << nEntriesEO << " entries to process..." << endl;
 
   // loop over embed-only tuple entries
@@ -258,7 +265,7 @@ void STrackCutStudy::Analyze() {
     hDeltaPtVsTruPt    -> Fill(gpt, deltaPt);
   
     // fill embed_only weird histograms
-    const Bool_t isWeirdTrack = ((ptFrac < weirdPtFracMin) || (ptFrac > weirdPtFracMax));
+    const Bool_t isWeirdTrack = ((ptFrac < normalPtFracMin) || (ptFrac > normalPtFracMax));
     if (isWeirdTrack) {
       hWeirdNMms       -> Fill(nlmms);
       hWeirdNMap       -> Fill(nlmaps);
@@ -294,8 +301,7 @@ void STrackCutStudy::Analyze() {
   cout << "      Finished embed-only entry loop." << endl;
 
   // prepare for embed-only entry loop
-  //Long64_t nEntriesPU = ntTrkPU -> GetEntries();
-  Long64_t nEntriesPU = 1000;
+  Long64_t nEntriesPU = ntTrkPU -> GetEntries();
   cout << "      Beginning with-pileup entry loop: " << nEntriesPU << " entries to process..." << endl;
 
   // loop over embed-only tuple entries
@@ -483,7 +489,537 @@ void STrackCutStudy::Analyze() {
   }  // end with-pileup entry loop
   cout << "      Finished with-pileup entry loop." << endl;
 
-  /* TODO: normalize histograms */
+  // normalize histograms if needed
+  if (doIntNorm) {
+
+    // track histograms
+    const Double_t iTrackNMms         = hTrackNMms         -> Integral();
+    const Double_t iTrackNMap         = hTrackNMap         -> Integral();
+    const Double_t iTrackNInt         = hTrackNInt         -> Integral();
+    const Double_t iTrackNTpc         = hTrackNTpc         -> Integral();
+    const Double_t iTrackNTot         = hTrackNTot         -> Integral();
+    const Double_t iTrackPerMms       = hTrackPerMms       -> Integral();
+    const Double_t iTrackPerMap       = hTrackPerMap       -> Integral();
+    const Double_t iTrackPerInt       = hTrackPerInt       -> Integral();
+    const Double_t iTrackPerTpc       = hTrackPerTpc       -> Integral();
+    const Double_t iTrackPerTot       = hTrackPerTot       -> Integral();
+    const Double_t iTrackChi2         = hTrackChi2         -> Integral();
+    const Double_t iTrackNDF          = hTrackNDF          -> Integral();
+    const Double_t iTrackQuality      = hTrackQuality      -> Integral();
+    const Double_t iTrackDCAxy        = hTrackDCAxy        -> Integral();
+    const Double_t iTrackDCAz         = hTrackDCAz         -> Integral();
+    const Double_t iTrackVx           = hTrackVx           -> Integral();
+    const Double_t iTrackVy           = hTrackVy           -> Integral();
+    const Double_t iTrackVz           = hTrackVz           -> Integral();
+    const Double_t iTrackEta          = hTrackEta          -> Integral();
+    const Double_t iTrackPhi          = hTrackPhi          -> Integral();
+    const Double_t iTrackPt           = hTrackPt           -> Integral();
+    const Double_t iDeltaDCAxy        = hDeltaDCAxy        -> Integral();
+    const Double_t iDeltaDCAz         = hDeltaDCAz         -> Integral();
+    const Double_t iDeltaEta          = hDeltaEta          -> Integral();
+    const Double_t iDeltaPhi          = hDeltaPhi          -> Integral();
+    const Double_t iDeltaPt           = hDeltaPt           -> Integral();
+    const Double_t iTrackPtVsNMms     = hTrackPtVsNMms     -> Integral();
+    const Double_t iTrackPtVsNMap     = hTrackPtVsNMap     -> Integral();
+    const Double_t iTrackPtVsNInt     = hTrackPtVsNInt     -> Integral();
+    const Double_t iTrackPtVsNTpc     = hTrackPtVsNTpc     -> Integral();
+    const Double_t iTrackPtVsNTot     = hTrackPtVsNTot     -> Integral();
+    const Double_t iTrackPtVsPerMap   = hTrackPtVsPerMap   -> Integral();
+    const Double_t iTrackPtVsPerInt   = hTrackPtVsPerInt   -> Integral();
+    const Double_t iTrackPtVsPerTpc   = hTrackPtVsPerTpc   -> Integral();
+    const Double_t iTrackPtVsPerTot   = hTrackPtVsPerTot   -> Integral();
+    const Double_t iTrackPtVsChi2     = hTrackPtVsChi2     -> Integral();
+    const Double_t iTrackPtVsNDF      = hTrackPtVsNDF      -> Integral();
+    const Double_t iTrackPtVsQuality  = hTrackPtVsQuality  -> Integral();
+    const Double_t iTrackPtVsDCAxy    = hTrackPtVsDCAxy    -> Integral();
+    const Double_t iTrackPtVsDCAz     = hTrackPtVsDCAz     -> Integral();
+    const Double_t iDeltaDCAxyVsTrkPt = hDeltaDCAxyVsTrkPt -> Integral();
+    const Double_t iDeltaDCAzVsTrkPt  = hDeltaDCAzVsTrkPt  -> Integral();
+    const Double_t iDeltaEtaVsTrkPt   = hDeltaEtaVsTrkPt   -> Integral();
+    const Double_t iDeltaPhiVsTrkPt   = hDeltaPhiVsTrkPt   -> Integral();
+    const Double_t iDeltaPtVsTrkPt    = hDeltaPtVsTrkPt    -> Integral();
+    if (iTrackNMms         > 0.) hTrackNMms         -> Scale(1. / iTrackNMms);
+    if (iTrackNMap         > 0.) hTrackNMap         -> Scale(1. / iTrackNMap);
+    if (iTrackNInt         > 0.) hTrackNInt         -> Scale(1. / iTrackNInt);
+    if (iTrackNTpc         > 0.) hTrackNTpc         -> Scale(1. / iTrackNTpc);
+    if (iTrackNTot         > 0.) hTrackNTot         -> Scale(1. / iTrackNTot);
+    if (iTrackPerMms       > 0.) hTrackPerMms       -> Scale(1. / iTrackPerMms);
+    if (iTrackPerMap       > 0.) hTrackPerMap       -> Scale(1. / iTrackPerMap);
+    if (iTrackPerInt       > 0.) hTrackPerInt       -> Scale(1. / iTrackPerInt);
+    if (iTrackPerTpc       > 0.) hTrackPerTpc       -> Scale(1. / iTrackPerTpc);
+    if (iTrackPerTot       > 0.) hTrackPerTot       -> Scale(1. / iTrackPerTot);
+    if (iTrackChi2         > 0.) hTrackChi2         -> Scale(1. / iTrackChi2);
+    if (iTrackNDF          > 0.) hTrackNDF          -> Scale(1. / iTrackNDF);
+    if (iTrackQuality      > 0.) hTrackQuality      -> Scale(1. / iTrackQuality);
+    if (iTrackDCAxy        > 0.) hTrackDCAxy        -> Scale(1. / iTrackDCAxy);
+    if (iTrackDCAz         > 0.) hTrackDCAz         -> Scale(1. / iTrackDCAz);
+    if (iTrackVx           > 0.) hTrackVx           -> Scale(1. / iTrackVx);
+    if (iTrackVy           > 0.) hTrackVy           -> Scale(1. / iTrackVy);
+    if (iTrackVz           > 0.) hTrackVz           -> Scale(1. / iTrackVz);
+    if (iTrackEta          > 0.) hTrackEta          -> Scale(1. / iTrackEta);
+    if (iTrackPhi          > 0.) hTrackPhi          -> Scale(1. / iTrackPhi);
+    if (iTrackPt           > 0.) hTrackPt           -> Scale(1. / iTrackPt);
+    if (iDeltaDCAxy        > 0.) hDeltaDCAxy        -> Scale(1. / iDeltaDCAxy);
+    if (iDeltaDCAz         > 0.) hDeltaDCAz         -> Scale(1. / iDeltaDCAz);
+    if (iDeltaEta          > 0.) hDeltaEta          -> Scale(1. / iDeltaEta);
+    if (iDeltaPhi          > 0.) hDeltaPhi          -> Scale(1. / iDeltaPhi);
+    if (iDeltaPt           > 0.) hDeltaPt           -> Scale(1. / iDeltaPt);
+    if (iTrackPtVsNMms     > 0.) hTrackPtVsNMms     -> Scale(1. / iTrackPtVsNMms);
+    if (iTrackPtVsNMap     > 0.) hTrackPtVsNMap     -> Scale(1. / iTrackPtVsNMap);
+    if (iTrackPtVsNInt     > 0.) hTrackPtVsNInt     -> Scale(1. / iTrackPtVsNInt);
+    if (iTrackPtVsNTpc     > 0.) hTrackPtVsNTpc     -> Scale(1. / iTrackPtVsNTpc);
+    if (iTrackPtVsNTot     > 0.) hTrackPtVsNTot     -> Scale(1. / iTrackPtVsNTot);
+    if (iTrackPtVsPerMap   > 0.) hTrackPtVsPerMap   -> Scale(1. / iTrackPtVsPerMap);
+    if (iTrackPtVsPerInt   > 0.) hTrackPtVsPerInt   -> Scale(1. / iTrackPtVsPerInt);
+    if (iTrackPtVsPerTpc   > 0.) hTrackPtVsPerTpc   -> Scale(1. / iTrackPtVsPerTpc);
+    if (iTrackPtVsPerTot   > 0.) hTrackPtVsPerTot   -> Scale(1. / iTrackPtVsPerTot);
+    if (iTrackPtVsChi2     > 0.) hTrackPtVsChi2     -> Scale(1. / iTrackPtVsChi2);
+    if (iTrackPtVsNDF      > 0.) hTrackPtVsNDF      -> Scale(1. / iTrackPtVsNDF);
+    if (iTrackPtVsQuality  > 0.) hTrackPtVsQuality  -> Scale(1. / iTrackPtVsQuality);
+    if (iTrackPtVsDCAxy    > 0.) hTrackPtVsDCAxy    -> Scale(1. / iTrackPtVsDCAxy);
+    if (iTrackPtVsDCAz     > 0.) hTrackPtVsDCAz     -> Scale(1. / iTrackPtVsDCAz);
+    if (iDeltaDCAxyVsTrkPt > 0.) hDeltaDCAxyVsTrkPt -> Scale(1. / iDeltaDCAxyVsTrkPt);
+    if (iDeltaDCAzVsTrkPt  > 0.) hDeltaDCAzVsTrkPt  -> Scale(1. / iDeltaDCAzVsTrkPt);
+    if (iDeltaEtaVsTrkPt   > 0.) hDeltaEtaVsTrkPt   -> Scale(1. / iDeltaEtaVsTrkPt);
+    if (iDeltaPhiVsTrkPt   > 0.) hDeltaPhiVsTrkPt   -> Scale(1. / iDeltaPhiVsTrkPt);
+    if (iDeltaPtVsTrkPt    > 0.) hDeltaPtVsTrkPt    -> Scale(1. / iDeltaPtVsTrkPt);
+
+    // truth histograms
+    const Double_t iTruthNMms         = hTruthNMms         -> Integral();
+    const Double_t iTruthNMap         = hTruthNMap         -> Integral();
+    const Double_t iTruthNInt         = hTruthNInt         -> Integral();
+    const Double_t iTruthNTpc         = hTruthNTpc         -> Integral();
+    const Double_t iTruthNTot         = hTruthNTot         -> Integral();
+    const Double_t iTruthEta          = hTruthEta          -> Integral();
+    const Double_t iTruthPhi          = hTruthPhi          -> Integral();
+    const Double_t iTruthPt           = hTruthPt           -> Integral();
+    const Double_t iTruthVx           = hTruthVx           -> Integral();
+    const Double_t iTruthVy           = hTruthVy           -> Integral();
+    const Double_t iTruthVz           = hTruthVz           -> Integral();
+    const Double_t iTruthEtaFrac      = hTruthEtaFrac      -> Integral();
+    const Double_t iTruthPhiFrac      = hTruthPhiFrac      -> Integral();
+    const Double_t iTruthPtFrac       = hTruthPtFrac       -> Integral();
+    const Double_t iTruthEtaDiff      = hTruthEtaDiff      -> Integral();
+    const Double_t iTruthPhiDiff      = hTruthPhiDiff      -> Integral();
+    const Double_t iTruthPtDiff       = hTruthPtDiff       -> Integral();
+    const Double_t iTruthVxDiff       = hTruthVxDiff       -> Integral();
+    const Double_t iTruthVyDiff       = hTruthVyDiff       -> Integral();
+    const Double_t iTruthVzDiff       = hTruthVzDiff       -> Integral();
+    const Double_t iTruthVsTrackEta   = hTruthVsTrackEta   -> Integral();
+    const Double_t iTruthVsTrackPhi   = hTruthVsTrackPhi   -> Integral();
+    const Double_t iTruthVsTrackPt    = hTruthVsTrackPt    -> Integral();
+    const Double_t iTruthVsTrackVx    = hTruthVsTrackVx    -> Integral();
+    const Double_t iTruthVsTrackVy    = hTruthVsTrackVy    -> Integral();
+    const Double_t iTruthVsTrackVz    = hTruthVsTrackVz    -> Integral();
+    const Double_t iFracVsTruthEta    = hFracVsTruthEta    -> Integral();
+    const Double_t iFracVsTruthPhi    = hFracVsTruthPhi    -> Integral();
+    const Double_t iFracVsTruthPt     = hFracVsTruthPt     -> Integral();
+    const Double_t iDiffVsTruthEta    = hDiffVsTruthEta    -> Integral();
+    const Double_t iDiffVsTruthPhi    = hDiffVsTruthPhi    -> Integral();
+    const Double_t iDiffVsTruthPt     = hDiffVsTruthPt     -> Integral();
+    const Double_t iTruthPtVsNMms     = hTruthPtVsNMms     -> Integral();
+    const Double_t iTruthPtVsNMap     = hTruthPtVsNMap     -> Integral();
+    const Double_t iTruthPtVsNInt     = hTruthPtVsNInt     -> Integral();
+    const Double_t iTruthPtVsNTpc     = hTruthPtVsNTpc     -> Integral();
+    const Double_t iTruthPtVsNTot     = hTruthPtVsNTot     -> Integral();
+    const Double_t iTruthPtVsChi2     = hTruthPtVsChi2     -> Integral();
+    const Double_t iTruthPtVsNDF      = hTruthPtVsNDF      -> Integral();
+    const Double_t iTruthPtVsQuality  = hTruthPtVsQuality  -> Integral();
+    const Double_t iFracPtVsQuality   = hFracPtVsQuality   -> Integral();
+    const Double_t iTruthPtVsDCAxy    = hTruthPtVsDCAxy    -> Integral();
+    const Double_t iTruthPtVsDCAz     = hTruthPtVsDCAz     -> Integral();
+    const Double_t iDeltaDCAxyVsTruPt = hDeltaDCAxyVsTruPt -> Integral();
+    const Double_t iDeltaDCAzVsTruPt  = hDeltaDCAzVsTruPt  -> Integral();
+    const Double_t iDeltaEtaVsTruPt   = hDeltaEtaVsTruPt   -> Integral();
+    const Double_t iDeltaPhiVsTruPt   = hDeltaPhiVsTruPt   -> Integral();
+    const Double_t iDeltaPtVsTruPt    = hDeltaPtVsTruPt    -> Integral();
+    if (iTruthNMms         > 0.) hTruthNMms         -> Scale(1. / iTruthNMms);
+    if (iTruthNMap         > 0.) hTruthNMap         -> Scale(1. / iTruthNMap);
+    if (iTruthNInt         > 0.) hTruthNInt         -> Scale(1. / iTruthNInt);
+    if (iTruthNTpc         > 0.) hTruthNTpc         -> Scale(1. / iTruthNTpc);
+    if (iTruthNTot         > 0.) hTruthNTot         -> Scale(1. / iTruthNTot);
+    if (iTruthEta          > 0.) hTruthEta          -> Scale(1. / iTruthEta);
+    if (iTruthPhi          > 0.) hTruthPhi          -> Scale(1. / iTruthPhi);
+    if (iTruthPt           > 0.) hTruthPt           -> Scale(1. / iTruthPt);
+    if (iTruthVx           > 0.) hTruthVx           -> Scale(1. / iTruthVx);
+    if (iTruthVy           > 0.) hTruthVy           -> Scale(1. / iTruthVy);
+    if (iTruthVz           > 0.) hTruthVz           -> Scale(1. / iTruthVz);
+    if (iTruthEtaFrac      > 0.) hTruthEtaFrac      -> Scale(1. / iTruthEtaFrac);
+    if (iTruthPhiFrac      > 0.) hTruthPhiFrac      -> Scale(1. / iTruthPhiFrac);
+    if (iTruthPtFrac       > 0.) hTruthPtFrac       -> Scale(1. / iTruthPtFrac);
+    if (iTruthEtaDiff      > 0.) hTruthEtaDiff      -> Scale(1. / iTruthEtaDiff);
+    if (iTruthPhiDiff      > 0.) hTruthPhiDiff      -> Scale(1. / iTruthPhiDiff);
+    if (iTruthPtDiff       > 0.) hTruthPtDiff       -> Scale(1. / iTruthPtDiff);
+    if (iTruthVxDiff       > 0.) hTruthVxDiff       -> Scale(1. / iTruthVxDiff);
+    if (iTruthVyDiff       > 0.) hTruthVyDiff       -> Scale(1. / iTruthVyDiff);
+    if (iTruthVzDiff       > 0.) hTruthVzDiff       -> Scale(1. / iTruthVzDiff);
+    if (iTruthVsTrackEta   > 0.) hTruthVsTrackEta   -> Scale(1. / iTruthVsTrackEta);
+    if (iTruthVsTrackPhi   > 0.) hTruthVsTrackPhi   -> Scale(1. / iTruthVsTrackPhi);
+    if (iTruthVsTrackPt    > 0.) hTruthVsTrackPt    -> Scale(1. / iTruthVsTrackPt);
+    if (iTruthVsTrackVx    > 0.) hTruthVsTrackVx    -> Scale(1. / iTruthVsTrackVx);
+    if (iTruthVsTrackVy    > 0.) hTruthVsTrackVy    -> Scale(1. / iTruthVsTrackVy);
+    if (iTruthVsTrackVz    > 0.) hTruthVsTrackVz    -> Scale(1. / iTruthVsTrackVz);
+    if (iFracVsTruthEta    > 0.) hFracVsTruthEta    -> Scale(1. / iFracVsTruthEta);
+    if (iFracVsTruthPhi    > 0.) hFracVsTruthPhi    -> Scale(1. / iFracVsTruthPhi);
+    if (iFracVsTruthPt     > 0.) hFracVsTruthPt     -> Scale(1. / iFracVsTruthPt);
+    if (iDiffVsTruthEta    > 0.) hDiffVsTruthEta    -> Scale(1. / iDiffVsTruthEta);
+    if (iDiffVsTruthPhi    > 0.) hDiffVsTruthPhi    -> Scale(1. / iDiffVsTruthPhi);
+    if (iDiffVsTruthPt     > 0.) hDiffVsTruthPt     -> Scale(1. / iDiffVsTruthPt);
+    if (iTruthPtVsNMms     > 0.) hTruthPtVsNMms     -> Scale(1. / iTruthPtVsNMms);
+    if (iTruthPtVsNMap     > 0.) hTruthPtVsNMap     -> Scale(1. / iTruthPtVsNMap);
+    if (iTruthPtVsNInt     > 0.) hTruthPtVsNInt     -> Scale(1. / iTruthPtVsNInt);
+    if (iTruthPtVsNTpc     > 0.) hTruthPtVsNTpc     -> Scale(1. / iTruthPtVsNTpc);
+    if (iTruthPtVsNTot     > 0.) hTruthPtVsNTot     -> Scale(1. / iTruthPtVsNTot);
+    if (iTruthPtVsChi2     > 0.) hTruthPtVsChi2     -> Scale(1. / iTruthPtVsChi2);
+    if (iTruthPtVsNDF      > 0.) hTruthPtVsNDF      -> Scale(1. / iTruthPtVsNDF);
+    if (iTruthPtVsQuality  > 0.) hTruthPtVsQuality  -> Scale(1. / iTruthPtVsQuality);
+    if (iFracPtVsQuality   > 0.) hFracPtVsQuality   -> Scale(1. / iFracPtVsQuality);
+    if (iTruthPtVsDCAxy    > 0.) hTruthPtVsDCAxy    -> Scale(1. / iTruthPtVsDCAxy);
+    if (iTruthPtVsDCAz     > 0.) hTruthPtVsDCAz     -> Scale(1. / iTruthPtVsDCAz);
+    if (iDeltaDCAxyVsTruPt > 0.) hDeltaDCAxyVsTruPt -> Scale(1. / iDeltaDCAxyVsTruPt);
+    if (iDeltaDCAzVsTruPt  > 0.) hDeltaDCAzVsTruPt  -> Scale(1. / iDeltaDCAzVsTruPt);
+    if (iDeltaEtaVsTruPt   > 0.) hDeltaEtaVsTruPt   -> Scale(1. / iDeltaEtaVsTruPt);
+    if (iDeltaPhiVsTruPt   > 0.) hDeltaPhiVsTruPt   -> Scale(1. / iDeltaPhiVsTruPt);
+    if (iDeltaPtVsTruPt    > 0.) hDeltaPtVsTruPt    -> Scale(1. / iDeltaPtVsTruPt);
+
+    // weird histograms
+    const Double_t iWeirdNMms       = hWeirdNMms       -> Integral();
+    const Double_t iWeirdNMap       = hWeirdNMap       -> Integral();
+    const Double_t iWeirdNInt       = hWeirdNInt       -> Integral();
+    const Double_t iWeirdNTpc       = hWeirdNTpc       -> Integral();
+    const Double_t iWeirdNTot       = hWeirdNTot       -> Integral();
+    const Double_t iWeirdPerMms     = hWeirdPerMms     -> Integral();
+    const Double_t iWeirdPerMap     = hWeirdPerMap     -> Integral();
+    const Double_t iWeirdPerInt     = hWeirdPerInt     -> Integral();
+    const Double_t iWeirdPerTpc     = hWeirdPerTpc     -> Integral();
+    const Double_t iWeirdPerTot     = hWeirdPerTot     -> Integral();
+    const Double_t iWeirdChi2       = hWeirdChi2       -> Integral();
+    const Double_t iWeirdNDF        = hWeirdNDF        -> Integral();
+    const Double_t iWeirdQuality    = hWeirdQuality    -> Integral();
+    const Double_t iWeirdDCAxy      = hWeirdDCAxy      -> Integral();
+    const Double_t iWeirdDCAz       = hWeirdDCAz       -> Integral();
+    const Double_t iWeirdVx         = hWeirdVx         -> Integral();
+    const Double_t iWeirdVy         = hWeirdVy         -> Integral();
+    const Double_t iWeirdVz         = hWeirdVz         -> Integral();
+    const Double_t iWeirdEta        = hWeirdEta        -> Integral();
+    const Double_t iWeirdPhi        = hWeirdPhi        -> Integral();
+    const Double_t iWeirdPt         = hWeirdPt         -> Integral();
+    const Double_t iWeirdDeltaDCAxy = hWeirdDeltaDCAxy -> Integral();
+    const Double_t iWeirdDeltaDCAz  = hWeirdDeltaDCAz  -> Integral();
+    const Double_t iWeirdDeltaEta   = hWeirdDeltaEta   -> Integral();
+    const Double_t iWeirdDeltaPhi   = hWeirdDeltaPhi   -> Integral();
+    const Double_t iWeirdDeltaPt    = hWeirdDeltaPt    -> Integral();
+    const Double_t iWeirdVxDiff     = hWeirdVxDiff     -> Integral();
+    const Double_t iWeirdVyDiff     = hWeirdVyDiff     -> Integral();
+    const Double_t iWeirdVzDiff     = hWeirdVzDiff     -> Integral();
+    if (iWeirdNMms       > 0.) hWeirdNMms       -> Scale(1. / iWeirdNMms);
+    if (iWeirdNMap       > 0.) hWeirdNMap       -> Scale(1. / iWeirdNMap);
+    if (iWeirdNInt       > 0.) hWeirdNInt       -> Scale(1. / iWeirdNInt);
+    if (iWeirdNTpc       > 0.) hWeirdNTpc       -> Scale(1. / iWeirdNTpc);
+    if (iWeirdNTot       > 0.) hWeirdNTot       -> Scale(1. / iWeirdNTot);
+    if (iWeirdPerMms     > 0.) hWeirdPerMms     -> Scale(1. / iWeirdPerMms);
+    if (iWeirdPerMap     > 0.) hWeirdPerMap     -> Scale(1. / iWeirdPerMap);
+    if (iWeirdPerInt     > 0.) hWeirdPerInt     -> Scale(1. / iWeirdPerInt);
+    if (iWeirdPerTpc     > 0.) hWeirdPerTpc     -> Scale(1. / iWeirdPerTpc);
+    if (iWeirdPerTot     > 0.) hWeirdPerTot     -> Scale(1. / iWeirdPerTot);
+    if (iWeirdChi2       > 0.) hWeirdChi2       -> Scale(1. / iWeirdChi2);
+    if (iWeirdNDF        > 0.) hWeirdNDF        -> Scale(1. / iWeirdNDF);
+    if (iWeirdQuality    > 0.) hWeirdQuality    -> Scale(1. / iWeirdQuality);
+    if (iWeirdDCAxy      > 0.) hWeirdDCAxy      -> Scale(1. / iWeirdDCAxy);
+    if (iWeirdDCAz       > 0.) hWeirdDCAz       -> Scale(1. / iWeirdDCAz);
+    if (iWeirdVx         > 0.) hWeirdVx         -> Scale(1. / iWeirdVx);
+    if (iWeirdVy         > 0.) hWeirdVy         -> Scale(1. / iWeirdVy);
+    if (iWeirdVz         > 0.) hWeirdVz         -> Scale(1. / iWeirdVz);
+    if (iWeirdEta        > 0.) hWeirdEta        -> Scale(1. / iWeirdEta);
+    if (iWeirdPhi        > 0.) hWeirdPhi        -> Scale(1. / iWeirdPhi);
+    if (iWeirdPt         > 0.) hWeirdPt         -> Scale(1. / iWeirdPt);
+    if (iWeirdDeltaDCAxy > 0.) hWeirdDeltaDCAxy -> Scale(1. / iWeirdDeltaDCAxy);
+    if (iWeirdDeltaDCAz  > 0.) hWeirdDeltaDCAz  -> Scale(1. / iWeirdDeltaDCAz);
+    if (iWeirdDeltaEta   > 0.) hWeirdDeltaEta   -> Scale(1. / iWeirdDeltaEta);
+    if (iWeirdDeltaPhi   > 0.) hWeirdDeltaPhi   -> Scale(1. / iWeirdDeltaPhi);
+    if (iWeirdDeltaPt    > 0.) hWeirdDeltaPt    -> Scale(1. / iWeirdDeltaPt);
+    if (iWeirdVxDiff     > 0.) hWeirdVxDiff     -> Scale(1. / iWeirdVxDiff);
+    if (iWeirdVyDiff     > 0.) hWeirdVyDiff     -> Scale(1. / iWeirdVyDiff);
+    if (iWeirdVzDiff     > 0.) hWeirdVzDiff     -> Scale(1. / iWeirdVzDiff);
+
+    // pile-up histograms
+    const Double_t iTrackNMms_PU         = hTrackNMms_PU         -> Integral();
+    const Double_t iTrackNMap_PU         = hTrackNMap_PU         -> Integral();
+    const Double_t iTrackNInt_PU         = hTrackNInt_PU         -> Integral();
+    const Double_t iTrackNTpc_PU         = hTrackNTpc_PU         -> Integral();
+    const Double_t iTrackNTot_PU         = hTrackNTot_PU         -> Integral();
+    const Double_t iTrackPerMms_PU       = hTrackPerMms_PU       -> Integral();
+    const Double_t iTrackPerMap_PU       = hTrackPerMap_PU       -> Integral();
+    const Double_t iTrackPerInt_PU       = hTrackPerInt_PU       -> Integral();
+    const Double_t iTrackPerTpc_PU       = hTrackPerTpc_PU       -> Integral();
+    const Double_t iTrackPerTot_PU       = hTrackPerTot_PU       -> Integral();
+    const Double_t iTrackChi2_PU         = hTrackChi2_PU         -> Integral();
+    const Double_t iTrackNDF_PU          = hTrackNDF_PU          -> Integral();
+    const Double_t iTrackQuality_PU      = hTrackQuality_PU      -> Integral();
+    const Double_t iTrackDCAxy_PU        = hTrackDCAxy_PU        -> Integral();
+    const Double_t iTrackDCAz_PU         = hTrackDCAz_PU         -> Integral();
+    const Double_t iTrackVx_PU           = hTrackVx_PU           -> Integral();
+    const Double_t iTrackVy_PU           = hTrackVy_PU           -> Integral();
+    const Double_t iTrackVz_PU           = hTrackVz_PU           -> Integral();
+    const Double_t iTrackEta_PU          = hTrackEta_PU          -> Integral();
+    const Double_t iTrackPhi_PU          = hTrackPhi_PU          -> Integral();
+    const Double_t iTrackPt_PU           = hTrackPt_PU           -> Integral();
+    const Double_t iDeltaDCAxy_PU        = hDeltaDCAxy_PU        -> Integral();
+    const Double_t iDeltaDCAz_PU         = hDeltaDCAz_PU         -> Integral();
+    const Double_t iDeltaEta_PU          = hDeltaEta_PU          -> Integral();
+    const Double_t iDeltaPhi_PU          = hDeltaPhi_PU          -> Integral();
+    const Double_t iDeltaPt_PU           = hDeltaPt_PU           -> Integral();
+    const Double_t iTrackPtVsNMms_PU     = hTrackPtVsNMms_PU     -> Integral();
+    const Double_t iTrackPtVsNMap_PU     = hTrackPtVsNMap_PU     -> Integral();
+    const Double_t iTrackPtVsNInt_PU     = hTrackPtVsNInt_PU     -> Integral();
+    const Double_t iTrackPtVsNTpc_PU     = hTrackPtVsNTpc_PU     -> Integral();
+    const Double_t iTrackPtVsNTot_PU     = hTrackPtVsNTot_PU     -> Integral();
+    const Double_t iTrackPtVsPerMap_PU   = hTrackPtVsPerMap_PU   -> Integral();
+    const Double_t iTrackPtVsPerInt_PU   = hTrackPtVsPerInt_PU   -> Integral();
+    const Double_t iTrackPtVsPerTpc_PU   = hTrackPtVsPerTpc_PU   -> Integral();
+    const Double_t iTrackPtVsPerTot_PU   = hTrackPtVsPerTot_PU   -> Integral();
+    const Double_t iTrackPtVsChi2_PU     = hTrackPtVsChi2_PU     -> Integral();
+    const Double_t iTrackPtVsNDF_PU      = hTrackPtVsNDF_PU      -> Integral();
+    const Double_t iTrackPtVsQuality_PU  = hTrackPtVsQuality_PU  -> Integral();
+    const Double_t iTrackPtVsDCAxy_PU    = hTrackPtVsDCAxy_PU    -> Integral();
+    const Double_t iTrackPtVsDCAz_PU     = hTrackPtVsDCAz_PU     -> Integral();
+    const Double_t iDeltaDCAxyVsTrkPt_PU = hDeltaDCAxyVsTrkPt_PU -> Integral();
+    const Double_t iDeltaDCAzVsTrkPt_PU  = hDeltaDCAzVsTrkPt_PU  -> Integral();
+    const Double_t iDeltaEtaVsTrkPt_PU   = hDeltaEtaVsTrkPt_PU   -> Integral();
+    const Double_t iDeltaPhiVsTrkPt_PU   = hDeltaPhiVsTrkPt_PU   -> Integral();
+    const Double_t iDeltaPtVsTrkPt_PU    = hDeltaPtVsTrkPt_PU    -> Integral();
+    if (iTrackNMms_PU         > 0.) hTrackNMms_PU         -> Scale(1. / iTrackNMms_PU);
+    if (iTrackNMap_PU         > 0.) hTrackNMap_PU         -> Scale(1. / iTrackNMap_PU);
+    if (iTrackNInt_PU         > 0.) hTrackNInt_PU         -> Scale(1. / iTrackNInt_PU);
+    if (iTrackNTpc_PU         > 0.) hTrackNTpc_PU         -> Scale(1. / iTrackNTpc_PU);
+    if (iTrackNTot_PU         > 0.) hTrackNTot_PU         -> Scale(1. / iTrackNTot_PU);
+    if (iTrackPerMms_PU       > 0.) hTrackPerMms_PU       -> Scale(1. / iTrackPerMms_PU);
+    if (iTrackPerMap_PU       > 0.) hTrackPerMap_PU       -> Scale(1. / iTrackPerMap_PU);
+    if (iTrackPerInt_PU       > 0.) hTrackPerInt_PU       -> Scale(1. / iTrackPerInt_PU);
+    if (iTrackPerTpc_PU       > 0.) hTrackPerTpc_PU       -> Scale(1. / iTrackPerTpc_PU);
+    if (iTrackPerTot_PU       > 0.) hTrackPerTot_PU       -> Scale(1. / iTrackPerTot_PU);
+    if (iTrackChi2_PU         > 0.) hTrackChi2_PU         -> Scale(1. / iTrackChi2_PU);
+    if (iTrackNDF_PU          > 0.) hTrackNDF_PU          -> Scale(1. / iTrackNDF_PU);
+    if (iTrackQuality_PU      > 0.) hTrackQuality_PU      -> Scale(1. / iTrackQuality_PU);
+    if (iTrackDCAxy_PU        > 0.) hTrackDCAxy_PU        -> Scale(1. / iTrackDCAxy_PU);
+    if (iTrackDCAz_PU         > 0.) hTrackDCAz_PU         -> Scale(1. / iTrackDCAz_PU);
+    if (iTrackVx_PU           > 0.) hTrackVx_PU           -> Scale(1. / iTrackVx_PU);
+    if (iTrackVy_PU           > 0.) hTrackVy_PU           -> Scale(1. / iTrackVy_PU);
+    if (iTrackVz_PU           > 0.) hTrackVz_PU           -> Scale(1. / iTrackVz_PU);
+    if (iTrackEta_PU          > 0.) hTrackEta_PU          -> Scale(1. / iTrackEta_PU);
+    if (iTrackPhi_PU          > 0.) hTrackPhi_PU          -> Scale(1. / iTrackPhi_PU);
+    if (iTrackPt_PU           > 0.) hTrackPt_PU           -> Scale(1. / iTrackPt_PU);
+    if (iDeltaDCAxy_PU        > 0.) hDeltaDCAxy_PU        -> Scale(1. / iDeltaDCAxy_PU);
+    if (iDeltaDCAz_PU         > 0.) hDeltaDCAz_PU         -> Scale(1. / iDeltaDCAz_PU);
+    if (iDeltaEta_PU          > 0.) hDeltaEta_PU          -> Scale(1. / iDeltaEta_PU);
+    if (iDeltaPhi_PU          > 0.) hDeltaPhi_PU          -> Scale(1. / iDeltaPhi_PU);
+    if (iDeltaPt_PU           > 0.) hDeltaPt_PU           -> Scale(1. / iDeltaPt_PU);
+    if (iTrackPtVsNMms_PU     > 0.) hTrackPtVsNMms_PU     -> Scale(1. / iTrackPtVsNMms_PU);
+    if (iTrackPtVsNMap_PU     > 0.) hTrackPtVsNMap_PU     -> Scale(1. / iTrackPtVsNMap_PU);
+    if (iTrackPtVsNInt_PU     > 0.) hTrackPtVsNInt_PU     -> Scale(1. / iTrackPtVsNInt_PU);
+    if (iTrackPtVsNTpc_PU     > 0.) hTrackPtVsNTpc_PU     -> Scale(1. / iTrackPtVsNTpc_PU);
+    if (iTrackPtVsNTot_PU     > 0.) hTrackPtVsNTot_PU     -> Scale(1. / iTrackPtVsNTot_PU);
+    if (iTrackPtVsPerMap_PU   > 0.) hTrackPtVsPerMap_PU   -> Scale(1. / iTrackPtVsPerMap_PU);
+    if (iTrackPtVsPerInt_PU   > 0.) hTrackPtVsPerInt_PU   -> Scale(1. / iTrackPtVsPerInt_PU);
+    if (iTrackPtVsPerTpc_PU   > 0.) hTrackPtVsPerTpc_PU   -> Scale(1. / iTrackPtVsPerTpc_PU);
+    if (iTrackPtVsPerTot_PU   > 0.) hTrackPtVsPerTot_PU   -> Scale(1. / iTrackPtVsPerTot_PU);
+    if (iTrackPtVsChi2_PU     > 0.) hTrackPtVsChi2_PU     -> Scale(1. / iTrackPtVsChi2_PU);
+    if (iTrackPtVsNDF_PU      > 0.) hTrackPtVsNDF_PU      -> Scale(1. / iTrackPtVsNDF_PU);
+    if (iTrackPtVsQuality_PU  > 0.) hTrackPtVsQuality_PU  -> Scale(1. / iTrackPtVsQuality_PU);
+    if (iTrackPtVsDCAxy_PU    > 0.) hTrackPtVsDCAxy_PU    -> Scale(1. / iTrackPtVsDCAxy_PU);
+    if (iTrackPtVsDCAz_PU     > 0.) hTrackPtVsDCAz_PU     -> Scale(1. / iTrackPtVsDCAz_PU);
+    if (iDeltaDCAxyVsTrkPt_PU > 0.) hDeltaDCAxyVsTrkPt_PU -> Scale(1. / iDeltaDCAxyVsTrkPt_PU);
+    if (iDeltaDCAzVsTrkPt_PU  > 0.) hDeltaDCAzVsTrkPt_PU  -> Scale(1. / iDeltaDCAzVsTrkPt_PU);
+    if (iDeltaEtaVsTrkPt_PU   > 0.) hDeltaEtaVsTrkPt_PU   -> Scale(1. / iDeltaEtaVsTrkPt_PU);
+    if (iDeltaPhiVsTrkPt_PU   > 0.) hDeltaPhiVsTrkPt_PU   -> Scale(1. / iDeltaPhiVsTrkPt_PU);
+    if (iDeltaPtVsTrkPt_PU    > 0.) hDeltaPtVsTrkPt_PU    -> Scale(1. / iDeltaPtVsTrkPt_PU);
+
+    // with-pileup primary histograms
+    const Double_t iPrimaryNMms_PU        = hPrimaryNMms_PU        -> Integral();
+    const Double_t iPrimaryNMap_PU        = hPrimaryNMap_PU        -> Integral();
+    const Double_t iPrimaryNInt_PU        = hPrimaryNInt_PU        -> Integral();
+    const Double_t iPrimaryNTpc_PU        = hPrimaryNTpc_PU        -> Integral();
+    const Double_t iPrimaryNTot_PU        = hPrimaryNTot_PU        -> Integral();
+    const Double_t iPrimaryPerMms_PU      = hPrimaryPerMms_PU      -> Integral();
+    const Double_t iPrimaryPerMap_PU      = hPrimaryPerMap_PU      -> Integral();
+    const Double_t iPrimaryPerInt_PU      = hPrimaryPerInt_PU      -> Integral();
+    const Double_t iPrimaryPerTpc_PU      = hPrimaryPerTpc_PU      -> Integral();
+    const Double_t iPrimaryPerTot_PU      = hPrimaryPerTot_PU      -> Integral();
+    const Double_t iPrimaryChi2_PU        = hPrimaryChi2_PU        -> Integral();
+    const Double_t iPrimaryNDF_PU         = hPrimaryNDF_PU         -> Integral();
+    const Double_t iPrimaryQuality_PU     = hPrimaryQuality_PU     -> Integral();
+    const Double_t iPrimaryDCAxy_PU       = hPrimaryDCAxy_PU       -> Integral();
+    const Double_t iPrimaryDCAz_PU        = hPrimaryDCAz_PU        -> Integral();
+    const Double_t iPrimaryVx_PU          = hPrimaryVx_PU          -> Integral();
+    const Double_t iPrimaryVy_PU          = hPrimaryVy_PU          -> Integral();
+    const Double_t iPrimaryVz_PU          = hPrimaryVz_PU          -> Integral();
+    const Double_t iPrimaryEta_PU         = hPrimaryEta_PU         -> Integral();
+    const Double_t iPrimaryPhi_PU         = hPrimaryPhi_PU         -> Integral();
+    const Double_t iPrimaryPt_PU          = hPrimaryPt_PU          -> Integral();
+    const Double_t iDeltaPrimDCAxy_PU     = hDeltaPrimDCAxy_PU     -> Integral();
+    const Double_t iDeltaPrimDCAz_PU      = hDeltaPrimDCAz_PU      -> Integral();
+    const Double_t iDeltaPrimEta_PU       = hDeltaPrimEta_PU       -> Integral();
+    const Double_t iDeltaPrimPhi_PU       = hDeltaPrimPhi_PU       -> Integral();
+    const Double_t iDeltaPrimPt_PU        = hDeltaPrimPt_PU        -> Integral();
+    const Double_t iPrimaryPtVsNMms_PU    = hPrimaryPtVsNMms_PU    -> Integral();
+    const Double_t iPrimaryPtVsNMap_PU    = hPrimaryPtVsNMap_PU    -> Integral();
+    const Double_t iPrimaryPtVsNInt_PU    = hPrimaryPtVsNInt_PU    -> Integral();
+    const Double_t iPrimaryPtVsNTpc_PU    = hPrimaryPtVsNTpc_PU    -> Integral();
+    const Double_t iPrimaryPtVsNTot_PU    = hPrimaryPtVsNTot_PU    -> Integral();
+    const Double_t iPrimaryPtVsPerMms_PU  = hPrimaryPtVsPerMms_PU  -> Integral();
+    const Double_t iPrimaryPtVsPerMap_PU  = hPrimaryPtVsPerMap_PU  -> Integral();
+    const Double_t iPrimaryPtVsPerInt_PU  = hPrimaryPtVsPerInt_PU  -> Integral();
+    const Double_t iPrimaryPtVsPerTpc_PU  = hPrimaryPtVsPerTpc_PU  -> Integral();
+    const Double_t iPrimaryPtVsPerTot_PU  = hPrimaryPtVsPerTot_PU  -> Integral();
+    const Double_t iPrimaryPtVsChi2_PU    = hPrimaryPtVsChi2_PU    -> Integral();
+    const Double_t iPrimaryPtVsNDF_PU     = hPrimaryPtVsNDF_PU     -> Integral();
+    const Double_t iPrimaryPtVsQuality_PU = hPrimaryPtVsQuality_PU -> Integral();
+    const Double_t iPrimaryPtVsDCAxy_PU   = hPrimaryPtVsDCAxy_PU   -> Integral();
+    const Double_t iPrimaryPtVsDCAz_PU    = hPrimaryPtVsDCAz_PU    -> Integral();
+    const Double_t iDeltaDCAxyVsPrimPt_PU = hDeltaDCAxyVsPrimPt_PU -> Integral();
+    const Double_t iDeltaDCAzVsPrimPt_PU  = hDeltaDCAzVsPrimPt_PU  -> Integral();
+    const Double_t iDeltaEtaVsPrimPt_PU   = hDeltaEtaVsPrimPt_PU   -> Integral();
+    const Double_t iDeltaPhiVsPrimPt_PU   = hDeltaPhiVsPrimPt_PU   -> Integral();
+    const Double_t iDeltaPtVsPrimPt_PU    = hDeltaPtVsPrimPt_PU    -> Integral();
+    if (iPrimaryNMms_PU        > 0.) hPrimaryNMms_PU        -> Scale(1. / iPrimaryNMms_PU);
+    if (iPrimaryNMap_PU        > 0.) hPrimaryNMap_PU        -> Scale(1. / iPrimaryNMap_PU);
+    if (iPrimaryNInt_PU        > 0.) hPrimaryNInt_PU        -> Scale(1. / iPrimaryNInt_PU);
+    if (iPrimaryNTpc_PU        > 0.) hPrimaryNTpc_PU        -> Scale(1. / iPrimaryNTpc_PU);
+    if (iPrimaryNTot_PU        > 0.) hPrimaryNTot_PU        -> Scale(1. / iPrimaryNTot_PU);
+    if (iPrimaryPerMms_PU      > 0.) hPrimaryPerMms_PU      -> Scale(1. / iPrimaryPerMms_PU);
+    if (iPrimaryPerMap_PU      > 0.) hPrimaryPerMap_PU      -> Scale(1. / iPrimaryPerMap_PU);
+    if (iPrimaryPerInt_PU      > 0.) hPrimaryPerInt_PU      -> Scale(1. / iPrimaryPerInt_PU);
+    if (iPrimaryPerTpc_PU      > 0.) hPrimaryPerTpc_PU      -> Scale(1. / iPrimaryPerTpc_PU);
+    if (iPrimaryPerTot_PU      > 0.) hPrimaryPerTot_PU      -> Scale(1. / iPrimaryPerTot_PU);
+    if (iPrimaryChi2_PU        > 0.) hPrimaryChi2_PU        -> Scale(1. / iPrimaryChi2_PU);
+    if (iPrimaryNDF_PU         > 0.) hPrimaryNDF_PU         -> Scale(1. / iPrimaryNDF_PU);
+    if (iPrimaryQuality_PU     > 0.) hPrimaryQuality_PU     -> Scale(1. / iPrimaryQuality_PU);
+    if (iPrimaryDCAxy_PU       > 0.) hPrimaryDCAxy_PU       -> Scale(1. / iPrimaryDCAxy_PU);
+    if (iPrimaryDCAz_PU        > 0.) hPrimaryDCAz_PU        -> Scale(1. / iPrimaryDCAz_PU);
+    if (iPrimaryVx_PU          > 0.) hPrimaryVx_PU          -> Scale(1. / iPrimaryVx_PU);
+    if (iPrimaryVy_PU          > 0.) hPrimaryVy_PU          -> Scale(1. / iPrimaryVy_PU);
+    if (iPrimaryVz_PU          > 0.) hPrimaryVz_PU          -> Scale(1. / iPrimaryVz_PU);
+    if (iPrimaryEta_PU         > 0.) hPrimaryEta_PU         -> Scale(1. / iPrimaryEta_PU);
+    if (iPrimaryPhi_PU         > 0.) hPrimaryPhi_PU         -> Scale(1. / iPrimaryPhi_PU);
+    if (iPrimaryPt_PU          > 0.) hPrimaryPt_PU          -> Scale(1. / iPrimaryPt_PU);
+    if (iDeltaPrimDCAxy_PU     > 0.) hDeltaPrimDCAxy_PU     -> Scale(1. / iDeltaPrimDCAxy_PU);
+    if (iDeltaPrimDCAz_PU      > 0.) hDeltaPrimDCAz_PU      -> Scale(1. / iDeltaPrimDCAz_PU);
+    if (iDeltaPrimEta_PU       > 0.) hDeltaPrimEta_PU       -> Scale(1. / iDeltaPrimEta_PU);
+    if (iDeltaPrimPhi_PU       > 0.) hDeltaPrimPhi_PU       -> Scale(1. / iDeltaPrimPhi_PU);
+    if (iDeltaPrimPt_PU        > 0.) hDeltaPrimPt_PU        -> Scale(1. / iDeltaPrimPt_PU);
+    if (iPrimaryPtVsNMms_PU    > 0.) hPrimaryPtVsNMms_PU    -> Scale(1. / iPrimaryPtVsNMms_PU);
+    if (iPrimaryPtVsNMap_PU    > 0.) hPrimaryPtVsNMap_PU    -> Scale(1. / iPrimaryPtVsNMap_PU);
+    if (iPrimaryPtVsNInt_PU    > 0.) hPrimaryPtVsNInt_PU    -> Scale(1. / iPrimaryPtVsNInt_PU);
+    if (iPrimaryPtVsNTpc_PU    > 0.) hPrimaryPtVsNTpc_PU    -> Scale(1. / iPrimaryPtVsNTpc_PU);
+    if (iPrimaryPtVsNTot_PU    > 0.) hPrimaryPtVsNTot_PU    -> Scale(1. / iPrimaryPtVsNTot_PU);
+    if (iPrimaryPtVsPerMms_PU  > 0.) hPrimaryPtVsPerMms_PU  -> Scale(1. / iPrimaryPtVsPerMms_PU);
+    if (iPrimaryPtVsPerMap_PU  > 0.) hPrimaryPtVsPerMap_PU  -> Scale(1. / iPrimaryPtVsPerMap_PU);
+    if (iPrimaryPtVsPerInt_PU  > 0.) hPrimaryPtVsPerInt_PU  -> Scale(1. / iPrimaryPtVsPerInt_PU);
+    if (iPrimaryPtVsPerTpc_PU  > 0.) hPrimaryPtVsPerTpc_PU  -> Scale(1. / iPrimaryPtVsPerTpc_PU);
+    if (iPrimaryPtVsPerTot_PU  > 0.) hPrimaryPtVsPerTot_PU  -> Scale(1. / iPrimaryPtVsPerTot_PU);
+    if (iPrimaryPtVsChi2_PU    > 0.) hPrimaryPtVsChi2_PU    -> Scale(1. / iPrimaryPtVsChi2_PU);
+    if (iPrimaryPtVsNDF_PU     > 0.) hPrimaryPtVsNDF_PU     -> Scale(1. / iPrimaryPtVsNDF_PU);
+    if (iPrimaryPtVsQuality_PU > 0.) hPrimaryPtVsQuality_PU -> Scale(1. / iPrimaryPtVsQuality_PU);
+    if (iPrimaryPtVsDCAxy_PU   > 0.) hPrimaryPtVsDCAxy_PU   -> Scale(1. / iPrimaryPtVsDCAxy_PU);
+    if (iPrimaryPtVsDCAz_PU    > 0.) hPrimaryPtVsDCAz_PU    -> Scale(1. / iPrimaryPtVsDCAz_PU);
+    if (iDeltaDCAxyVsPrimPt_PU > 0.) hDeltaDCAxyVsPrimPt_PU -> Scale(1. / iDeltaDCAxyVsPrimPt_PU);
+    if (iDeltaDCAzVsPrimPt_PU  > 0.) hDeltaDCAzVsPrimPt_PU  -> Scale(1. / iDeltaDCAzVsPrimPt_PU);
+    if (iDeltaEtaVsPrimPt_PU   > 0.) hDeltaEtaVsPrimPt_PU   -> Scale(1. / iDeltaEtaVsPrimPt_PU);
+    if (iDeltaPhiVsPrimPt_PU   > 0.) hDeltaPhiVsPrimPt_PU   -> Scale(1. / iDeltaPhiVsPrimPt_PU);
+    if (iDeltaPtVsPrimPt_PU    > 0.) hDeltaPtVsPrimPt_PU    -> Scale(1. / iDeltaPtVsPrimPt_PU);
+
+    // with-pileup non-primary histograms
+    const Double_t iNonPrimNMms_PU        = hNonPrimNMms_PU        -> Integral();
+    const Double_t iNonPrimNMap_PU        = hNonPrimNMap_PU        -> Integral();
+    const Double_t iNonPrimNInt_PU        = hNonPrimNInt_PU        -> Integral();
+    const Double_t iNonPrimNTpc_PU        = hNonPrimNTpc_PU        -> Integral();
+    const Double_t iNonPrimNTot_PU        = hNonPrimNTot_PU        -> Integral();
+    const Double_t iNonPrimPerMms_PU      = hNonPrimPerMms_PU      -> Integral();
+    const Double_t iNonPrimPerMap_PU      = hNonPrimPerMap_PU      -> Integral();
+    const Double_t iNonPrimPerInt_PU      = hNonPrimPerInt_PU      -> Integral();
+    const Double_t iNonPrimPerTpc_PU      = hNonPrimPerTpc_PU      -> Integral();
+    const Double_t iNonPrimPerTot_PU      = hNonPrimPerTot_PU      -> Integral();
+    const Double_t iNonPrimChi2_PU        = hNonPrimChi2_PU        -> Integral();
+    const Double_t iNonPrimNDF_PU         = hNonPrimNDF_PU         -> Integral();
+    const Double_t iNonPrimQuality_PU     = hNonPrimQuality_PU     -> Integral();
+    const Double_t iNonPrimDCAxy_PU       = hNonPrimDCAxy_PU       -> Integral();
+    const Double_t iNonPrimDCAz_PU        = hNonPrimDCAz_PU        -> Integral();
+    const Double_t iNonPrimVx_PU          = hNonPrimVx_PU          -> Integral();
+    const Double_t iNonPrimVy_PU          = hNonPrimVy_PU          -> Integral();
+    const Double_t iNonPrimVz_PU          = hNonPrimVz_PU          -> Integral();
+    const Double_t iNonPrimEta_PU         = hNonPrimEta_PU         -> Integral();
+    const Double_t iNonPrimPhi_PU         = hNonPrimPhi_PU         -> Integral();
+    const Double_t iNonPrimPt_PU          = hNonPrimPt_PU          -> Integral();
+    const Double_t iDeltaNoPrDCAxy_PU     = hDeltaNoPrDCAxy_PU     -> Integral();
+    const Double_t iDeltaNoPrDCAz_PU      = hDeltaNoPrDCAz_PU      -> Integral();
+    const Double_t iDeltaNoPrEta_PU       = hDeltaNoPrEta_PU       -> Integral();
+    const Double_t iDeltaNoPrPhi_PU       = hDeltaNoPrPhi_PU       -> Integral();
+    const Double_t iDeltaNoPrPt_PU        = hDeltaNoPrPt_PU        -> Integral();
+    const Double_t iNonPrimPtVsNMms_PU    = hNonPrimPtVsNMms_PU    -> Integral();
+    const Double_t iNonPrimPtVsNMap_PU    = hNonPrimPtVsNMap_PU    -> Integral();
+    const Double_t iNonPrimPtVsNInt_PU    = hNonPrimPtVsNInt_PU    -> Integral();
+    const Double_t iNonPrimPtVsNTpc_PU    = hNonPrimPtVsNTpc_PU    -> Integral();
+    const Double_t iNonPrimPtVsNTot_PU    = hNonPrimPtVsNTot_PU    -> Integral();
+    const Double_t iNonPrimPtVsPerMms_PU  = hNonPrimPtVsPerMms_PU  -> Integral();
+    const Double_t iNonPrimPtVsPerMap_PU  = hNonPrimPtVsPerMap_PU  -> Integral();
+    const Double_t iNonPrimPtVsPerInt_PU  = hNonPrimPtVsPerInt_PU  -> Integral();
+    const Double_t iNonPrimPtVsPerTpc_PU  = hNonPrimPtVsPerTpc_PU  -> Integral();
+    const Double_t iNonPrimPtVsPerTot_PU  = hNonPrimPtVsPerTot_PU  -> Integral();
+    const Double_t iNonPrimPtVsChi2_PU    = hNonPrimPtVsChi2_PU    -> Integral();
+    const Double_t iNonPrimPtVsNDF_PU     = hNonPrimPtVsNDF_PU     -> Integral();
+    const Double_t iNonPrimPtVsQuality_PU = hNonPrimPtVsQuality_PU -> Integral();
+    const Double_t iNonPrimPtVsDCAxy_PU   = hNonPrimPtVsDCAxy_PU   -> Integral();
+    const Double_t iNonPrimPtVsDCAz_PU    = hNonPrimPtVsDCAz_PU    -> Integral();
+    const Double_t iDeltaDCAxyVsNoPrPt_PU = hDeltaDCAxyVsNoPrPt_PU -> Integral();
+    const Double_t iDeltaDCAzVsNoPrPt_PU  = hDeltaDCAzVsNoPrPt_PU  -> Integral();
+    const Double_t iDeltaEtaVsNoPrPt_PU   = hDeltaEtaVsNoPrPt_PU   -> Integral();
+    const Double_t iDeltaPhiVsNoPrPt_PU   = hDeltaPhiVsNoPrPt_PU   -> Integral();
+    if (iNonPrimNMms_PU        > 0.) hNonPrimNMms_PU        -> Scale(1. / iNonPrimNMms_PU);
+    if (iNonPrimNMap_PU        > 0.) hNonPrimNMap_PU        -> Scale(1. / iNonPrimNMap_PU);
+    if (iNonPrimNInt_PU        > 0.) hNonPrimNInt_PU        -> Scale(1. / iNonPrimNInt_PU);
+    if (iNonPrimNTpc_PU        > 0.) hNonPrimNTpc_PU        -> Scale(1. / iNonPrimNTpc_PU);
+    if (iNonPrimNTot_PU        > 0.) hNonPrimNTot_PU        -> Scale(1. / iNonPrimNTot_PU);
+    if (iNonPrimPerMms_PU      > 0.) hNonPrimPerMms_PU      -> Scale(1. / iNonPrimPerMms_PU);
+    if (iNonPrimPerMap_PU      > 0.) hNonPrimPerMap_PU      -> Scale(1. / iNonPrimPerMap_PU);
+    if (iNonPrimPerInt_PU      > 0.) hNonPrimPerInt_PU      -> Scale(1. / iNonPrimPerInt_PU);
+    if (iNonPrimPerTpc_PU      > 0.) hNonPrimPerTpc_PU      -> Scale(1. / iNonPrimPerTpc_PU);
+    if (iNonPrimPerTot_PU      > 0.) hNonPrimPerTot_PU      -> Scale(1. / iNonPrimPerTot_PU);
+    if (iNonPrimChi2_PU        > 0.) hNonPrimChi2_PU        -> Scale(1. / iNonPrimChi2_PU);
+    if (iNonPrimNDF_PU         > 0.) hNonPrimNDF_PU         -> Scale(1. / iNonPrimNDF_PU);
+    if (iNonPrimQuality_PU     > 0.) hNonPrimQuality_PU     -> Scale(1. / iNonPrimQuality_PU);
+    if (iNonPrimDCAxy_PU       > 0.) hNonPrimDCAxy_PU       -> Scale(1. / iNonPrimDCAxy_PU);
+    if (iNonPrimDCAz_PU        > 0.) hNonPrimDCAz_PU        -> Scale(1. / iNonPrimDCAz_PU);
+    if (iNonPrimVx_PU          > 0.) hNonPrimVx_PU          -> Scale(1. / iNonPrimVx_PU);
+    if (iNonPrimVy_PU          > 0.) hNonPrimVy_PU          -> Scale(1. / iNonPrimVy_PU);
+    if (iNonPrimVz_PU          > 0.) hNonPrimVz_PU          -> Scale(1. / iNonPrimVz_PU);
+    if (iNonPrimEta_PU         > 0.) hNonPrimEta_PU         -> Scale(1. / iNonPrimEta_PU);
+    if (iNonPrimPhi_PU         > 0.) hNonPrimPhi_PU         -> Scale(1. / iNonPrimPhi_PU);
+    if (iNonPrimPt_PU          > 0.) hNonPrimPt_PU          -> Scale(1. / iNonPrimPt_PU);
+    if (iDeltaNoPrDCAxy_PU     > 0.) hDeltaNoPrDCAxy_PU     -> Scale(1. / iDeltaNoPrDCAxy_PU);
+    if (iDeltaNoPrDCAz_PU      > 0.) hDeltaNoPrDCAz_PU      -> Scale(1. / iDeltaNoPrDCAz_PU);
+    if (iDeltaNoPrEta_PU       > 0.) hDeltaNoPrEta_PU       -> Scale(1. / iDeltaNoPrEta_PU);
+    if (iDeltaNoPrPhi_PU       > 0.) hDeltaNoPrPhi_PU       -> Scale(1. / iDeltaNoPrPhi_PU);
+    if (iDeltaNoPrPt_PU        > 0.) hDeltaNoPrPt_PU        -> Scale(1. / iDeltaNoPrPt_PU);
+    if (iNonPrimPtVsNMms_PU    > 0.) hNonPrimPtVsNMms_PU    -> Scale(1. / iNonPrimPtVsNMms_PU);
+    if (iNonPrimPtVsNMap_PU    > 0.) hNonPrimPtVsNMap_PU    -> Scale(1. / iNonPrimPtVsNMap_PU);
+    if (iNonPrimPtVsNInt_PU    > 0.) hNonPrimPtVsNInt_PU    -> Scale(1. / iNonPrimPtVsNInt_PU);
+    if (iNonPrimPtVsNTpc_PU    > 0.) hNonPrimPtVsNTpc_PU    -> Scale(1. / iNonPrimPtVsNTpc_PU);
+    if (iNonPrimPtVsNTot_PU    > 0.) hNonPrimPtVsNTot_PU    -> Scale(1. / iNonPrimPtVsNTot_PU);
+    if (iNonPrimPtVsPerMms_PU  > 0.) hNonPrimPtVsPerMms_PU  -> Scale(1. / iNonPrimPtVsPerMms_PU);
+    if (iNonPrimPtVsPerMap_PU  > 0.) hNonPrimPtVsPerMap_PU  -> Scale(1. / iNonPrimPtVsPerMap_PU);
+    if (iNonPrimPtVsPerInt_PU  > 0.) hNonPrimPtVsPerInt_PU  -> Scale(1. / iNonPrimPtVsPerInt_PU);
+    if (iNonPrimPtVsPerTpc_PU  > 0.) hNonPrimPtVsPerTpc_PU  -> Scale(1. / iNonPrimPtVsPerTpc_PU);
+    if (iNonPrimPtVsPerTot_PU  > 0.) hNonPrimPtVsPerTot_PU  -> Scale(1. / iNonPrimPtVsPerTot_PU);
+    if (iNonPrimPtVsChi2_PU    > 0.) hNonPrimPtVsChi2_PU    -> Scale(1. / iNonPrimPtVsChi2_PU);
+    if (iNonPrimPtVsNDF_PU     > 0.) hNonPrimPtVsNDF_PU     -> Scale(1. / iNonPrimPtVsNDF_PU);
+    if (iNonPrimPtVsQuality_PU > 0.) hNonPrimPtVsQuality_PU -> Scale(1. / iNonPrimPtVsQuality_PU);
+    if (iNonPrimPtVsDCAxy_PU   > 0.) hNonPrimPtVsDCAxy_PU   -> Scale(1. / iNonPrimPtVsDCAxy_PU);
+    if (iNonPrimPtVsDCAz_PU    > 0.) hNonPrimPtVsDCAz_PU    -> Scale(1. / iNonPrimPtVsDCAz_PU);
+    if (iDeltaDCAxyVsNoPrPt_PU > 0.) hDeltaDCAxyVsNoPrPt_PU -> Scale(1. / iDeltaDCAxyVsNoPrPt_PU);
+    if (iDeltaDCAzVsNoPrPt_PU  > 0.) hDeltaDCAzVsNoPrPt_PU  -> Scale(1. / iDeltaDCAzVsNoPrPt_PU);
+    if (iDeltaEtaVsNoPrPt_PU   > 0.) hDeltaEtaVsNoPrPt_PU   -> Scale(1. / iDeltaEtaVsNoPrPt_PU);
+    if (iDeltaPhiVsNoPrPt_PU   > 0.) hDeltaPhiVsNoPrPt_PU   -> Scale(1. / iDeltaPhiVsNoPrPt_PU);
+  }  // end if (doIntNorm)
   return;
 
 }  // end Analyze()
@@ -1334,56 +1870,64 @@ void STrackCutStudy::SetHistStyles() {
   const Float_t fOffY(1.2); 
   const Float_t fOffZ(1.0);
 
+  // select count label to use
+  TString sCountToUse("");
+  if (doIntNorm) {
+    sCountToUse = "arbitrary units";
+  } else {
+    sCountToUse = "counts";
+  } 
+
   // generic axis titles
-  TString sCount("counts");
-  TString sPerMms("r_{MMS} = N_{layer/trk}^{MMS} / N_{layer/truth}^{MMS}");
-  TString sPerMap("r_{MAPS} = N_{layer/trk}^{MAPS} / N_{layer/truth}^{MAPS}");
-  TString sPerInt("r_{INTT} = N_{layer/trk}^{INTT} / N_{layer/truth}^{INTT}");
-  TString sPerTpc("r_{TPC} = N_{layer/trk}^{TPC} / N_{layer/truth}^{TPC}");
-  TString sPerTot("r_{tot} = N_{layer/trk}^{tot} / N_{layer/truth}^{tot}");
+  const TString sCount(sCountToUse.Data());
+  const TString sPerMms("r_{MMS} = N_{layer/trk}^{MMS} / N_{layer/truth}^{MMS}");
+  const TString sPerMap("r_{MAPS} = N_{layer/trk}^{MAPS} / N_{layer/truth}^{MAPS}");
+  const TString sPerInt("r_{INTT} = N_{layer/trk}^{INTT} / N_{layer/truth}^{INTT}");
+  const TString sPerTpc("r_{TPC} = N_{layer/trk}^{TPC} / N_{layer/truth}^{TPC}");
+  const TString sPerTot("r_{tot} = N_{layer/trk}^{tot} / N_{layer/truth}^{tot}");
   // track specific axis titles
-  TString sTrkNMms("N_{layer}^{MMS}");
-  TString sTrkNMap("N_{layer}^{MAPS}");
-  TString sTrkNInt("N_{layer}^{INTT}");
-  TString sTrkNTpc("N_{layer}^{TPC}");
-  TString sTrkNTot("N_{layer}^{tot}");
-  TString sTrkChi2("#chi^{2}");
-  TString sTrkNDF("ndf");
-  TString sTrkQuality("#chi^{2}/ndf");
-  TString sTrkDCAxy("DCA_{xy} [#mum]");
-  TString sTrkDCAz("DCA_{z} [#mum]");
-  TString sTrkVx("v_{x}^{trk} [cm]");
-  TString sTrkVy("v_{y}^{trk} [cm]");
-  TString sTrkVz("v_{z}^{trk} [cm]");
-  TString sTrkEta("#eta^{trk}");
-  TString sTrkPhi("#phi^{trk}");
-  TString sTrkPt("p_{T}^{trk} [GeV/c]");
-  TString sDeltaDCAxy("#DeltaDCA_{xy} / DCA_{xy}");
-  TString sDeltaDCAz("#DeltaDCA_{z} / DCA_{z}");
-  TString sDeltaEta("#Delta#eta^{trk} / #eta^{trk}");
-  TString sDeltaPhi("#Delta#phi^{trk} / #phi^{trk}");
-  TString sDeltaPt("#Deltap_{T}^{trk} / p_{T}^{trk}");
+  const TString sTrkNMms("N_{layer}^{MMS}");
+  const TString sTrkNMap("N_{layer}^{MAPS}");
+  const TString sTrkNInt("N_{layer}^{INTT}");
+  const TString sTrkNTpc("N_{layer}^{TPC}");
+  const TString sTrkNTot("N_{layer}^{tot}");
+  const TString sTrkChi2("#chi^{2}");
+  const TString sTrkNDF("ndf");
+  const TString sTrkQuality("#chi^{2}/ndf");
+  const TString sTrkDCAxy("DCA_{xy} [#mum]");
+  const TString sTrkDCAz("DCA_{z} [#mum]");
+  const TString sTrkVx("v_{x}^{trk} [cm]");
+  const TString sTrkVy("v_{y}^{trk} [cm]");
+  const TString sTrkVz("v_{z}^{trk} [cm]");
+  const TString sTrkEta("#eta^{trk}");
+  const TString sTrkPhi("#phi^{trk}");
+  const TString sTrkPt("p_{T}^{trk} [GeV/c]");
+  const TString sDeltaDCAxy("#DeltaDCA_{xy} / DCA_{xy}");
+  const TString sDeltaDCAz("#DeltaDCA_{z} / DCA_{z}");
+  const TString sDeltaEta("#Delta#eta^{trk} / #eta^{trk}");
+  const TString sDeltaPhi("#Delta#phi^{trk} / #phi^{trk}");
+  const TString sDeltaPt("#Deltap_{T}^{trk} / p_{T}^{trk}");
   // truth specific axis titles
-  TString sTruNMms("N_{layer}^{MMS}");
-  TString sTruNMap("N_{layer}^{MAPS}");
-  TString sTruNInt("N_{layer}^{INTT}");
-  TString sTruNTpc("N_{layer}^{TPC}");
-  TString sTruNTot("N_{layer}^{tot}");
-  TString sTruEta("#eta^{truth}");
-  TString sTruPhi("#phi^{truth}");
-  TString sTruPt("p_{T}^{truth} [GeV/c]");
-  TString sTruVx("v_{x}^{truth} [cm]");
-  TString sTruVy("v_{y}^{truth} [cm]");
-  TString sTruVz("v_{z}^{truth} [cm]");
-  TString sFracEta("#delta#eta^{trk} = #eta^{trk} / #eta^{truth}");
-  TString sFracPhi("#delta#phi^{trk} = #phi^{trk} / #phi^{truth}");
-  TString sFracPt("#deltap_{T}^{trk} = p_{T}^{trk} / p_{T}^{truth}");
-  TString sDiffEta("#varsigma#eta^{trk} = #eta^{trk} - #eta^{truth}");
-  TString sDiffPhi("#varsigma#phi^{trk} = #phi^{trk} - #phi^{truth}");
-  TString sDiffPt("#varsigmap_{T}^{trk} = p_{T}^{trk} - p_{T}^{truth}");
-  TString sDiffVx("#varsigmav_{x} = v_{x}^{trk} - v_{x}^{truth}");
-  TString sDiffVy("#varsigmav_{y} = v_{y}^{trk} - v_{y}^{truth}");
-  TString sDiffVz("#varsigmav_{z} = v_{z}^{trk} - v_{z}^{truth}");
+  const TString sTruNMms("N_{layer}^{MMS}");
+  const TString sTruNMap("N_{layer}^{MAPS}");
+  const TString sTruNInt("N_{layer}^{INTT}");
+  const TString sTruNTpc("N_{layer}^{TPC}");
+  const TString sTruNTot("N_{layer}^{tot}");
+  const TString sTruEta("#eta^{truth}");
+  const TString sTruPhi("#phi^{truth}");
+  const TString sTruPt("p_{T}^{truth} [GeV/c]");
+  const TString sTruVx("v_{x}^{truth} [cm]");
+  const TString sTruVy("v_{y}^{truth} [cm]");
+  const TString sTruVz("v_{z}^{truth} [cm]");
+  const TString sFracEta("#delta#eta^{trk} = #eta^{trk} / #eta^{truth}");
+  const TString sFracPhi("#delta#phi^{trk} = #phi^{trk} / #phi^{truth}");
+  const TString sFracPt("#deltap_{T}^{trk} = p_{T}^{trk} / p_{T}^{truth}");
+  const TString sDiffEta("#varsigma#eta^{trk} = #eta^{trk} - #eta^{truth}");
+  const TString sDiffPhi("#varsigma#phi^{trk} = #phi^{trk} - #phi^{truth}");
+  const TString sDiffPt("#varsigmap_{T}^{trk} = p_{T}^{trk} - p_{T}^{truth}");
+  const TString sDiffVx("#varsigmav_{x} = v_{x}^{trk} - v_{x}^{truth}");
+  const TString sDiffVy("#varsigmav_{y} = v_{y}^{trk} - v_{y}^{truth}");
+  const TString sDiffVz("#varsigmav_{z} = v_{z}^{trk} - v_{z}^{truth}");
 
   // set embed-only track histogram styles
   hTrackNMms             -> SetMarkerColor(fColTrk);
@@ -6704,6 +7248,7 @@ void STrackCutStudy::SaveHists() {
   hTrackNInt             -> Write();
   hTrackNTpc             -> Write();
   hTrackNTot             -> Write();
+  hTrackPerMms           -> Write();
   hTrackPerMap           -> Write();
   hTrackPerInt           -> Write();
   hTrackPerTpc           -> Write();
@@ -6798,6 +7343,7 @@ void STrackCutStudy::SaveHists() {
   hWeirdNInt             -> Write();
   hWeirdNTpc             -> Write();
   hWeirdNTot             -> Write();
+  hWeirdPerMms           -> Write();
   hWeirdPerMap           -> Write();
   hWeirdPerInt           -> Write();
   hWeirdPerTpc           -> Write();
@@ -6827,6 +7373,7 @@ void STrackCutStudy::SaveHists() {
   hTrackNInt_PU          -> Write();
   hTrackNTpc_PU          -> Write();
   hTrackNTot_PU          -> Write();
+  hTrackPerMms_PU        -> Write();
   hTrackPerMap_PU        -> Write();
   hTrackPerInt_PU        -> Write();
   hTrackPerTpc_PU        -> Write();

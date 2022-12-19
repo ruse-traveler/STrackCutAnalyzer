@@ -111,7 +111,8 @@ void STrackCutStudy::Analyze() {
   cout << "    Analyzing:" <<endl;
 
   // prepare for embed-only entry loop
-  Long64_t nEntriesEO = ntTrkEO -> GetEntries();
+  //Long64_t nEntriesEO = ntTrkEO -> GetEntries();
+  Long64_t nEntriesEO = 1000;
   cout << "      Beginning embed-only entry loop: " << nEntriesEO << " entries to process..." << endl;
 
   // loop over embed-only tuple entries
@@ -154,6 +155,9 @@ void STrackCutStudy::Analyze() {
     const Double_t etaDiff    = eta - geta;
     const Double_t phiDiff    = phi - gphi;
     const Double_t ptDiff     = pt - gpt;
+    const Double_t vxDiff     = vx - gvx;
+    const Double_t vyDiff     = vy - gvy;
+    const Double_t vzDiff     = vz - gvz;
 
     // fill embed-only track histograms
     hTrackNMms         -> Fill(nlmms);
@@ -221,6 +225,9 @@ void STrackCutStudy::Analyze() {
     hTruthEtaDiff      -> Fill(etaDiff);
     hTruthPhiDiff      -> Fill(phiDiff);
     hTruthPtDiff       -> Fill(ptDiff);
+    hTruthVxDiff       -> Fill(vxDiff);
+    hTruthVyDiff       -> Fill(vyDiff);
+    hTruthVzDiff       -> Fill(vzDiff);
     hTruthVsTrackEta   -> Fill(eta, geta);
     hTruthVsTrackPhi   -> Fill(phi, gphi);
     hTruthVsTrackPt    -> Fill(pt, gpt);
@@ -279,12 +286,16 @@ void STrackCutStudy::Analyze() {
       hWeirdDeltaEta   -> Fill(deltaEta);
       hWeirdDeltaPhi   -> Fill(deltaPhi);
       hWeirdDeltaPt    -> Fill(deltaPt);
+      hWeirdVxDiff     -> Fill(vxDiff);
+      hWeirdVyDiff     -> Fill(vyDiff);
+      hWeirdVzDiff     -> Fill(vzDiff);
     }
   }  // end embed-only entry loop
   cout << "      Finished embed-only entry loop." << endl;
 
   // prepare for embed-only entry loop
-  Long64_t nEntriesPU = ntTrkPU -> GetEntries();
+  //Long64_t nEntriesPU = ntTrkPU -> GetEntries();
+  Long64_t nEntriesPU = 1000;
   cout << "      Beginning with-pileup entry loop: " << nEntriesPU << " entries to process..." << endl;
 
   // loop over embed-only tuple entries
@@ -755,6 +766,7 @@ void STrackCutStudy::InitHists() {
   const UInt_t  nDiffBins(2000);
   const UInt_t  nErrBins(5000);
   const UInt_t  nVtxBins(1200);
+  const UInt_t  nDVtxBins(2400);
   const Float_t rNHitBins[NRange] = {0,      100};
   const Float_t rChiBins[NRange]  = {0.,     1000.};
   const Float_t rQualBins[NRange] = {0.,     20.};
@@ -767,6 +779,7 @@ void STrackCutStudy::InitHists() {
   const Float_t rDiffBins[NRange] = {-100.,  100.};     
   const Float_t rErrBins[NRange]  = {0.,     100.};
   const Float_t rVtxBins[NRange]  = {-300., 300.};
+  const Float_t rDVtxBins[NRange] = {-600., 600.};
   // embed-only track histograms
   hTrackNMms             = new TH1D("hTrackNMms",            "Track N_{layer}^{MMS}",                         nNHitBins, rNHitBins[0], rNHitBins[1]);
   hTrackNMap             = new TH1D("hTrackNMap",            "Track N_{layer}^{MAPS}",                        nNHitBins, rNHitBins[0], rNHitBins[1]);
@@ -832,6 +845,9 @@ void STrackCutStudy::InitHists() {
   hTruthEtaDiff          = new TH1D("hTruthEtaDiff",         "Track #eta - truth #eta",                       nDiffBins, rDiffBins[0], rDiffBins[1]);
   hTruthPhiDiff          = new TH1D("hTruthPhiDiff",         "Track #phi - truth #phi",                       nDiffBins, rDiffBins[0], rDiffBins[1]);
   hTruthPtDiff           = new TH1D("hTruthPtDiff",          "Track p_{T} - truth p_{T}",                     nDiffBins, rDiffBins[0], rDiffBins[1]);
+  hTruthVxDiff           = new TH1D("hTruthVxDiff",          "Track v_{x} - truth v_{x}",                     nDVtxBins, rDVtxBins[0], rDVtxBins[1]);
+  hTruthVyDiff           = new TH1D("hTruthVyDiff",          "Track v_{y} - truth v_{y}",                     nDVtxBins, rDVtxBins[0], rDVtxBins[1]);
+  hTruthVzDiff           = new TH1D("hTruthVzDiff",          "Track v_{z} - truth v_{z}",                     nDVtxBins, rDVtxBins[0], rDVtxBins[1]);
   hTruthVsTrackEta       = new TH2D("hTruthVsTrackEta",      "Truth #eta vs. track #eta",                     nEtaBins,  rEtaBins[0],  rEtaBins[1],  nEtaBins,  rEtaBins[0],  rEtaBins[1]);
   hTruthVsTrackPhi       = new TH2D("hTruthVsTrackPhi",      "Truth #phi vs. track #phi",                     nPhiBins,  rPhiBins[0],  rPhiBins[1],  nPhiBins,  rPhiBins[0],  rPhiBins[1]);
   hTruthVsTrackPt        = new TH2D("hTruthVsTrackPt",       "Truth p_{T} vs. track p_{T}",                   nPtBins,   rPtBins[0],   rPtBins[1],   nPtBins,   rPtBins[0],   rPtBins[1]);
@@ -887,6 +903,9 @@ void STrackCutStudy::InitHists() {
   hWeirdDeltaEta         = new TH1D("hWeirdDeltaEta",        "Weird #eta \%-error",                           nErrBins,  rErrBins[0],  rErrBins[1]);
   hWeirdDeltaPhi         = new TH1D("hWeirdDeltaPhi",        "Weird #phi \%-error",                           nErrBins,  rErrBins[0],  rErrBins[1]);
   hWeirdDeltaPt          = new TH1D("hWeirdDeltaPt",         "Weird p_{T} \%-error",                          nErrBins,  rErrBins[0],  rErrBins[1]);
+  hWeirdVxDiff           = new TH1D("hWeirdVxDiff",          "Weird v_{x} - truth v_{x}",                     nDVtxBins, rDVtxBins[0], rDVtxBins[1]);
+  hWeirdVyDiff           = new TH1D("hWeirdVyDiff",          "Weird v_{y} - truth v_{y}",                     nDVtxBins, rDVtxBins[0], rDVtxBins[1]);
+  hWeirdVzDiff           = new TH1D("hWeirdVzDiff",          "Weird v_{z} - truth v_{z}",                     nDVtxBins, rDVtxBins[0], rDVtxBins[1]);
   // with-pileup track histograms
   hTrackNMms_PU          = new TH1D("hTrackNMms_PU",         "Track N_{layer}^{MMS}",                         nNHitBins, rNHitBins[0], rNHitBins[1]);
   hTrackNMap_PU          = new TH1D("hTrackNMap_PU",         "Track N_{layer}^{MAPS}",                        nNHitBins, rNHitBins[0], rNHitBins[1]);
@@ -1092,6 +1111,9 @@ void STrackCutStudy::InitHists() {
   hTruthEtaDiff          -> Sumw2();
   hTruthPhiDiff          -> Sumw2();
   hTruthPtDiff           -> Sumw2();
+  hTruthVxDiff           -> Sumw2();
+  hTruthVyDiff           -> Sumw2();
+  hTruthVzDiff           -> Sumw2();
   hTruthVsTrackEta       -> Sumw2();
   hTruthVsTrackPhi       -> Sumw2();
   hTruthVsTrackPt        -> Sumw2();
@@ -1146,6 +1168,9 @@ void STrackCutStudy::InitHists() {
   hWeirdDeltaEta         -> Sumw2();
   hWeirdDeltaPhi         -> Sumw2();
   hWeirdDeltaPt          -> Sumw2();
+  hWeirdVxDiff           -> Sumw2();
+  hWeirdVyDiff           -> Sumw2();
+  hWeirdVzDiff           -> Sumw2();
   // with-pileup errors
   hTrackNMms_PU          -> Sumw2();
   hTrackNMap_PU          -> Sumw2();
@@ -1356,6 +1381,9 @@ void STrackCutStudy::SetHistStyles() {
   TString sDiffEta("#varsigma#eta^{trk} = #eta^{trk} - #eta^{truth}");
   TString sDiffPhi("#varsigma#phi^{trk} = #phi^{trk} - #phi^{truth}");
   TString sDiffPt("#varsigmap_{T}^{trk} = p_{T}^{trk} - p_{T}^{truth}");
+  TString sDiffVx("#varsigmav_{x} = v_{x}^{trk} - v_{x}^{truth}");
+  TString sDiffVy("#varsigmav_{y} = v_{y}^{trk} - v_{y}^{truth}");
+  TString sDiffVz("#varsigmav_{z} = v_{z}^{trk} - v_{z}^{truth}");
 
   // set embed-only track histogram styles
   hTrackNMms             -> SetMarkerColor(fColTrk);
@@ -2237,6 +2265,45 @@ void STrackCutStudy::SetHistStyles() {
   hTruthPtDiff           -> GetYaxis() -> SetTitle(sCount.Data());
   hTruthPtDiff           -> GetYaxis() -> SetTitleFont(FTxt);
   hTruthPtDiff           -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTruthVxDiff           -> SetMarkerColor(fColTrk);
+  hTruthVxDiff           -> SetMarkerStyle(fMarTrk);
+  hTruthVxDiff           -> SetLineColor(fColTrk);
+  hTruthVxDiff           -> SetLineStyle(fLin);
+  hTruthVxDiff           -> SetFillColor(fColTrk);
+  hTruthVxDiff           -> SetFillStyle(fFil);
+  hTruthVxDiff           -> SetTitleFont(FTxt);
+  hTruthVxDiff           -> GetXaxis() -> SetTitle(sDiffVx.Data());
+  hTruthVxDiff           -> GetXaxis() -> SetTitleFont(FTxt);
+  hTruthVxDiff           -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTruthVxDiff           -> GetYaxis() -> SetTitle(sCount.Data());
+  hTruthVxDiff           -> GetYaxis() -> SetTitleFont(FTxt);
+  hTruthVxDiff           -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTruthVyDiff           -> SetMarkerColor(fColTrk);
+  hTruthVyDiff           -> SetMarkerStyle(fMarTrk);
+  hTruthVyDiff           -> SetLineColor(fColTrk);
+  hTruthVyDiff           -> SetLineStyle(fLin);
+  hTruthVyDiff           -> SetFillColor(fColTrk);
+  hTruthVyDiff           -> SetFillStyle(fFil);
+  hTruthVyDiff           -> SetTitleFont(FTxt);
+  hTruthVyDiff           -> GetXaxis() -> SetTitle(sDiffVy.Data());
+  hTruthVyDiff           -> GetXaxis() -> SetTitleFont(FTxt);
+  hTruthVyDiff           -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTruthVyDiff           -> GetYaxis() -> SetTitle(sCount.Data());
+  hTruthVyDiff           -> GetYaxis() -> SetTitleFont(FTxt);
+  hTruthVyDiff           -> GetYaxis() -> SetTitleOffset(fOffY);
+  hTruthVzDiff           -> SetMarkerColor(fColTrk);
+  hTruthVzDiff           -> SetMarkerStyle(fMarTrk);
+  hTruthVzDiff           -> SetLineColor(fColTrk);
+  hTruthVzDiff           -> SetLineStyle(fLin);
+  hTruthVzDiff           -> SetFillColor(fColTrk);
+  hTruthVzDiff           -> SetFillStyle(fFil);
+  hTruthVzDiff           -> SetTitleFont(FTxt);
+  hTruthVzDiff           -> GetXaxis() -> SetTitle(sDiffVz.Data());
+  hTruthVzDiff           -> GetXaxis() -> SetTitleFont(FTxt);
+  hTruthVzDiff           -> GetXaxis() -> SetTitleOffset(fOffX);
+  hTruthVzDiff           -> GetYaxis() -> SetTitle(sCount.Data());
+  hTruthVzDiff           -> GetYaxis() -> SetTitleFont(FTxt);
+  hTruthVzDiff           -> GetYaxis() -> SetTitleOffset(fOffY);
   hTruthVsTrackEta       -> SetMarkerColor(fColTru);
   hTruthVsTrackEta       -> SetMarkerStyle(fMarTru);
   hTruthVsTrackEta       -> SetLineColor(fColTru);
@@ -3023,6 +3090,45 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdDeltaPt          -> GetYaxis() -> SetTitle(sCount.Data());
   hWeirdDeltaPt          -> GetYaxis() -> SetTitleFont(FTxt);
   hWeirdDeltaPt          -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdVxDiff           -> SetMarkerColor(fColOdd);
+  hWeirdVxDiff           -> SetMarkerStyle(fMarOdd);
+  hWeirdVxDiff           -> SetLineColor(fColOdd);
+  hWeirdVxDiff           -> SetLineStyle(fLin);
+  hWeirdVxDiff           -> SetFillColor(fColOdd);
+  hWeirdVxDiff           -> SetFillStyle(fFil);
+  hWeirdVxDiff           -> SetTitleFont(FTxt);
+  hWeirdVxDiff           -> GetXaxis() -> SetTitle(sDiffVx.Data());
+  hWeirdVxDiff           -> GetXaxis() -> SetTitleFont(FTxt);
+  hWeirdVxDiff           -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdVxDiff           -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdVxDiff           -> GetYaxis() -> SetTitleFont(FTxt);
+  hWeirdVxDiff           -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdVyDiff           -> SetMarkerColor(fColOdd);
+  hWeirdVyDiff           -> SetMarkerStyle(fMarOdd);
+  hWeirdVyDiff           -> SetLineColor(fColOdd);
+  hWeirdVyDiff           -> SetLineStyle(fLin);
+  hWeirdVyDiff           -> SetFillColor(fColOdd);
+  hWeirdVyDiff           -> SetFillStyle(fFil);
+  hWeirdVyDiff           -> SetTitleFont(FTxt);
+  hWeirdVyDiff           -> GetXaxis() -> SetTitle(sDiffVy.Data());
+  hWeirdVyDiff           -> GetXaxis() -> SetTitleFont(FTxt);
+  hWeirdVyDiff           -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdVyDiff           -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdVyDiff           -> GetYaxis() -> SetTitleFont(FTxt);
+  hWeirdVyDiff           -> GetYaxis() -> SetTitleOffset(fOffY);
+  hWeirdVzDiff           -> SetMarkerColor(fColOdd);
+  hWeirdVzDiff           -> SetMarkerStyle(fMarOdd);
+  hWeirdVzDiff           -> SetLineColor(fColOdd);
+  hWeirdVzDiff           -> SetLineStyle(fLin);
+  hWeirdVzDiff           -> SetFillColor(fColOdd);
+  hWeirdVzDiff           -> SetFillStyle(fFil);
+  hWeirdVzDiff           -> SetTitleFont(FTxt);
+  hWeirdVzDiff           -> GetXaxis() -> SetTitle(sDiffVz.Data());
+  hWeirdVzDiff           -> GetXaxis() -> SetTitleFont(FTxt);
+  hWeirdVzDiff           -> GetXaxis() -> SetTitleOffset(fOffX);
+  hWeirdVzDiff           -> GetYaxis() -> SetTitle(sCount.Data());
+  hWeirdVzDiff           -> GetYaxis() -> SetTitleFont(FTxt);
+  hWeirdVzDiff           -> GetYaxis() -> SetTitleOffset(fOffY);
   // set with-pileup track histogram styles
   hTrackNMms_PU          -> SetMarkerColor(fColTrk);
   hTrackNMms_PU          -> SetMarkerStyle(fMarTrk);
@@ -5338,6 +5444,36 @@ void STrackCutStudy::CreatePlots(){
   cDeltaPt      -> Write();
   cDeltaPt      -> Close();
 
+  TCanvas *cDiffVx = new TCanvas("cDiffVx", "", fWidth1P, fHeight1P);
+  cDiffVx      -> cd();
+  hTruthVxDiff -> Draw();
+  hWeirdVxDiff -> Draw("same");
+  oddNT        -> Draw();
+  txtEO        -> Draw();
+  fOut         -> cd();
+  cDiffVx      -> Write();
+  cDiffVx      -> Close();
+
+  TCanvas *cDiffVy = new TCanvas("cDiffVy", "", fWidth1P, fHeight1P);
+  cDiffVy      -> cd();
+  hTruthVyDiff -> Draw();
+  hWeirdVyDiff -> Draw("same");
+  oddNT        -> Draw();
+  txtEO        -> Draw();
+  fOut         -> cd();
+  cDiffVy      -> Write();
+  cDiffVy      -> Close();
+
+  TCanvas *cDiffVz = new TCanvas("cDiffVz", "", fWidth1P, fHeight1P);
+  cDiffVz      -> cd();
+  hTruthVzDiff -> Draw();
+  hWeirdVzDiff -> Draw("same");
+  oddNT        -> Draw();
+  txtEO        -> Draw();
+  fOut         -> cd();
+  cDiffVz      -> Write();
+  cDiffVz      -> Close();
+
   // make embed-only 2d plots
   TCanvas *cPerMms   = new TCanvas("cPerMms", "", fWidth2P, fHeight2P);
   TPad    *pPerMms1D = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]); 
@@ -6625,6 +6761,9 @@ void STrackCutStudy::SaveHists() {
   hTruthEtaDiff          -> Write();
   hTruthPhiDiff          -> Write();
   hTruthPtDiff           -> Write();
+  hTruthVxDiff           -> Write();
+  hTruthVyDiff           -> Write();
+  hTruthVzDiff           -> Write();
   hTruthVsTrackEta       -> Write();
   hTruthVsTrackPhi       -> Write();
   hTruthVsTrackPt        -> Write();
@@ -6679,6 +6818,9 @@ void STrackCutStudy::SaveHists() {
   hWeirdDeltaEta         -> Write();
   hWeirdDeltaPhi         -> Write();
   hWeirdDeltaPt          -> Write();
+  hWeirdVxDiff           -> Write();
+  hWeirdVyDiff           -> Write();
+  hWeirdVzDiff           -> Write();
   dOut[3]                -> cd();
   hTrackNMms_PU          -> Write();
   hTrackNMap_PU          -> Write();

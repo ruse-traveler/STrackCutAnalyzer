@@ -181,6 +181,9 @@ class STrackCutStudy {
     TH1D *hTruthEtaDiff;
     TH1D *hTruthPhiDiff;
     TH1D *hTruthPtDiff;
+    TH1D *hTruthVxDiff;
+    TH1D *hTruthVyDiff;
+    TH1D *hTruthVzDiff;
     TH2D *hTruthVsTrackEta;
     TH2D *hTruthVsTrackPhi;
     TH2D *hTruthVsTrackPt;
@@ -237,6 +240,9 @@ class STrackCutStudy {
     TH1D *hWeirdDeltaEta;
     TH1D *hWeirdDeltaPhi;
     TH1D *hWeirdDeltaPt;
+    TH1D *hWeirdVxDiff;
+    TH1D *hWeirdVyDiff;
+    TH1D *hWeirdVzDiff;
 
     // with-pileup track histograms
     TH1D *hTrackNMms_PU;

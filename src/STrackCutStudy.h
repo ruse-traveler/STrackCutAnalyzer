@@ -35,7 +35,7 @@ using namespace std;
 static const Ssiz_t NVtx(4);
 static const Ssiz_t NTxt(3);
 static const Ssiz_t NTyp(6);
-static const Ssiz_t NVar(24);
+static const Ssiz_t NVar(20);
 static const Ssiz_t NRange(2);
 static const Ssiz_t NPanel(2);
 static const UInt_t FTxt(42);
@@ -64,15 +64,21 @@ class STrackCutStudy {
       PT      = 12,
       DDCAXY  = 13,
       DDCAZ   = 14,
-      DPHI    = 15,
-      DETA    = 16,
-      DPT     = 17,
-      PHIFRAC = 18,
-      ETAFRAC = 19,
-      PTFRAC  = 20,
-      PHIDIFF = 21,
-      ETADIFF = 22,
-      PTDIFF  = 23
+      VX      = 15,
+      VY      = 16,
+      VZ      = 17,
+      DPHI    = 18,
+      DETA    = 19,
+      DPT     = 20,
+      PHIFRAC = 21,
+      ETAFRAC = 22,
+      PTFRAC  = 23,
+      PHIDIFF = 24,
+      ETADIFF = 25,
+      PTDIFF  = 26,
+      VXDIFF  = 27,
+      VYDIFF  = 28,
+      VZDIFF  = 29
     };
     enum TYPE {
       TRACK   = 0,
@@ -125,6 +131,9 @@ class STrackCutStudy {
     TH1D *hTrackQuality;
     TH1D *hTrackDCAxy;
     TH1D *hTrackDCAz;
+    TH1D *hTrackVx;
+    TH1D *hTrackVy;
+    TH1D *hTrackVz;
     TH1D *hTrackEta;
     TH1D *hTrackPhi;
     TH1D *hTrackPt;
@@ -163,6 +172,9 @@ class STrackCutStudy {
     TH1D *hTruthEta;
     TH1D *hTruthPhi;
     TH1D *hTruthPt;
+    TH1D *hTruthVx;
+    TH1D *hTruthVy;
+    TH1D *hTruthVz;
     TH1D *hTruthEtaFrac;
     TH1D *hTruthPhiFrac;
     TH1D *hTruthPtFrac;
@@ -172,6 +184,9 @@ class STrackCutStudy {
     TH2D *hTruthVsTrackEta;
     TH2D *hTruthVsTrackPhi;
     TH2D *hTruthVsTrackPt;
+    TH2D *hTruthVsTrackVx;
+    TH2D *hTruthVsTrackVy;
+    TH2D *hTruthVsTrackVz;
     TH2D *hFracVsTruthEta;
     TH2D *hFracVsTruthPhi;
     TH2D *hFracVsTruthPt;
@@ -186,6 +201,7 @@ class STrackCutStudy {
     TH2D *hTruthPtVsChi2;
     TH2D *hTruthPtVsNDF;
     TH2D *hTruthPtVsQuality;
+    TH2D *hFracPtVsQuality;
     TH2D *hTruthPtVsDCAxy;
     TH2D *hTruthPtVsDCAz;
     TH2D *hDeltaDCAxyVsTruPt;
@@ -210,6 +226,9 @@ class STrackCutStudy {
     TH1D *hWeirdQuality;
     TH1D *hWeirdDCAxy;
     TH1D *hWeirdDCAz;
+    TH1D *hWeirdVx;
+    TH1D *hWeirdVy;
+    TH1D *hWeirdVz;
     TH1D *hWeirdEta;
     TH1D *hWeirdPhi;
     TH1D *hWeirdPt;
@@ -235,6 +254,9 @@ class STrackCutStudy {
     TH1D *hTrackQuality_PU;
     TH1D *hTrackDCAxy_PU;
     TH1D *hTrackDCAz_PU;
+    TH1D *hTrackVx_PU;
+    TH1D *hTrackVy_PU;
+    TH1D *hTrackVz_PU;
     TH1D *hTrackEta_PU;
     TH1D *hTrackPhi_PU;
     TH1D *hTrackPt_PU;
@@ -280,6 +302,9 @@ class STrackCutStudy {
     TH1D *hPrimaryQuality_PU;
     TH1D *hPrimaryDCAxy_PU;
     TH1D *hPrimaryDCAz_PU;
+    TH1D *hPrimaryVx_PU;
+    TH1D *hPrimaryVy_PU;
+    TH1D *hPrimaryVz_PU;
     TH1D *hPrimaryEta_PU;
     TH1D *hPrimaryPhi_PU;
     TH1D *hPrimaryPt_PU;
@@ -325,6 +350,9 @@ class STrackCutStudy {
     TH1D *hNonPrimQuality_PU;
     TH1D *hNonPrimDCAxy_PU;
     TH1D *hNonPrimDCAz_PU;
+    TH1D *hNonPrimVx_PU;
+    TH1D *hNonPrimVy_PU;
+    TH1D *hNonPrimVz_PU;
     TH1D *hNonPrimEta_PU;
     TH1D *hNonPrimPhi_PU;
     TH1D *hNonPrimPt_PU;

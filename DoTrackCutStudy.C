@@ -25,14 +25,15 @@ void DoTrackCutStudy() {
   gErrorIgnoreLevel = kWarning;
 
   // i/o parameters
-  const TString sOutFile("trackCutStudy.embedOnly_withVtxAndFractPtPlots.pt020n5pim.d16m12y2022.root");
-  const TString sInFileEO("input/merge/sPhenixG4_forTrackCutStudy_embedOnly0t299_g4svtxeval.pt020n5pim.d16m12y2022.root");
-  const TString sInFilePU("input/test/sPhenixG4_testWithPileup000_g4svtxEval.d15m12y2022.root");
+  const TString sOutFile("trackCutStudy.embedOnly_withVtxDiffPlots.pt020n5pim.d19m12y2022.root");
+  const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_forTrackCutStudy_embedOnly0t1099_g4svtxeval.pt020n5pim.d12m1y2023.root");
+  const TString sInFilePU("input/test/sPhenixG4_testWithPileup001_g4svtxEval.d18m12y2022.root");
   const TString sInTupleEO("ntp_track");
   const TString sInTuplePU("ntp_gtrack");
 
   // study parameters
   const Bool_t   doIntNorm(true);
+  const Bool_t   useOnlyPrimary(false);
   const Double_t normalPtFracMin(0.20);
   const Double_t normalPtFracMax(1.20);
 
@@ -42,7 +43,7 @@ void DoTrackCutStudy() {
   STrackCutStudy *study = new STrackCutStudy();
   study -> SetInputOutputFiles(sInFileEO, sInFilePU, sOutFile);
   study -> SetInputTuples(sInTupleEO, sInTuplePU);
-  study -> SetStudyParameters(doIntNorm, normalPtFracMin, normalPtFracMax);
+  study -> SetStudyParameters(doIntNorm, useOnlyPrimary, normalPtFracMin, normalPtFracMax);
   study -> Init();
   study -> Analyze();
   study -> End();

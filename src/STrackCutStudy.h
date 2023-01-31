@@ -98,6 +98,7 @@ class STrackCutStudy {
     void SetInputOutputFiles(const TString sEmbedOnlyInput, const TString sPileupInput, const TString sOutput);
     void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple);
     void SetStudyParameters(const Bool_t intNorm, const Bool_t onlyPrim, const Double_t weirdFracMin, const Double_t weirdFracMax);
+    void SetTrackCuts(const Double_t trkQualMin, const Double_t trkQualMax);
     void Init();
     void Analyze();
     void End();
@@ -534,6 +535,10 @@ class STrackCutStudy {
     Double_t normalPtFracMin;
     Double_t normalPtFracMax;
 
+    // track cuts
+    Double_t qualityMin;
+    Double_t qualityMax;
+
     // embed-only leaves
     Float_t event;
     Float_t seed;
@@ -733,12 +738,13 @@ class STrackCutStudy {
     Float_t pu_nclusmms;
 
     // private methods
-    void InitFiles();
-    void InitTuples();
-    void InitHists();
-    void SetHistStyles();
-    void CreatePlots();
-    void SaveHists();
+    void   InitFiles();
+    void   InitTuples();
+    void   InitHists();
+    void   SetHistStyles();
+    void   CreatePlots();
+    void   SaveHists();
+    Bool_t ApplyCuts(const Double_t trkQuality);
 
 };  // end STrackCutStudy definition
 

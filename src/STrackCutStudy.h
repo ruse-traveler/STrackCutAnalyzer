@@ -34,8 +34,9 @@ using namespace std;
 // global constants
 static const Ssiz_t NVtx(4);
 static const Ssiz_t NTxt(3);
-static const Ssiz_t NTyp(7);
-static const Ssiz_t NVar(20);
+static const Ssiz_t NType(9);
+static const Ssiz_t NTrkVar(10);
+static const Ssiz_t NPhysVar(3);
 static const Ssiz_t NRange(2);
 static const Ssiz_t NPanel(2);
 static const UInt_t FTxt(42);
@@ -47,47 +48,33 @@ class STrackCutStudy {
   public:
 
     // enums
-    // TODO: streamline histogram declarations, styling, and saving
-    enum VARIABLE {
-      NMMS    = 0,
-      NMAP    = 1,
-      NINT    = 2,
-      NTPC    = 3,
-      NTOT    = 4,
-      CHISQ   = 5,
-      NDF     = 6,
-      QUAL    = 7,
-      DCAXY   = 8,
-      DCAZ    = 9,
-      PHI     = 10,
-      ETA     = 11,
-      PT      = 12,
-      DDCAXY  = 13,
-      DDCAZ   = 14,
-      VX      = 15,
-      VY      = 16,
-      VZ      = 17,
-      DPHI    = 18,
-      DETA    = 19,
-      DPT     = 20,
-      PHIFRAC = 21,
-      ETAFRAC = 22,
-      PTFRAC  = 23,
-      PHIDIFF = 24,
-      ETADIFF = 25,
-      PTDIFF  = 26,
-      VXDIFF  = 27,
-      VYDIFF  = 28,
-      VZDIFF  = 29
+    enum TRKVAR {
+      VX    = 0,
+      VY    = 1,
+      VZ    = 2,
+      NMMS  = 3,
+      NMAP  = 4,
+      NINT  = 5,
+      NTPC  = 6,
+      QUAL  = 7,
+      DCAXY = 8,
+      DCAZ  = 9
+    };
+    enum PHYSVAR {
+      PHI = 0,
+      ETA = 1,
+      PT  = 2
     };
     enum TYPE {
-      TRACK   = 0,
-      TRUTH   = 1,
-      WEIRD   = 2,
-      NORMAL  = 3,
-      PILEUP  = 4,
-      PRIMARY = 5,
-      NONPRIM = 6
+      TRACK     = 0,
+      TRUTH     = 1,
+      WEIRD_ALL = 2,
+      WEIRD_SI  = 3,
+      WEIRD_TPC = 4,
+      NORMAL    = 5,
+      PILEUP    = 6,
+      PRIMARY   = 7,
+      NONPRIM   = 8
     };
 
     // ctor/dtor
@@ -116,6 +103,21 @@ class STrackCutStudy {
     TString  sOutfile;
     TNtuple *ntTrkEO;
     TNtuple *ntTrkPU;
+
+    // track-variable histograms
+    TH1D *hTrkVar[NType][NTrkVar];
+    TH1D *hTrkVarDiff[NType][NTrkVar];
+    TH2D *hTrkVarVsNTpc[NType][NTrkVar];
+    TH2D *hTrkVarVsPtReco[NType][NTrkVar];
+    TH2D *hTrkVarVsPtTrue[NType][NTrkVar];
+    TH2D *hTrkVarVsPtFrac[NType][NTrkVar];
+
+    // physics-variable histograms
+    TH1D *hPhysVar1D[NType][NPhysVar];
+    TH1D *hPhysVarDiff[NType][NPhysVar];
+    TH2D *hPhysVarVsNTpc[NType][NPhysVar];
+    TH2D *hPhysVarVsPtTrue[NType][NPhysVar];
+    TH2D *hPhysVarVsPtFrac[NType][NPhysVar];
 
     // embed-only track output histograms
     TH1D *hTrackNMms;

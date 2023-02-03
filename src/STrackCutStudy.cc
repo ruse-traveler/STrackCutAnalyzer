@@ -11739,7 +11739,7 @@ void STrackCutStudy::SetHistStyles() {
 void STrackCutStudy::CreatePlots(){
 
   // text parameters
-  const TString sLeg[NTyp]   = {"Tracks", "Truth", "Weird Tracks", "Normal Tracks", "Pileup", "Pileup #bf{[gprimary == 1]}", "Pileup #bf{[gprimary != 1]}"};
+  const TString sLeg[NType - 2]   = {"Tracks", "Truth", "Weird Tracks", "Normal Tracks", "Pileup", "Pileup #bf{[gprimary == 1]}", "Pileup #bf{[gprimary != 1]}"};
   const TString sTxtEO[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "single #pi^{-}, p_{T} #in (0, 20) GeV/c", "#bf{Embedded Only Tracks}"};
   const TString sTxtPU[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "0-20 fm Hijing, 50 kHz pileup", "#bf{With Pileup Tracks}"};
 
@@ -13499,11 +13499,11 @@ void STrackCutStudy::CreatePlots(){
 void STrackCutStudy::SaveHists() {
 
   // directory parameters
-  const TString sOutDir[NTyp] = {"Track", "Truth", "Weird", "Normal", "Pileup", "Primary", "NonPrimary"};
+  const TString sOutDir[NType - 2] = {"Track", "Truth", "Weird", "Normal", "Pileup", "Primary", "NonPrimary"};
 
   // create output directories
-  TDirectory *dOut[NTyp];
-  for (UInt_t iDir = 0; iDir < NTyp; iDir++) {
+  TDirectory *dOut[NType - 2];
+  for (UInt_t iDir = 0; iDir < (NType - 2); iDir++) {
     fOut       -> cd();
     dOut[iDir] = (TDirectory*) fOut -> mkdir(sOutDir[iDir].Data());
   }

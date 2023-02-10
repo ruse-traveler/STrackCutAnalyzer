@@ -12,10 +12,10 @@
 #include <TROOT.h>
 #include <TString.h>
 // user includes
-#include </sphenix/u/danderson/install/include/strackcutstudy/STrackCutStudy.h>
+#include </sphenix/user/danderson/install/include/strackcutstudy/STrackCutStudy.h>
 
 // load libraries
-R__LOAD_LIBRARY(/sphenix/u/danderson/install/lib/libstrackcutstudy.so)
+R__LOAD_LIBRARY(/sphenix/user/danderson/install/lib/libstrackcutstudy.so)
 
 
 
@@ -32,7 +32,7 @@ void DoTrackCutStudy() {
   const TString sInTuplePU("ntp_gtrack");
 
   // study parameters
-  const Bool_t   doIntNorm(false);
+  const Bool_t   doIntNorm(true);
   const Bool_t   useOnlyPrimary(true);
   const Double_t normalPtFracMin(0.20);
   const Double_t normalPtFracMax(1.20);

@@ -107,15 +107,18 @@ class STrackCutStudy {
     // track-variable histograms
     TH1D *hTrkVar[NType][NTrkVar];
     TH1D *hTrkVarDiff[NType][NTrkVar];
+    TH1D *hTrkVarFrac[NType][NTrkVar];
     TH2D *hTrkVarVsNTpc[NType][NTrkVar];
     TH2D *hTrkVarVsPtReco[NType][NTrkVar];
     TH2D *hTrkVarVsPtTrue[NType][NTrkVar];
     TH2D *hTrkVarVsPtFrac[NType][NTrkVar];
 
     // physics-variable histograms
-    TH1D *hPhysVar1D[NType][NPhysVar];
+    TH1D *hPhysVar[NType][NPhysVar];
     TH1D *hPhysVarDiff[NType][NPhysVar];
+    TH1D *hPhysVarFrac[NType][NPhysVar];
     TH2D *hPhysVarVsNTpc[NType][NPhysVar];
+    TH2D *hPhysVarVsPtReco[NType][NPhysVar];
     TH2D *hPhysVarVsPtTrue[NType][NPhysVar];
     TH2D *hPhysVarVsPtFrac[NType][NPhysVar];
 
@@ -913,9 +916,13 @@ class STrackCutStudy {
     void   InitFiles();
     void   InitTuples();
     void   InitHists();
+    void   NormalizeHists();
     void   SetHistStyles();
     void   CreatePlots();
     void   SaveHists();
+    void   FillTrackHistogram(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
+    void   FillTruthHistogram(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
+    void   FillPileupHistogram(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
     Bool_t ApplyCuts(const Double_t trkQuality);
 
 };  // end STrackCutStudy definition

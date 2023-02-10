@@ -6,6 +6,7 @@ lists/
 input/
 backup/
 submit/
+test/
 src/*
 !src/STrackCutStudy.cc
 !src/STrackCutStudy.h

@@ -40,10 +40,10 @@ R__LOAD_LIBRARY(libffamodules.so)
 // try inputFile = /sphenix/sim/sim01/sphnxpro/sHijing_HepMC/sHijing_0-12fm.dat
 
 int Fun4All_G4_sPHENIX_ForTrackCutStudy(
-    const int nEvents = 50,
-    const string &inputFile = "https://www.phenix.bnl.gov/WWW/publish/phnxbld/sPHENIX/files/G4Hits_sHijing_0_20fm-0000000040-00019.root",
+    const int nEvents = 1,
+    const string &inputFile = "/sphenix/lustre01/sphnxpro/mdc2/shijing_hepmc/fm_0_20/g4hits/G4Hits_sHijing_0_20fm-0000000040-00848.root",
     const string &outputFile = "sPhenixG4_test00019.root",
-    const string &embed_input_file = "https://www.phenix.bnl.gov/WWW/publish/phnxbld/sPHENIX/files/G4Hits_sHijing_0_20fm-0000000040-00019.root",
+    const string &embed_input_file = "/sphenix/lustre01/sphnxpro/mdc2/shijing_hepmc/fm_0_20/g4hits/G4Hits_sHijing_0_20fm-0000000040-00848.root",
     const int skip = 0,
     const string &outdir = ".")
 {

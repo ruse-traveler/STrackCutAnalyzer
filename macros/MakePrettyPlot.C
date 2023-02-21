@@ -20,7 +20,7 @@
 using namespace std;
 
 // global constants
-static const UInt_t NNumer(4);
+static const UInt_t NNumer(1);
 static const UInt_t NPlot(2);
 static const UInt_t NPad(2);
 static const UInt_t NVtx(4);
@@ -34,33 +34,18 @@ void MakePrettyPlot() {
   cout << "\n  Beginning plot macro..." << endl;
 
   // output and denominator parameters
-  const TString sOutput("trkQuality_weirdVsAllTrks.pt020n5pim.d1m2y2023.root");
-  const TString sDenom("output/jan/trackCutStudy.onlyPrimariesInEmbed_nhitsNotNlayers.pt020n5pim.d24m1y2023.root");
-  const TString sHistDenom("Track/hTrackQuality");
-  const TString sNameDenom("hAllTracks");
-  const TString sLabelDenom("all tracks");
+  const TString sOutput("trkQuality_embeddedVsSingleParticl.pt020n5pim.d15m2y2023.root");
+  const TString sDenom("trackCutStudy.forMvtxCheck_noMvtxCut_withIntNorm.pt020n5pim.d14m2y2023.root");
+  const TString sHistDenom("Old/Track/hTrackQuality");
+  const TString sNameDenom("hSingleParticle");
+  const TString sLabelDenom("single particle only");
 
   // numerator parameters
-  const TString sNumer[NNumer]      = {"output/jan/trackCutStudy.onlyPrimariesInEmbed_nhitsNotNlayers.pt020n5pim.d24m1y2023.root",
-                                       "output/jan/trackCutStudy.onlyPrimariesInEmbed_nhitsNotNlayers_weirdNMaps0.pt020n5pim.d24m1y2023.root",
-                                       "output/jan/trackCutStudy.onlyPrimariesInEmbed_nhitsNotNlayers_weirdNMaps3.pt020n5pim.d24m1y2023.root",
-                                       "output/jan/trackCutStudy.onlyPrimariesInEmbed_nhitsNotNlayers.pt020n5pim.d24m1y2023.root"};
-  const TString sHistNumer[NNumer]  = {"Weird/hWeirdQuality",
-                                       "Weird/hWeirdQuality",
-                                       "Weird/hWeirdQuality",
-                                       "Normal/hNormalQuality"};
-  const TString sNameNumer[NNumer]  = {"hAllWeirdTracks",
-                                       "hTpcWeirdTracks",
-                                       "hSiWeirdTracks",
-                                       "hNormalQuality"};
-  const TString sNameRatio[NNumer]  = {"hRatio_allWeird",
-                                       "hRatio_tpcWeird",
-                                       "hRatio_siWeird",
-                                       "hRatio_normal"};
-  const TString sLabelNumer[NNumer] = {"all weird tracks",
-                                       "weird tracks w/o Si seed",
-                                       "weird tracks w/ Si seed",
-                                       "normal tracks"};
+  const TString sNumer[NNumer]      = {"trackCutStudy.forMvtxCheck_noMvtxCut_withIntNorm.pt020n5pim.d14m2y2023.root"};
+  const TString sHistNumer[NNumer]  = {"Old/Primary/hPrimaryQuality_PU"};
+  const TString sNameNumer[NNumer]  = {"hWithPileup"};
+  const TString sNameRatio[NNumer]  = {"hRatio"};
+  const TString sLabelNumer[NNumer] = {"Embedded into 0-20 fm Hijing"};
 
   // rebin parameters
   const UInt_t nRebin(2);
@@ -68,24 +53,24 @@ void MakePrettyPlot() {
 
   // plot parameters
   const TString sOptDenom("");
-  const TString sOptNumer[NNumer] = {"SAME", "SAME", "SAME", "SAME"};
-  const TString sOptRatio[NNumer] = {"",     "SAME", "SAME", "SAME"};
+  const TString sOptNumer[NNumer] = {"SAME"};
+  const TString sOptRatio[NNumer] = {"",   };
   const Float_t xPlotRange[NPlot] = {0., 10.};
 
   // style parameters
   const TString sTitle("");
   const TString sTitleX("Quality");
-  const TString sTitleY("counts");
-  const TString sTitleR("[weird, normal] / all");
+  const TString sTitleY("counts / integral");
+  const TString sTitleR("ratio");
   const UInt_t  fColDen(923);
   const UInt_t  fMarDen(20);
-  const UInt_t  fColNum[NNumer] = {799, 899, 879, 839};
-  const UInt_t  fMarNum[NNumer] = {25,  26,  32,  24};
+  const UInt_t  fColNum[NNumer] = {899};
+  const UInt_t  fMarNum[NNumer] = {25};
 
   // text parameters
-  const TString sSys("#bf{#it{sPHENIX}} Simulation");
-  const TString sTrg("single #pi^{-}, p_{T} #in (0, 20) GeV/c");
-  const TString sJet("#bf{Embedded only tracks}");
+  const TString sSys("#bf{#it{sPHENIX}} Simulation, single #pi^{-}");
+  const TString sTrg("20 #pi^{-} per event, p_{T} #in (0, 20) GeV/c");
+  const TString sJet("#bf{Only primary tracks}");
   const TString sTyp("");
   const TString sHeader("");
 

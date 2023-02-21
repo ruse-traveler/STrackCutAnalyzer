@@ -25,7 +25,7 @@ void DoTrackCutStudy() {
   gErrorIgnoreLevel = kWarning;
 
   // i/o parameters
-  const TString sOutFile("trackCutStudy.onlyPrimariesInEmbed_nhitsNotNlayers_weirdNMapsG3.pt020n5pim.d24m1y2022.root");
+  const TString sOutFile("trackCutStudy.forMvtxCheck_noMvtxCut_withIntNorm.pt020n5pim.d14m2y2023.root");
   const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_forTrackCutStudy_embedOnly0t1099_g4svtxeval.pt020n5pim.d12m1y2023.root");
   const TString sInFilePU("input/test/sPhenixG4_testWithPileup001_g4svtxEval.d18m12y2022.root");
   const TString sInTupleEO("ntp_track");

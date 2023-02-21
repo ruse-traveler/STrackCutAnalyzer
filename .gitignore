@@ -6,6 +6,8 @@ lists/
 input/
 backup/
 submit/
+submit_withPileup/
+submit_embedOnly/
 test/
 src/*
 !src/STrackCutStudy.cc

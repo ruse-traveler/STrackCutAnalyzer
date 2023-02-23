@@ -3720,12 +3720,16 @@ void STrackCutStudy::SetHistStyles() {
   const UInt_t  fColTrk(923);
   const UInt_t  fColTru(618);
   const UInt_t  fColOdd(635);
+  const UInt_t  fColOddSi(631);
+  const UInt_t  fColOddTpc(627);
   const UInt_t  fColNorm(603);
   const UInt_t  fColPrim(879);
   const UInt_t  fColNoPr(799);
   const UInt_t  fMarTrk(22);
   const UInt_t  fMarTru(32);
   const UInt_t  fMarOdd(5);
+  const UInt_t  fMarOddSi(5);
+  const UInt_t  fMarOddTpc(5);
   const UInt_t  fMarNorm(24);
   const UInt_t  fMarPrim(26);
   const UInt_t  fMarNoPr(32);
@@ -3743,14 +3747,28 @@ void STrackCutStudy::SetHistStyles() {
     sCountToUse = "counts";
   } 
 
-  // generic axis titles
+  // axis titles
   const TString sCount(sCountToUse.Data());
-  const TString sPerMms("r_{MMS} = N_{layer/trk}^{MMS} / N_{layer/truth}^{MMS}");
-  const TString sPerMap("r_{MAPS} = N_{layer/trk}^{MAPS} / N_{layer/truth}^{MAPS}");
-  const TString sPerInt("r_{INTT} = N_{layer/trk}^{INTT} / N_{layer/truth}^{INTT}");
-  const TString sPerTpc("r_{TPC} = N_{layer/trk}^{TPC} / N_{layer/truth}^{TPC}");
-  const TString sPerTot("r_{tot} = N_{layer/trk}^{tot} / N_{layer/truth}^{tot}");
-  // track specific axis titles
+  const TString sDeltaDCAxy("#DeltaDCA_{xy} / DCA_{xy}");
+  const TString sDeltaDCAz("#DeltaDCA_{z} / DCA_{z}");
+  const TString sDeltaEta("#Delta#eta^{trk} / #eta^{trk}");
+  const TString sDeltaPhi("#Delta#phi^{trk} / #phi^{trk}");
+  const TString sDeltaPt("#Deltap_{T}^{trk} / p_{T}^{trk}");
+
+  // truth axis titles
+  const TString sTruVx("v_{x} [cm]");
+  const TString sTruVy("v_{y} [cm]");
+  const TString sTruVz("v_{z} [cm]");
+  const TString sTruNMms("N_{layer}^{MMS}");
+  const TString sTruNMap("N_{layer}^{MAPS}");
+  const TString sTruNInt("N_{layer}^{INTT}");
+  const TString sTruNTpc("N_{layer}^{TPC}");
+  const TString sTruNTot("N_{layer}^{tot}");
+  const TString sTruPhi("#phi");
+  const TString sTruEta("#eta");
+  const TString sTruPt("p_{T}^{truth} [GeV/c]");
+
+  // track axis titles
   const TString sTrkNMms("N_{layer}^{MMS}");
   const TString sTrkNMap("N_{layer}^{MAPS}");
   const TString sTrkNInt("N_{layer}^{INTT}");
@@ -3761,38 +3779,43 @@ void STrackCutStudy::SetHistStyles() {
   const TString sTrkQuality("#chi^{2}/ndf");
   const TString sTrkDCAxy("DCA_{xy} [#mum]");
   const TString sTrkDCAz("DCA_{z} [#mum]");
-  const TString sTrkVx("v_{x}^{trk} [cm]");
-  const TString sTrkVy("v_{y}^{trk} [cm]");
-  const TString sTrkVz("v_{z}^{trk} [cm]");
-  const TString sTrkEta("#eta^{trk}");
-  const TString sTrkPhi("#phi^{trk}");
-  const TString sTrkPt("p_{T}^{trk} [GeV/c]");
-  const TString sDeltaDCAxy("#DeltaDCA_{xy} / DCA_{xy}");
-  const TString sDeltaDCAz("#DeltaDCA_{z} / DCA_{z}");
-  const TString sDeltaEta("#Delta#eta^{trk} / #eta^{trk}");
-  const TString sDeltaPhi("#Delta#phi^{trk} / #phi^{trk}");
-  const TString sDeltaPt("#Deltap_{T}^{trk} / p_{T}^{trk}");
-  // truth specific axis titles
-  const TString sTruNMms("N_{layer}^{MMS}");
-  const TString sTruNMap("N_{layer}^{MAPS}");
-  const TString sTruNInt("N_{layer}^{INTT}");
-  const TString sTruNTpc("N_{layer}^{TPC}");
-  const TString sTruNTot("N_{layer}^{tot}");
-  const TString sTruEta("#eta^{truth}");
-  const TString sTruPhi("#phi^{truth}");
-  const TString sTruPt("p_{T}^{truth} [GeV/c]");
-  const TString sTruVx("v_{x}^{truth} [cm]");
-  const TString sTruVy("v_{y}^{truth} [cm]");
-  const TString sTruVz("v_{z}^{truth} [cm]");
-  const TString sFracEta("#delta#eta^{trk} = #eta^{trk} / #eta^{truth}");
+  const TString sTrkVx("v_{x} [cm]");
+  const TString sTrkVy("v_{y} [cm]");
+  const TString sTrkVz("v_{z} [cm]");
+  const TString sTrkPhi("#phi");
+  const TString sTrkEta("#eta");
+  const TString sTrkPt("p_{T} [GeV/c]");
+
+  // difference axis titles
+  const TString sDiffVx("v_{x}^{reco} - v_{x}^{truth}");
+  const TString sDiffVy("v_{y}^{reco} - v_{y}^{truth}");
+  const TString sDiffVz("v_{z}^{reco} - v_{z}^{truth}");
+  const TString sDiffNMms("N_{layer/reco}^{MMS} - N_{layer/truth}^{MMS}");
+  const TString sDiffNMap("N_{layer/reco}^{MAP} - N_{layer/truth}^{MAP}");
+  const TString sDiffNInt("N_{layer/reco}^{INTT} - N_{layer/truth}^{INTT}");
+  const TString sDiffNTpc("N_{layer/reco}^{TPC} - N_{layer/truth}^{TPC}");
+  const TString sDiffQual("Quality(reco) - Quality(truth)");
+  const TString sDiffDCAxy("DCA_{xy}^{reco} - DCA_{xy}^{truth} [#mum]");
+  const TString sDiffDCAz("DCA_{z}^{reco} - DCA_{z}^{truth} [#mum]");
+  const TString sDiffPhi("#phi^{reco} - #phi^{truth}");
+  const TString sDiffEta("#eta^{reco} - #eta^{truth}");
+  const TString sDiffPt("p_{T}^{reco} - p_{T}^{truth}");
+
+  // fraction axis titles
+  const TString sFracVx("v_{x}^{reco} / v_{x}^{truth}");
+  const TString sFracVy("v_{y}^{reco} / v_{y}^{truth}");
+  const TString sFracVz("v_{z}^{reco} / v_{z}^{truth}");
+  const TString sFracMms("N_{layer/reco}^{MMS} / N_{layer/truth}^{MMS}");
+  const TString sFracMap("N_{layer/reco}^{MAPS} / N_{layer/truth}^{MAPS}");
+  const TString sFracInt("N_{layer/reco}^{INTT} / N_{layer/truth}^{INTT}");
+  const TString sFracTpc("N_{layer/reco}^{TPC} / N_{layer/truth}^{TPC}");
+  const TString sFracTot("N_{layer/reco}^{tot} / N_{layer/truth}^{tot}");
+  const TString sFracQual("Quality(reco) / Quality(truth)");
+  const TString sFracDCAxy("DCA_{xy}^{reco} / DCA_{xy}^{truth}");
+  const TString sFracDCAz("DCA_{z}^{reco} / DCA_{z}^{truth}");
   const TString sFracPhi("#delta#phi^{trk} = #phi^{trk} / #phi^{truth}");
+  const TString sFracEta("#delta#eta^{trk} = #eta^{trk} / #eta^{truth}");
   const TString sFracPt("#deltap_{T}^{trk} = p_{T}^{trk} / p_{T}^{truth}");
-  const TString sDiffEta("#varsigma#eta^{trk} = #eta^{trk} - #eta^{truth}");
-  const TString sDiffPhi("#varsigma#phi^{trk} = #phi^{trk} - #phi^{truth}");
-  const TString sDiffPt("#varsigmap_{T}^{trk} = p_{T}^{trk} - p_{T}^{truth}");
-  const TString sDiffVx("#varsigmav_{x} = v_{x}^{trk} - v_{x}^{truth}");
-  const TString sDiffVy("#varsigmav_{y} = v_{y}^{trk} - v_{y}^{truth}");
-  const TString sDiffVz("#varsigmav_{z} = v_{z}^{trk} - v_{z}^{truth}");
 
   // set embed-only track histogram styles
   hTrackNMms                -> SetMarkerColor(fColTrk);
@@ -3867,7 +3890,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerMms              -> SetFillColor(fColTrk);
   hTrackPerMms              -> SetFillStyle(fFil);
   hTrackPerMms              -> SetTitleFont(FTxt);
-  hTrackPerMms              -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPerMms              -> GetXaxis() -> SetTitle(sFracMms.Data());
   hTrackPerMms              -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerMms              -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerMms              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -3880,7 +3903,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerMap              -> SetFillColor(fColTrk);
   hTrackPerMap              -> SetFillStyle(fFil);
   hTrackPerMap              -> SetTitleFont(FTxt);
-  hTrackPerMap              -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hTrackPerMap              -> GetXaxis() -> SetTitle(sFracMap.Data());
   hTrackPerMap              -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerMap              -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerMap              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -3893,7 +3916,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerInt              -> SetFillColor(fColTrk);
   hTrackPerInt              -> SetFillStyle(fFil);
   hTrackPerInt              -> SetTitleFont(FTxt);
-  hTrackPerInt              -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hTrackPerInt              -> GetXaxis() -> SetTitle(sFracInt.Data());
   hTrackPerInt              -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerInt              -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerInt              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -3906,7 +3929,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerTpc              -> SetFillColor(fColTrk);
   hTrackPerTpc              -> SetFillStyle(fFil);
   hTrackPerTpc              -> SetTitleFont(FTxt);
-  hTrackPerTpc              -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hTrackPerTpc              -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hTrackPerTpc              -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerTpc              -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerTpc              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -3919,7 +3942,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerTot              -> SetFillColor(fColTrk);
   hTrackPerTot              -> SetFillStyle(fFil);
   hTrackPerTot              -> SetTitleFont(FTxt);
-  hTrackPerTot              -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hTrackPerTot              -> GetXaxis() -> SetTitle(sFracTot.Data());
   hTrackPerTot              -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerTot              -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerTot              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -4219,7 +4242,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerMms          -> SetFillColor(fColTrk);
   hTrackPtVsPerMms          -> SetFillStyle(fFil);
   hTrackPtVsPerMms          -> SetTitleFont(FTxt);
-  hTrackPtVsPerMms          -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPtVsPerMms          -> GetXaxis() -> SetTitle(sFracMms.Data());
   hTrackPtVsPerMms          -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerMms          -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerMms          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -4235,7 +4258,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerMap          -> SetFillColor(fColTrk);
   hTrackPtVsPerMap          -> SetFillStyle(fFil);
   hTrackPtVsPerMap          -> SetTitleFont(FTxt);
-  hTrackPtVsPerMap          -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hTrackPtVsPerMap          -> GetXaxis() -> SetTitle(sFracMap.Data());
   hTrackPtVsPerMap          -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerMap          -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerMap          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -4251,7 +4274,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerInt          -> SetFillColor(fColTrk);
   hTrackPtVsPerInt          -> SetFillStyle(fFil);
   hTrackPtVsPerInt          -> SetTitleFont(FTxt);
-  hTrackPtVsPerInt          -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hTrackPtVsPerInt          -> GetXaxis() -> SetTitle(sFracInt.Data());
   hTrackPtVsPerInt          -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerInt          -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerInt          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -4267,7 +4290,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerTpc          -> SetFillColor(fColTrk);
   hTrackPtVsPerTpc          -> SetFillStyle(fFil);
   hTrackPtVsPerTpc          -> SetTitleFont(FTxt);
-  hTrackPtVsPerTpc          -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hTrackPtVsPerTpc          -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hTrackPtVsPerTpc          -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerTpc          -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerTpc          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -4283,7 +4306,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerTot          -> SetFillColor(fColTrk);
   hTrackPtVsPerTot          -> SetFillStyle(fFil);
   hTrackPtVsPerTot          -> SetTitleFont(FTxt);
-  hTrackPtVsPerTot          -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hTrackPtVsPerTot          -> GetXaxis() -> SetTitle(sFracTot.Data());
   hTrackPtVsPerTot          -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerTot          -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerTot          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -5234,7 +5257,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerMms              -> SetFillColor(fColOdd);
   hWeirdPerMms              -> SetFillStyle(fFil);
   hWeirdPerMms              -> SetTitleFont(FTxt);
-  hWeirdPerMms              -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hWeirdPerMms              -> GetXaxis() -> SetTitle(sFracMms.Data());
   hWeirdPerMms              -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerMms              -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerMms              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -5247,7 +5270,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerMap              -> SetFillColor(fColOdd);
   hWeirdPerMap              -> SetFillStyle(fFil);
   hWeirdPerMap              -> SetTitleFont(FTxt);
-  hWeirdPerMap              -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hWeirdPerMap              -> GetXaxis() -> SetTitle(sFracMap.Data());
   hWeirdPerMap              -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerMap              -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerMap              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -5260,7 +5283,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerInt              -> SetFillColor(fColOdd);
   hWeirdPerInt              -> SetFillStyle(fFil);
   hWeirdPerInt              -> SetTitleFont(FTxt);
-  hWeirdPerInt              -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hWeirdPerInt              -> GetXaxis() -> SetTitle(sFracInt.Data());
   hWeirdPerInt              -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerInt              -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerInt              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -5273,7 +5296,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerTpc              -> SetFillColor(fColOdd);
   hWeirdPerTpc              -> SetFillStyle(fFil);
   hWeirdPerTpc              -> SetTitleFont(FTxt);
-  hWeirdPerTpc              -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hWeirdPerTpc              -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hWeirdPerTpc              -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerTpc              -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerTpc              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -5286,7 +5309,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerTot              -> SetFillColor(fColTrk);
   hWeirdPerTot              -> SetFillStyle(fFil);
   hWeirdPerTot              -> SetTitleFont(FTxt);
-  hWeirdPerTot              -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hWeirdPerTot              -> GetXaxis() -> SetTitle(sFracTot.Data());
   hWeirdPerTot              -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerTot              -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerTot              -> GetYaxis() -> SetTitle(sCount.Data());
@@ -5703,7 +5726,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerMms          -> SetFillColor(fColOdd);
   hWeirdPtVsPerMms          -> SetFillStyle(fFil);
   hWeirdPtVsPerMms          -> SetTitleFont(FTxt);
-  hWeirdPtVsPerMms          -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hWeirdPtVsPerMms          -> GetXaxis() -> SetTitle(sFracMms.Data());
   hWeirdPtVsPerMms          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerMms          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerMms          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -5719,7 +5742,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerMap          -> SetFillColor(fColOdd);
   hWeirdPtVsPerMap          -> SetFillStyle(fFil);
   hWeirdPtVsPerMap          -> SetTitleFont(FTxt);
-  hWeirdPtVsPerMap          -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hWeirdPtVsPerMap          -> GetXaxis() -> SetTitle(sFracMap.Data());
   hWeirdPtVsPerMap          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerMap          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerMap          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -5735,7 +5758,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerInt          -> SetFillColor(fColOdd);
   hWeirdPtVsPerInt          -> SetFillStyle(fFil);
   hWeirdPtVsPerInt          -> SetTitleFont(FTxt);
-  hWeirdPtVsPerInt          -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hWeirdPtVsPerInt          -> GetXaxis() -> SetTitle(sFracInt.Data());
   hWeirdPtVsPerInt          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerInt          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerInt          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -5751,7 +5774,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerTpc          -> SetFillColor(fColOdd);
   hWeirdPtVsPerTpc          -> SetFillStyle(fFil);
   hWeirdPtVsPerTpc          -> SetTitleFont(FTxt);
-  hWeirdPtVsPerTpc          -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hWeirdPtVsPerTpc          -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hWeirdPtVsPerTpc          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerTpc          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerTpc          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -5767,7 +5790,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerTot          -> SetFillColor(fColOdd);
   hWeirdPtVsPerTot          -> SetFillStyle(fFil);
   hWeirdPtVsPerTot          -> SetTitleFont(FTxt);
-  hWeirdPtVsPerTot          -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hWeirdPtVsPerTot          -> GetXaxis() -> SetTitle(sFracTot.Data());
   hWeirdPtVsPerTot          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerTot          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerTot          -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -6457,7 +6480,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerMms_SI           -> SetFillColor(fColOdd);
   hWeirdPerMms_SI           -> SetFillStyle(fFil);
   hWeirdPerMms_SI           -> SetTitleFont(FTxt);
-  hWeirdPerMms_SI           -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hWeirdPerMms_SI           -> GetXaxis() -> SetTitle(sFracMms.Data());
   hWeirdPerMms_SI           -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerMms_SI           -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerMms_SI           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -6470,7 +6493,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerMap_SI           -> SetFillColor(fColOdd);
   hWeirdPerMap_SI           -> SetFillStyle(fFil);
   hWeirdPerMap_SI           -> SetTitleFont(FTxt);
-  hWeirdPerMap_SI           -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hWeirdPerMap_SI           -> GetXaxis() -> SetTitle(sFracMap.Data());
   hWeirdPerMap_SI           -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerMap_SI           -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerMap_SI           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -6483,7 +6506,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerInt_SI           -> SetFillColor(fColOdd);
   hWeirdPerInt_SI           -> SetFillStyle(fFil);
   hWeirdPerInt_SI           -> SetTitleFont(FTxt);
-  hWeirdPerInt_SI           -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hWeirdPerInt_SI           -> GetXaxis() -> SetTitle(sFracInt.Data());
   hWeirdPerInt_SI           -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerInt_SI           -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerInt_SI           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -6496,7 +6519,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerTpc_SI           -> SetFillColor(fColOdd);
   hWeirdPerTpc_SI           -> SetFillStyle(fFil);
   hWeirdPerTpc_SI           -> SetTitleFont(FTxt);
-  hWeirdPerTpc_SI           -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hWeirdPerTpc_SI           -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hWeirdPerTpc_SI           -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerTpc_SI           -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerTpc_SI           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -6509,7 +6532,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerTot_SI           -> SetFillColor(fColTrk);
   hWeirdPerTot_SI           -> SetFillStyle(fFil);
   hWeirdPerTot_SI           -> SetTitleFont(FTxt);
-  hWeirdPerTot_SI           -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hWeirdPerTot_SI           -> GetXaxis() -> SetTitle(sFracTot.Data());
   hWeirdPerTot_SI           -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerTot_SI           -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerTot_SI           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -6926,7 +6949,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerMms_SI       -> SetFillColor(fColOdd);
   hWeirdPtVsPerMms_SI       -> SetFillStyle(fFil);
   hWeirdPtVsPerMms_SI       -> SetTitleFont(FTxt);
-  hWeirdPtVsPerMms_SI       -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hWeirdPtVsPerMms_SI       -> GetXaxis() -> SetTitle(sFracMms.Data());
   hWeirdPtVsPerMms_SI       -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerMms_SI       -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerMms_SI       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -6942,7 +6965,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerMap_SI       -> SetFillColor(fColOdd);
   hWeirdPtVsPerMap_SI       -> SetFillStyle(fFil);
   hWeirdPtVsPerMap_SI       -> SetTitleFont(FTxt);
-  hWeirdPtVsPerMap_SI       -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hWeirdPtVsPerMap_SI       -> GetXaxis() -> SetTitle(sFracMap.Data());
   hWeirdPtVsPerMap_SI       -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerMap_SI       -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerMap_SI       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -6958,7 +6981,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerInt_SI       -> SetFillColor(fColOdd);
   hWeirdPtVsPerInt_SI       -> SetFillStyle(fFil);
   hWeirdPtVsPerInt_SI       -> SetTitleFont(FTxt);
-  hWeirdPtVsPerInt_SI       -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hWeirdPtVsPerInt_SI       -> GetXaxis() -> SetTitle(sFracInt.Data());
   hWeirdPtVsPerInt_SI       -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerInt_SI       -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerInt_SI       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -6974,7 +6997,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerTpc_SI       -> SetFillColor(fColOdd);
   hWeirdPtVsPerTpc_SI       -> SetFillStyle(fFil);
   hWeirdPtVsPerTpc_SI       -> SetTitleFont(FTxt);
-  hWeirdPtVsPerTpc_SI       -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hWeirdPtVsPerTpc_SI       -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hWeirdPtVsPerTpc_SI       -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerTpc_SI       -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerTpc_SI       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -6990,7 +7013,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerTot_SI       -> SetFillColor(fColOdd);
   hWeirdPtVsPerTot_SI       -> SetFillStyle(fFil);
   hWeirdPtVsPerTot_SI       -> SetTitleFont(FTxt);
-  hWeirdPtVsPerTot_SI       -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hWeirdPtVsPerTot_SI       -> GetXaxis() -> SetTitle(sFracTot.Data());
   hWeirdPtVsPerTot_SI       -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerTot_SI       -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerTot_SI       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -7680,7 +7703,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerMms_TPC          -> SetFillColor(fColOdd);
   hWeirdPerMms_TPC          -> SetFillStyle(fFil);
   hWeirdPerMms_TPC          -> SetTitleFont(FTxt);
-  hWeirdPerMms_TPC          -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hWeirdPerMms_TPC          -> GetXaxis() -> SetTitle(sFracMms.Data());
   hWeirdPerMms_TPC          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerMms_TPC          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerMms_TPC          -> GetYaxis() -> SetTitle(sCount.Data());
@@ -7693,7 +7716,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerMap_TPC          -> SetFillColor(fColOdd);
   hWeirdPerMap_TPC          -> SetFillStyle(fFil);
   hWeirdPerMap_TPC          -> SetTitleFont(FTxt);
-  hWeirdPerMap_TPC          -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hWeirdPerMap_TPC          -> GetXaxis() -> SetTitle(sFracMap.Data());
   hWeirdPerMap_TPC          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerMap_TPC          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerMap_TPC          -> GetYaxis() -> SetTitle(sCount.Data());
@@ -7706,7 +7729,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerInt_TPC          -> SetFillColor(fColOdd);
   hWeirdPerInt_TPC          -> SetFillStyle(fFil);
   hWeirdPerInt_TPC          -> SetTitleFont(FTxt);
-  hWeirdPerInt_TPC          -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hWeirdPerInt_TPC          -> GetXaxis() -> SetTitle(sFracInt.Data());
   hWeirdPerInt_TPC          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerInt_TPC          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerInt_TPC          -> GetYaxis() -> SetTitle(sCount.Data());
@@ -7719,7 +7742,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerTpc_TPC          -> SetFillColor(fColOdd);
   hWeirdPerTpc_TPC          -> SetFillStyle(fFil);
   hWeirdPerTpc_TPC          -> SetTitleFont(FTxt);
-  hWeirdPerTpc_TPC          -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hWeirdPerTpc_TPC          -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hWeirdPerTpc_TPC          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerTpc_TPC          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerTpc_TPC          -> GetYaxis() -> SetTitle(sCount.Data());
@@ -7732,7 +7755,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPerTot_TPC          -> SetFillColor(fColTrk);
   hWeirdPerTot_TPC          -> SetFillStyle(fFil);
   hWeirdPerTot_TPC          -> SetTitleFont(FTxt);
-  hWeirdPerTot_TPC          -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hWeirdPerTot_TPC          -> GetXaxis() -> SetTitle(sFracTot.Data());
   hWeirdPerTot_TPC          -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPerTot_TPC          -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPerTot_TPC          -> GetYaxis() -> SetTitle(sCount.Data());
@@ -8149,7 +8172,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerMms_TPC      -> SetFillColor(fColOdd);
   hWeirdPtVsPerMms_TPC      -> SetFillStyle(fFil);
   hWeirdPtVsPerMms_TPC      -> SetTitleFont(FTxt);
-  hWeirdPtVsPerMms_TPC      -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hWeirdPtVsPerMms_TPC      -> GetXaxis() -> SetTitle(sFracMms.Data());
   hWeirdPtVsPerMms_TPC      -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerMms_TPC      -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerMms_TPC      -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -8165,7 +8188,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerMap_TPC      -> SetFillColor(fColOdd);
   hWeirdPtVsPerMap_TPC      -> SetFillStyle(fFil);
   hWeirdPtVsPerMap_TPC      -> SetTitleFont(FTxt);
-  hWeirdPtVsPerMap_TPC      -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hWeirdPtVsPerMap_TPC      -> GetXaxis() -> SetTitle(sFracMap.Data());
   hWeirdPtVsPerMap_TPC      -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerMap_TPC      -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerMap_TPC      -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -8181,7 +8204,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerInt_TPC      -> SetFillColor(fColOdd);
   hWeirdPtVsPerInt_TPC      -> SetFillStyle(fFil);
   hWeirdPtVsPerInt_TPC      -> SetTitleFont(FTxt);
-  hWeirdPtVsPerInt_TPC      -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hWeirdPtVsPerInt_TPC      -> GetXaxis() -> SetTitle(sFracInt.Data());
   hWeirdPtVsPerInt_TPC      -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerInt_TPC      -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerInt_TPC      -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -8197,7 +8220,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerTpc_TPC      -> SetFillColor(fColOdd);
   hWeirdPtVsPerTpc_TPC      -> SetFillStyle(fFil);
   hWeirdPtVsPerTpc_TPC      -> SetTitleFont(FTxt);
-  hWeirdPtVsPerTpc_TPC      -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hWeirdPtVsPerTpc_TPC      -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hWeirdPtVsPerTpc_TPC      -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerTpc_TPC      -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerTpc_TPC      -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -8213,7 +8236,7 @@ void STrackCutStudy::SetHistStyles() {
   hWeirdPtVsPerTot_TPC      -> SetFillColor(fColOdd);
   hWeirdPtVsPerTot_TPC      -> SetFillStyle(fFil);
   hWeirdPtVsPerTot_TPC      -> SetTitleFont(FTxt);
-  hWeirdPtVsPerTot_TPC      -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hWeirdPtVsPerTot_TPC      -> GetXaxis() -> SetTitle(sFracTot.Data());
   hWeirdPtVsPerTot_TPC      -> GetXaxis() -> SetTitleFont(FTxt);
   hWeirdPtVsPerTot_TPC      -> GetXaxis() -> SetTitleOffset(fOffX);
   hWeirdPtVsPerTot_TPC      -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -8903,7 +8926,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPerMms             -> SetFillColor(fColNorm);
   hNormalPerMms             -> SetFillStyle(fFil);
   hNormalPerMms             -> SetTitleFont(FTxt);
-  hNormalPerMms             -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hNormalPerMms             -> GetXaxis() -> SetTitle(sFracMms.Data());
   hNormalPerMms             -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPerMms             -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPerMms             -> GetYaxis() -> SetTitle(sCount.Data());
@@ -8916,7 +8939,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPerMap             -> SetFillColor(fColNorm);
   hNormalPerMap             -> SetFillStyle(fFil);
   hNormalPerMap             -> SetTitleFont(FTxt);
-  hNormalPerMap             -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hNormalPerMap             -> GetXaxis() -> SetTitle(sFracMap.Data());
   hNormalPerMap             -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPerMap             -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPerMap             -> GetYaxis() -> SetTitle(sCount.Data());
@@ -8929,7 +8952,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPerInt             -> SetFillColor(fColNorm);
   hNormalPerInt             -> SetFillStyle(fFil);
   hNormalPerInt             -> SetTitleFont(FTxt);
-  hNormalPerInt             -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hNormalPerInt             -> GetXaxis() -> SetTitle(sFracInt.Data());
   hNormalPerInt             -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPerInt             -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPerInt             -> GetYaxis() -> SetTitle(sCount.Data());
@@ -8942,7 +8965,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPerTpc             -> SetFillColor(fColNorm);
   hNormalPerTpc             -> SetFillStyle(fFil);
   hNormalPerTpc             -> SetTitleFont(FTxt);
-  hNormalPerTpc             -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hNormalPerTpc             -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hNormalPerTpc             -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPerTpc             -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPerTpc             -> GetYaxis() -> SetTitle(sCount.Data());
@@ -8955,7 +8978,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPerTot             -> SetFillColor(fColTrk);
   hNormalPerTot             -> SetFillStyle(fFil);
   hNormalPerTot             -> SetTitleFont(FTxt);
-  hNormalPerTot             -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hNormalPerTot             -> GetXaxis() -> SetTitle(sFracTot.Data());
   hNormalPerTot             -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPerTot             -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPerTot             -> GetYaxis() -> SetTitle(sCount.Data());
@@ -9373,7 +9396,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPtVsPerMms         -> SetFillColor(fColNorm);
   hNormalPtVsPerMms         -> SetFillStyle(fFil);
   hNormalPtVsPerMms         -> SetTitleFont(FTxt);
-  hNormalPtVsPerMms         -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hNormalPtVsPerMms         -> GetXaxis() -> SetTitle(sFracMms.Data());
   hNormalPtVsPerMms         -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPtVsPerMms         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPtVsPerMms         -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -9389,7 +9412,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPtVsPerMap         -> SetFillColor(fColNorm);
   hNormalPtVsPerMap         -> SetFillStyle(fFil);
   hNormalPtVsPerMap         -> SetTitleFont(FTxt);
-  hNormalPtVsPerMap         -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hNormalPtVsPerMap         -> GetXaxis() -> SetTitle(sFracMap.Data());
   hNormalPtVsPerMap         -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPtVsPerMap         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPtVsPerMap         -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -9405,7 +9428,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPtVsPerInt         -> SetFillColor(fColNorm);
   hNormalPtVsPerInt         -> SetFillStyle(fFil);
   hNormalPtVsPerInt         -> SetTitleFont(FTxt);
-  hNormalPtVsPerInt         -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hNormalPtVsPerInt         -> GetXaxis() -> SetTitle(sFracInt.Data());
   hNormalPtVsPerInt         -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPtVsPerInt         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPtVsPerInt         -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -9421,7 +9444,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPtVsPerTpc         -> SetFillColor(fColNorm);
   hNormalPtVsPerTpc         -> SetFillStyle(fFil);
   hNormalPtVsPerTpc         -> SetTitleFont(FTxt);
-  hNormalPtVsPerTpc         -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hNormalPtVsPerTpc         -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hNormalPtVsPerTpc         -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPtVsPerTpc         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPtVsPerTpc         -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -9437,7 +9460,7 @@ void STrackCutStudy::SetHistStyles() {
   hNormalPtVsPerTot         -> SetFillColor(fColNorm);
   hNormalPtVsPerTot         -> SetFillStyle(fFil);
   hNormalPtVsPerTot         -> SetTitleFont(FTxt);
-  hNormalPtVsPerTot         -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hNormalPtVsPerTot         -> GetXaxis() -> SetTitle(sFracTot.Data());
   hNormalPtVsPerTot         -> GetXaxis() -> SetTitleFont(FTxt);
   hNormalPtVsPerTot         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNormalPtVsPerTot         -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -10127,7 +10150,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerMms_PU           -> SetFillColor(fColTrk);
   hTrackPerMms_PU           -> SetFillStyle(fFil);
   hTrackPerMms_PU           -> SetTitleFont(FTxt);
-  hTrackPerMms_PU           -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPerMms_PU           -> GetXaxis() -> SetTitle(sFracMms.Data());
   hTrackPerMms_PU           -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerMms_PU           -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerMms_PU           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10140,7 +10163,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerMap_PU           -> SetFillColor(fColTrk);
   hTrackPerMap_PU           -> SetFillStyle(fFil);
   hTrackPerMap_PU           -> SetTitleFont(FTxt);
-  hTrackPerMap_PU           -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hTrackPerMap_PU           -> GetXaxis() -> SetTitle(sFracMap.Data());
   hTrackPerMap_PU           -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerMap_PU           -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerMap_PU           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10153,7 +10176,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerInt_PU           -> SetFillColor(fColTrk);
   hTrackPerInt_PU           -> SetFillStyle(fFil);
   hTrackPerInt_PU           -> SetTitleFont(FTxt);
-  hTrackPerInt_PU           -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hTrackPerInt_PU           -> GetXaxis() -> SetTitle(sFracInt.Data());
   hTrackPerInt_PU           -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerInt_PU           -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerInt_PU           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10166,7 +10189,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerTpc_PU           -> SetFillColor(fColTrk);
   hTrackPerTpc_PU           -> SetFillStyle(fFil);
   hTrackPerTpc_PU           -> SetTitleFont(FTxt);
-  hTrackPerTpc_PU           -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hTrackPerTpc_PU           -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hTrackPerTpc_PU           -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerTpc_PU           -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerTpc_PU           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10179,7 +10202,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPerTot_PU           -> SetFillColor(fColTrk);
   hTrackPerTot_PU           -> SetFillStyle(fFil);
   hTrackPerTot_PU           -> SetTitleFont(FTxt);
-  hTrackPerTot_PU           -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hTrackPerTot_PU           -> GetXaxis() -> SetTitle(sFracTot.Data());
   hTrackPerTot_PU           -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPerTot_PU           -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPerTot_PU           -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10479,7 +10502,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerMms_PU       -> SetFillColor(fColTrk);
   hTrackPtVsPerMms_PU       -> SetFillStyle(fFil);
   hTrackPtVsPerMms_PU       -> SetTitleFont(FTxt);
-  hTrackPtVsPerMms_PU       -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hTrackPtVsPerMms_PU       -> GetXaxis() -> SetTitle(sFracMms.Data());
   hTrackPtVsPerMms_PU       -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerMms_PU       -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerMms_PU       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -10495,7 +10518,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerMap_PU       -> SetFillColor(fColTrk);
   hTrackPtVsPerMap_PU       -> SetFillStyle(fFil);
   hTrackPtVsPerMap_PU       -> SetTitleFont(FTxt);
-  hTrackPtVsPerMap_PU       -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hTrackPtVsPerMap_PU       -> GetXaxis() -> SetTitle(sFracMap.Data());
   hTrackPtVsPerMap_PU       -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerMap_PU       -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerMap_PU       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -10511,7 +10534,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerInt_PU       -> SetFillColor(fColTrk);
   hTrackPtVsPerInt_PU       -> SetFillStyle(fFil);
   hTrackPtVsPerInt_PU       -> SetTitleFont(FTxt);
-  hTrackPtVsPerInt_PU       -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hTrackPtVsPerInt_PU       -> GetXaxis() -> SetTitle(sFracInt.Data());
   hTrackPtVsPerInt_PU       -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerInt_PU       -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerInt_PU       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -10527,7 +10550,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerTpc_PU       -> SetFillColor(fColTrk);
   hTrackPtVsPerTpc_PU       -> SetFillStyle(fFil);
   hTrackPtVsPerTpc_PU       -> SetTitleFont(FTxt);
-  hTrackPtVsPerTpc_PU       -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hTrackPtVsPerTpc_PU       -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hTrackPtVsPerTpc_PU       -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerTpc_PU       -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerTpc_PU       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -10543,7 +10566,7 @@ void STrackCutStudy::SetHistStyles() {
   hTrackPtVsPerTot_PU       -> SetFillColor(fColTrk);
   hTrackPtVsPerTot_PU       -> SetFillStyle(fFil);
   hTrackPtVsPerTot_PU       -> SetTitleFont(FTxt);
-  hTrackPtVsPerTot_PU       -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hTrackPtVsPerTot_PU       -> GetXaxis() -> SetTitle(sFracTot.Data());
   hTrackPtVsPerTot_PU       -> GetXaxis() -> SetTitleFont(FTxt);
   hTrackPtVsPerTot_PU       -> GetXaxis() -> SetTitleOffset(fOffX);
   hTrackPtVsPerTot_PU       -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -10785,7 +10808,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPerMms_PU         -> SetFillColor(fColPrim);
   hPrimaryPerMms_PU         -> SetFillStyle(fFil);
   hPrimaryPerMms_PU         -> SetTitleFont(FTxt);
-  hPrimaryPerMms_PU         -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hPrimaryPerMms_PU         -> GetXaxis() -> SetTitle(sFracMms.Data());
   hPrimaryPerMms_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPerMms_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPerMms_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10798,7 +10821,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPerMap_PU         -> SetFillColor(fColPrim);
   hPrimaryPerMap_PU         -> SetFillStyle(fFil);
   hPrimaryPerMap_PU         -> SetTitleFont(FTxt);
-  hPrimaryPerMap_PU         -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hPrimaryPerMap_PU         -> GetXaxis() -> SetTitle(sFracMap.Data());
   hPrimaryPerMap_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPerMap_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPerMap_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10811,7 +10834,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPerInt_PU         -> SetFillColor(fColPrim);
   hPrimaryPerInt_PU         -> SetFillStyle(fFil);
   hPrimaryPerInt_PU         -> SetTitleFont(FTxt);
-  hPrimaryPerInt_PU         -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hPrimaryPerInt_PU         -> GetXaxis() -> SetTitle(sFracInt.Data());
   hPrimaryPerInt_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPerInt_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPerInt_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10824,7 +10847,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPerTpc_PU         -> SetFillColor(fColPrim);
   hPrimaryPerTpc_PU         -> SetFillStyle(fFil);
   hPrimaryPerTpc_PU         -> SetTitleFont(FTxt);
-  hPrimaryPerTpc_PU         -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hPrimaryPerTpc_PU         -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hPrimaryPerTpc_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPerTpc_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPerTpc_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -10837,7 +10860,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPerTot_PU         -> SetFillColor(fColPrim);
   hPrimaryPerTot_PU         -> SetFillStyle(fFil);
   hPrimaryPerTot_PU         -> SetTitleFont(FTxt);
-  hPrimaryPerTot_PU         -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hPrimaryPerTot_PU         -> GetXaxis() -> SetTitle(sFracTot.Data());
   hPrimaryPerTot_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPerTot_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPerTot_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -11137,7 +11160,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPtVsPerMms_PU     -> SetFillColor(fColPrim);
   hPrimaryPtVsPerMms_PU     -> SetFillStyle(fFil);
   hPrimaryPtVsPerMms_PU     -> SetTitleFont(FTxt);
-  hPrimaryPtVsPerMms_PU     -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hPrimaryPtVsPerMms_PU     -> GetXaxis() -> SetTitle(sFracMms.Data());
   hPrimaryPtVsPerMms_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPtVsPerMms_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPtVsPerMms_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11153,7 +11176,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPtVsPerMap_PU     -> SetFillColor(fColPrim);
   hPrimaryPtVsPerMap_PU     -> SetFillStyle(fFil);
   hPrimaryPtVsPerMap_PU     -> SetTitleFont(FTxt);
-  hPrimaryPtVsPerMap_PU     -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hPrimaryPtVsPerMap_PU     -> GetXaxis() -> SetTitle(sFracMap.Data());
   hPrimaryPtVsPerMap_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPtVsPerMap_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPtVsPerMap_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11169,7 +11192,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPtVsPerInt_PU     -> SetFillColor(fColPrim);
   hPrimaryPtVsPerInt_PU     -> SetFillStyle(fFil);
   hPrimaryPtVsPerInt_PU     -> SetTitleFont(FTxt);
-  hPrimaryPtVsPerInt_PU     -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hPrimaryPtVsPerInt_PU     -> GetXaxis() -> SetTitle(sFracInt.Data());
   hPrimaryPtVsPerInt_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPtVsPerInt_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPtVsPerInt_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11185,7 +11208,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPtVsPerTpc_PU     -> SetFillColor(fColPrim);
   hPrimaryPtVsPerTpc_PU     -> SetFillStyle(fFil);
   hPrimaryPtVsPerTpc_PU     -> SetTitleFont(FTxt);
-  hPrimaryPtVsPerTpc_PU     -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hPrimaryPtVsPerTpc_PU     -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hPrimaryPtVsPerTpc_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPtVsPerTpc_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPtVsPerTpc_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11201,7 +11224,7 @@ void STrackCutStudy::SetHistStyles() {
   hPrimaryPtVsPerTot_PU     -> SetFillColor(fColPrim);
   hPrimaryPtVsPerTot_PU     -> SetFillStyle(fFil);
   hPrimaryPtVsPerTot_PU     -> SetTitleFont(FTxt);
-  hPrimaryPtVsPerTot_PU     -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hPrimaryPtVsPerTot_PU     -> GetXaxis() -> SetTitle(sFracTot.Data());
   hPrimaryPtVsPerTot_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hPrimaryPtVsPerTot_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hPrimaryPtVsPerTot_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11443,7 +11466,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPerMms_PU         -> SetFillColor(fColNoPr);
   hNonPrimPerMms_PU         -> SetFillStyle(fFil);
   hNonPrimPerMms_PU         -> SetTitleFont(FTxt);
-  hNonPrimPerMms_PU         -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hNonPrimPerMms_PU         -> GetXaxis() -> SetTitle(sFracMms.Data());
   hNonPrimPerMms_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPerMms_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPerMms_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -11456,7 +11479,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPerMap_PU         -> SetFillColor(fColNoPr);
   hNonPrimPerMap_PU         -> SetFillStyle(fFil);
   hNonPrimPerMap_PU         -> SetTitleFont(FTxt);
-  hNonPrimPerMap_PU         -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hNonPrimPerMap_PU         -> GetXaxis() -> SetTitle(sFracMap.Data());
   hNonPrimPerMap_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPerMap_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPerMap_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -11469,7 +11492,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPerInt_PU         -> SetFillColor(fColNoPr);
   hNonPrimPerInt_PU         -> SetFillStyle(fFil);
   hNonPrimPerInt_PU         -> SetTitleFont(FTxt);
-  hNonPrimPerInt_PU         -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hNonPrimPerInt_PU         -> GetXaxis() -> SetTitle(sFracInt.Data());
   hNonPrimPerInt_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPerInt_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPerInt_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -11482,7 +11505,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPerTpc_PU         -> SetFillColor(fColNoPr);
   hNonPrimPerTpc_PU         -> SetFillStyle(fFil);
   hNonPrimPerTpc_PU         -> SetTitleFont(FTxt);
-  hNonPrimPerTpc_PU         -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hNonPrimPerTpc_PU         -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hNonPrimPerTpc_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPerTpc_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPerTpc_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -11495,7 +11518,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPerTot_PU         -> SetFillColor(fColNoPr);
   hNonPrimPerTot_PU         -> SetFillStyle(fFil);
   hNonPrimPerTot_PU         -> SetTitleFont(FTxt);
-  hNonPrimPerTot_PU         -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hNonPrimPerTot_PU         -> GetXaxis() -> SetTitle(sFracTot.Data());
   hNonPrimPerTot_PU         -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPerTot_PU         -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPerTot_PU         -> GetYaxis() -> SetTitle(sCount.Data());
@@ -11795,7 +11818,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPtVsPerMms_PU     -> SetFillColor(fColNoPr);
   hNonPrimPtVsPerMms_PU     -> SetFillStyle(fFil);
   hNonPrimPtVsPerMms_PU     -> SetTitleFont(FTxt);
-  hNonPrimPtVsPerMms_PU     -> GetXaxis() -> SetTitle(sPerMms.Data());
+  hNonPrimPtVsPerMms_PU     -> GetXaxis() -> SetTitle(sFracMms.Data());
   hNonPrimPtVsPerMms_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPtVsPerMms_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPtVsPerMms_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11811,7 +11834,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPtVsPerMap_PU     -> SetFillColor(fColNoPr);
   hNonPrimPtVsPerMap_PU     -> SetFillStyle(fFil);
   hNonPrimPtVsPerMap_PU     -> SetTitleFont(FTxt);
-  hNonPrimPtVsPerMap_PU     -> GetXaxis() -> SetTitle(sPerMap.Data());
+  hNonPrimPtVsPerMap_PU     -> GetXaxis() -> SetTitle(sFracMap.Data());
   hNonPrimPtVsPerMap_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPtVsPerMap_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPtVsPerMap_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11827,7 +11850,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPtVsPerInt_PU     -> SetFillColor(fColNoPr);
   hNonPrimPtVsPerInt_PU     -> SetFillStyle(fFil);
   hNonPrimPtVsPerInt_PU     -> SetTitleFont(FTxt);
-  hNonPrimPtVsPerInt_PU     -> GetXaxis() -> SetTitle(sPerInt.Data());
+  hNonPrimPtVsPerInt_PU     -> GetXaxis() -> SetTitle(sFracInt.Data());
   hNonPrimPtVsPerInt_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPtVsPerInt_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPtVsPerInt_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11843,7 +11866,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPtVsPerTpc_PU     -> SetFillColor(fColNoPr);
   hNonPrimPtVsPerTpc_PU     -> SetFillStyle(fFil);
   hNonPrimPtVsPerTpc_PU     -> SetTitleFont(FTxt);
-  hNonPrimPtVsPerTpc_PU     -> GetXaxis() -> SetTitle(sPerTpc.Data());
+  hNonPrimPtVsPerTpc_PU     -> GetXaxis() -> SetTitle(sFracTpc.Data());
   hNonPrimPtVsPerTpc_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPtVsPerTpc_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPtVsPerTpc_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -11859,7 +11882,7 @@ void STrackCutStudy::SetHistStyles() {
   hNonPrimPtVsPerTot_PU     -> SetFillColor(fColNoPr);
   hNonPrimPtVsPerTot_PU     -> SetFillStyle(fFil);
   hNonPrimPtVsPerTot_PU     -> SetTitleFont(FTxt);
-  hNonPrimPtVsPerTot_PU     -> GetXaxis() -> SetTitle(sPerTot.Data());
+  hNonPrimPtVsPerTot_PU     -> GetXaxis() -> SetTitle(sFracTot.Data());
   hNonPrimPtVsPerTot_PU     -> GetXaxis() -> SetTitleFont(FTxt);
   hNonPrimPtVsPerTot_PU     -> GetXaxis() -> SetTitleOffset(fOffX);
   hNonPrimPtVsPerTot_PU     -> GetYaxis() -> SetTitle(sTrkPt.Data());
@@ -12012,7 +12035,7 @@ void STrackCutStudy::SetHistStyles() {
   hDeltaPhiVsNoPrPt_PU      -> GetZaxis() -> SetTitle(sCount.Data());
   hDeltaPhiVsNoPrPt_PU      -> GetZaxis() -> SetTitleFont(FTxt);
   hDeltaPhiVsNoPrPt_PU      -> GetZaxis() -> SetTitleOffset(fOffZ);
-  hDeltaEtaVsNoPrPt_PU      -> SetMarkerColor(fColNoPr);
+  hDeltaPtVsNoPrPt_PU       -> SetMarkerColor(fColNoPr);
   hDeltaPtVsNoPrPt_PU       -> SetMarkerStyle(fMarNoPr);
   hDeltaPtVsNoPrPt_PU       -> SetLineColor(fColNoPr);
   hDeltaPtVsNoPrPt_PU       -> SetLineStyle(fLin);
@@ -12029,6 +12052,230 @@ void STrackCutStudy::SetHistStyles() {
   hDeltaPtVsNoPrPt_PU       -> GetZaxis() -> SetTitleFont(FTxt);
   hDeltaPtVsNoPrPt_PU       -> GetZaxis() -> SetTitleOffset(fOffZ);
 
+  // histograms styles
+  const UInt_t fTypeCol[NType] = {fColTrk, fColTru, fColOdd, fColOddSi, fColOddTpc, fColNorm, fColTrk, fColPrim, fColNoPr};
+  const UInt_t fTypeMar[NType] = {fMarTrk, fMarTru, fMarOdd, fMarOddSi, fMarOddTpc, fMarNorm, fMarTrk, fMarPrim, fMarNoPr};
+
+  // axis titles
+  const TString sTrkTitles[NTrkVar]       = {sTrkVx,   sTrkVy,   sTrkVz,  sTrkNMms,  sTrkNMap,  sTrkNInt,  sTrkNTpc,  sTrkQuality, sTrkDCAxy,  sTrkDCAz};
+  const TString sTrkDiffTitles[NTrkVar]   = {sDiffVx,  sDiffVy,  sDiffVz, sDiffNMms, sDiffNMap, sDiffNInt, sDiffNTpc, sDiffQual,   sDiffDCAxy, sDiffDCAz};
+  const TString sTrkFracTitles[NTrkVar]   = {sFracVx,  sFracVy,  sFracVz, sFracMms,  sFracMap,  sFracInt,  sFracTpc,  sFracQual,   sTrkDCAxy,  sTrkDCAz};
+  const TString sPhysTitles[NPhysVar]     = {sTrkPhi,  sTrkEta,  sTrkPt};
+  const TString sPhysDiffTitles[NPhysVar] = {sDiffPhi, sDiffEta, sDiffPt};
+  const TString sPhysFracTitles[NPhysVar] = {sFracPhi, sFracEta, sFracPt};
+
+  for (Int_t iType = 0; iType < NType; iType++) {
+    for (Int_t iTrkVar = 0; iTrkVar < NTrkVar; iTrkVar++) {
+      hTrkVar[iType][iTrkVar]         -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVar[iType][iTrkVar]         -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVar[iType][iTrkVar]         -> SetLineColor(fTypeCol[iType]);
+      hTrkVar[iType][iTrkVar]         -> SetLineStyle(fLin);
+      hTrkVar[iType][iTrkVar]         -> SetFillColor(fTypeCol[iType]);
+      hTrkVar[iType][iTrkVar]         -> SetFillStyle(fFil);
+      hTrkVar[iType][iTrkVar]         -> SetTitleFont(FTxt);
+      hTrkVar[iType][iTrkVar]         -> GetXaxis() -> SetTitle(sTrkTitles[iTrkVar].Data());
+      hTrkVar[iType][iTrkVar]         -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVar[iType][iTrkVar]         -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVar[iType][iTrkVar]         -> GetYaxis() -> SetTitle(sCount.Data());
+      hTrkVar[iType][iTrkVar]         -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVar[iType][iTrkVar]         -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarDiff[iType][iTrkVar]     -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarDiff[iType][iTrkVar]     -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarDiff[iType][iTrkVar]     -> SetLineColor(fTypeCol[iType]);
+      hTrkVarDiff[iType][iTrkVar]     -> SetLineStyle(fLin);
+      hTrkVarDiff[iType][iTrkVar]     -> SetFillColor(fTypeCol[iType]);
+      hTrkVarDiff[iType][iTrkVar]     -> SetFillStyle(fFil);
+      hTrkVarDiff[iType][iTrkVar]     -> SetTitleFont(FTxt);
+      hTrkVarDiff[iType][iTrkVar]     -> GetXaxis() -> SetTitle(sTrkDiffTitles[iTrkVar].Data());
+      hTrkVarDiff[iType][iTrkVar]     -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarDiff[iType][iTrkVar]     -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarDiff[iType][iTrkVar]     -> GetYaxis() -> SetTitle(sCount.Data());
+      hTrkVarDiff[iType][iTrkVar]     -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarDiff[iType][iTrkVar]     -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarFrac[iType][iTrkVar]     -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarFrac[iType][iTrkVar]     -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarFrac[iType][iTrkVar]     -> SetLineColor(fTypeCol[iType]);
+      hTrkVarFrac[iType][iTrkVar]     -> SetLineStyle(fLin);
+      hTrkVarFrac[iType][iTrkVar]     -> SetFillColor(fTypeCol[iType]);
+      hTrkVarFrac[iType][iTrkVar]     -> SetFillStyle(fFil);
+      hTrkVarFrac[iType][iTrkVar]     -> SetTitleFont(FTxt);
+      hTrkVarFrac[iType][iTrkVar]     -> GetXaxis() -> SetTitle(sTrkFracTitles[iTrkVar].Data());
+      hTrkVarFrac[iType][iTrkVar]     -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarFrac[iType][iTrkVar]     -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarFrac[iType][iTrkVar]     -> GetYaxis() -> SetTitle(sCount.Data());
+      hTrkVarFrac[iType][iTrkVar]     -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarFrac[iType][iTrkVar]     -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetLineColor(fTypeCol[iType]);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetLineStyle(fLin);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetFillColor(fTypeCol[iType]);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetFillStyle(fFil);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetTitleFont(FTxt);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetXaxis() -> SetTitle(sTrkNTpc.Data());
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetYaxis() -> SetTitle(sTrkTitles[iTrkVar].Data());
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitle(sCount.Data());
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetLineColor(fTypeCol[iType]);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetLineStyle(fLin);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetFillColor(fTypeCol[iType]);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetFillStyle(fFil);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetTitleFont(FTxt);
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetXaxis() -> SetTitle(sTrkPt.Data());
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetYaxis() -> SetTitle(sTrkTitles[iTrkVar].Data());
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetZaxis() -> SetTitle(sCount.Data());
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetZaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtReco[iType][iTrkVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetLineColor(fTypeCol[iType]);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetLineStyle(fLin);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetFillColor(fTypeCol[iType]);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetFillStyle(fFil);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetTitleFont(FTxt);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetXaxis() -> SetTitle(sTruPt.Data());
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetYaxis() -> SetTitle(sTrkTitles[iTrkVar].Data());
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetZaxis() -> SetTitle(sCount.Data());
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetZaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetLineColor(fTypeCol[iType]);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetLineStyle(fLin);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetFillColor(fTypeCol[iType]);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetFillStyle(fFil);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetTitleFont(FTxt);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetXaxis() -> SetTitle(sFracPt.Data());
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetYaxis() -> SetTitle(sTrkTitles[iTrkVar].Data());
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetZaxis() -> SetTitle(sCount.Data());
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetZaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
+    }
+    for (Int_t iPhysVar = 0; iPhysVar < NPhysVar; iPhysVar++) {
+      hPhysVar[iType][iPhysVar]         -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVar[iType][iPhysVar]         -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVar[iType][iPhysVar]         -> SetLineColor(fTypeCol[iType]);
+      hPhysVar[iType][iPhysVar]         -> SetLineStyle(fLin);
+      hPhysVar[iType][iPhysVar]         -> SetFillColor(fTypeCol[iType]);
+      hPhysVar[iType][iPhysVar]         -> SetFillStyle(fFil);
+      hPhysVar[iType][iPhysVar]         -> SetTitleFont(FTxt);
+      hPhysVar[iType][iPhysVar]         -> GetXaxis() -> SetTitle(sPhysTitles[iPhysVar].Data());
+      hPhysVar[iType][iPhysVar]         -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVar[iType][iPhysVar]         -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVar[iType][iPhysVar]         -> GetYaxis() -> SetTitle(sCount.Data());
+      hPhysVar[iType][iPhysVar]         -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVar[iType][iPhysVar]         -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarDiff[iType][iPhysVar]     -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarDiff[iType][iPhysVar]     -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarDiff[iType][iPhysVar]     -> SetLineColor(fTypeCol[iType]);
+      hPhysVarDiff[iType][iPhysVar]     -> SetLineStyle(fLin);
+      hPhysVarDiff[iType][iPhysVar]     -> SetFillColor(fTypeCol[iType]);
+      hPhysVarDiff[iType][iPhysVar]     -> SetFillStyle(fFil);
+      hPhysVarDiff[iType][iPhysVar]     -> SetTitleFont(FTxt);
+      hPhysVarDiff[iType][iPhysVar]     -> GetXaxis() -> SetTitle(sPhysDiffTitles[iPhysVar].Data());
+      hPhysVarDiff[iType][iPhysVar]     -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarDiff[iType][iPhysVar]     -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarDiff[iType][iPhysVar]     -> GetYaxis() -> SetTitle(sCount.Data());
+      hPhysVarDiff[iType][iPhysVar]     -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarDiff[iType][iPhysVar]     -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarFrac[iType][iPhysVar]     -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarFrac[iType][iPhysVar]     -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarFrac[iType][iPhysVar]     -> SetLineColor(fTypeCol[iType]);
+      hPhysVarFrac[iType][iPhysVar]     -> SetLineStyle(fLin);
+      hPhysVarFrac[iType][iPhysVar]     -> SetFillColor(fTypeCol[iType]);
+      hPhysVarFrac[iType][iPhysVar]     -> SetFillStyle(fFil);
+      hPhysVarFrac[iType][iPhysVar]     -> SetTitleFont(FTxt);
+      hPhysVarFrac[iType][iPhysVar]     -> GetXaxis() -> SetTitle(sPhysFracTitles[iPhysVar].Data());
+      hPhysVarFrac[iType][iPhysVar]     -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarFrac[iType][iPhysVar]     -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarFrac[iType][iPhysVar]     -> GetYaxis() -> SetTitle(sCount.Data());
+      hPhysVarFrac[iType][iPhysVar]     -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarFrac[iType][iPhysVar]     -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetLineColor(fTypeCol[iType]);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetLineStyle(fLin);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetFillColor(fTypeCol[iType]);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetFillStyle(fFil);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetTitleFont(FTxt);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetXaxis() -> SetTitle(sTrkNTpc.Data());
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetYaxis() -> SetTitle(sPhysTitles[iPhysVar].Data());
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitle(sCount.Data());
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetLineColor(fTypeCol[iType]);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetLineStyle(fLin);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetFillColor(fTypeCol[iType]);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetFillStyle(fFil);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetTitleFont(FTxt);
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetXaxis() -> SetTitle(sTrkPt.Data());
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetYaxis() -> SetTitle(sPhysTitles[iPhysVar].Data());
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetZaxis() -> SetTitle(sCount.Data());
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetZaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtReco[iType][iPhysVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetLineColor(fTypeCol[iType]);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetLineStyle(fLin);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetFillColor(fTypeCol[iType]);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetFillStyle(fFil);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetTitleFont(FTxt);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetXaxis() -> SetTitle(sTruPt.Data());
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetYaxis() -> SetTitle(sPhysTitles[iPhysVar].Data());
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetZaxis() -> SetTitle(sCount.Data());
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetZaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetLineColor(fTypeCol[iType]);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetLineStyle(fLin);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetFillColor(fTypeCol[iType]);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetFillStyle(fFil);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetTitleFont(FTxt);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetXaxis() -> SetTitle(sFracPt.Data());
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetYaxis() -> SetTitle(sPhysTitles[iPhysVar].Data());
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetZaxis() -> SetTitle(sCount.Data());
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetZaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
+    }
+  }
   cout << "      Set histogram styles." << endl;
   return;
 

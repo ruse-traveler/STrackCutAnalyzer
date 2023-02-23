@@ -1,3 +1,4 @@
+// ----------------------------------------------------------------------------
 // 'MakePrettyPlot.C'
 // Derek Anderson
 // 04.18.2021
@@ -5,6 +6,7 @@
 // Use this quickly plot a set of numerator
 // distributions against a denominator
 // distribution
+// ----------------------------------------------------------------------------
 
 #include <iostream>
 #include "TH1.h"
@@ -34,18 +36,18 @@ void MakePrettyPlot() {
   cout << "\n  Beginning plot macro..." << endl;
 
   // output and denominator parameters
-  const TString sOutput("trkQuality_embeddedVsSingleParticl.pt020n5pim.d15m2y2023.root");
-  const TString sDenom("trackCutStudy.forMvtxCheck_noMvtxCut_withIntNorm.pt020n5pim.d14m2y2023.root");
-  const TString sHistDenom("Old/Track/hTrackQuality");
-  const TString sNameDenom("hSingleParticle");
-  const TString sLabelDenom("single particle only");
+  const TString sOutput("trkPt_inclusiveVsMvtxCut_withFineBins.pt020n5pim.d21m2y2023.root");
+  const TString sDenom("trackCutStudy.forMvtxCheck_noMvtxCut_finePtBinsWithNoIntNorm.pt020n5pim.d21m2y2023.root");
+  const TString sHistDenom("Old/Track/hTrackPt");
+  const TString sNameDenom("hInclusive");
+  const TString sLabelDenom("inclusive (N^{layer}_{MVTX} #geq 0)");
 
   // numerator parameters
-  const TString sNumer[NNumer]      = {"trackCutStudy.forMvtxCheck_noMvtxCut_withIntNorm.pt020n5pim.d14m2y2023.root"};
-  const TString sHistNumer[NNumer]  = {"Old/Primary/hPrimaryQuality_PU"};
-  const TString sNameNumer[NNumer]  = {"hWithPileup"};
+  const TString sNumer[NNumer]      = {"trackCutStudy.forMvtxCheck_withMvtxCut_finePtBinsWithNoIntNorm.pt020n5pim.d21m2y2023.root"};
+  const TString sHistNumer[NNumer]  = {"Old/Track/hTrackPt"};
+  const TString sNameNumer[NNumer]  = {"hMvtxCut"};
   const TString sNameRatio[NNumer]  = {"hRatio"};
-  const TString sLabelNumer[NNumer] = {"Embedded into 0-20 fm Hijing"};
+  const TString sLabelNumer[NNumer] = {"with cut (N^{layer}_{MVTX} #geq 2)"};
 
   // rebin parameters
   const UInt_t nRebin(2);
@@ -55,13 +57,13 @@ void MakePrettyPlot() {
   const TString sOptDenom("");
   const TString sOptNumer[NNumer] = {"SAME"};
   const TString sOptRatio[NNumer] = {"",   };
-  const Float_t xPlotRange[NPlot] = {0., 10.};
+  const Float_t xPlotRange[NPlot] = {0., 20.};
 
   // style parameters
   const TString sTitle("");
-  const TString sTitleX("Quality");
-  const TString sTitleY("counts / integral");
-  const TString sTitleR("ratio");
+  const TString sTitleX("p_{T}^{reco} [GeV/c]");
+  const TString sTitleY("counts");
+  const TString sTitleR("cut / inclusive");
   const UInt_t  fColDen(923);
   const UInt_t  fMarDen(20);
   const UInt_t  fColNum[NNumer] = {899};
@@ -70,7 +72,7 @@ void MakePrettyPlot() {
   // text parameters
   const TString sSys("#bf{#it{sPHENIX}} Simulation, single #pi^{-}");
   const TString sTrg("20 #pi^{-} per event, p_{T} #in (0, 20) GeV/c");
-  const TString sJet("#bf{Only primary tracks}");
+  const TString sJet("#bf{Embedded only tracks}");
   const TString sTyp("");
   const TString sHeader("");
 
@@ -124,6 +126,23 @@ void MakePrettyPlot() {
     }
     hDenom -> Rebin(nRebin);
     cout << "    Rebinned histograms." << endl;
+  }
+
+  // scale by bin width
+  const UInt_t nBinsX = hDenom -> GetNbinsX();
+  for (UInt_t iBinX = 1; iBinX < (nBinsX + 1); iBinX++) {
+    const Double_t denBinWidth = hDenom -> GetXaxis() -> GetBinWidth(iBinX);
+    const Double_t denBinVal   = hDenom -> GetBinContent(iBinX);
+    const Double_t denBinErr   = hDenom -> GetBinError(iBinX);
+    hDenom -> SetBinContent(iBinX, denBinVal / denBinWidth);
+    hDenom -> SetBinError(iBinX, denBinErr / denBinWidth);
+    for (UInt_t iNumer = 0; iNumer < NNumer; iNumer++) {
+      const Double_t numBinWidth = hNumer[iNumer] -> GetXaxis() -> GetBinWidth(iBinX);
+      const Double_t numBinVal   = hNumer[iNumer] -> GetBinContent(iBinX);
+      const Double_t numBinErr   = hNumer[iNumer] -> GetBinError(iBinX);
+      hNumer[iNumer] -> SetBinContent(iBinX, numBinVal / numBinWidth);
+      hNumer[iNumer] -> SetBinError(iBinX, numBinErr / numBinWidth);
+    }
   }
 
   // calculate ratios

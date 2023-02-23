@@ -108,12 +108,15 @@ void STrackCutStudy::SetStudyParameters(const Bool_t intNorm, const Bool_t onlyP
 
 
 
-void STrackCutStudy::SetTrackCuts(const Double_t trkQualMin, const Double_t trkQualMax) {
+void STrackCutStudy::SetTrackCuts(const Double_t trkVzMin, const Double_t trkVzMax, const Double_t trkQualMin, const Double_t trkQualMax) {
 
+  vzMin      = trkVzMin;
+  vzMax      = trkVzMax;
   qualityMin = trkQualMin;
   qualityMax = trkQualMax;
   cout << "    Set track cuts:\n"
-       << "      quality = (" << qualityMin << ", " << qualityMax << ")"
+       << "      z-vertex = (" << vzMin      << ", " << vzMax      << ")\n"
+       << "      quality  = (" << qualityMin << ", " << qualityMax << ")"
        << endl;
   return;
 
@@ -235,8 +238,8 @@ void STrackCutStudy::Analyze() {
     truePhysVars[PHYSVAR::PT]  = gpt;
 
     // [02.14.2023] TEST
-    //const Bool_t isInMvtxCut = (nlmaps >= 2);
-    //if (!isInMvtxCut) continue;
+    const Bool_t isInMvtxCut = (nlmaps >= 2);
+    if (!isInMvtxCut) continue;
 
     // select only primaries if need be
     const Bool_t isPrimary = (gprimary == 1);
@@ -788,8 +791,8 @@ void STrackCutStudy::Analyze() {
     truePhysVars[PHYSVAR::PT]  = gpt;
 
     // [02.14.2023] TEST
-    //const Bool_t isInMvtxCut = (pu_nlmaps >= 2);
-    //if (!isInMvtxCut) continue;
+    const Bool_t isInMvtxCut = (pu_nlmaps >= 2);
+    if (!isInMvtxCut) continue;
 
     // fill histograms
     FillTrackHistograms(6, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
@@ -1218,6 +1221,11 @@ void STrackCutStudy::InitTuples() {
 
 void STrackCutStudy::InitHists() {
 
+  // [02.21.2023] TEST
+  const UInt_t  nPtVar            = 26;
+  const UInt_t  nPtVarBins        = nPtVar - 1;
+  const Float_t ptVarBins[nPtVar] = {0., 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.2, 1.4, 1.6, 2., 2.4, 2.8, 3.2, 3.6, 4., 5., 6., 8., 10., 13., 16., 20.};
+
   const UInt_t  nNHitBins(100);
   const UInt_t  nChiBins(100);
   const UInt_t  nQualBins(40);
@@ -1269,7 +1277,8 @@ void STrackCutStudy::InitHists() {
   hTrackVz                  = new TH1D("hTrackVz",           "", nZVtxBins,  rZVtxBins[0],  rZVtxBins[1]);
   hTrackEta                 = new TH1D("hTrackEta",          "", nEtaBins,   rEtaBins[0],   rEtaBins[1]);
   hTrackPhi                 = new TH1D("hTrackPhi",          "", nPhiBins,   rPhiBins[0],   rPhiBins[1]);
-  hTrackPt                  = new TH1D("hTrackPt",           "", nPtBins,    rPtBins[0],    rPtBins[1]);
+  //hTrackPt                  = new TH1D("hTrackPt",           "", nPtBins,    rPtBins[0],    rPtBins[1]);
+  hTrackPt                  = new TH1D("hTrackPt",           "", nPtVarBins, ptVarBins);
   hDeltaDCAxy               = new TH1D("hDeltaDCAxy",        "", nErrBins,   rErrBins[0],   rErrBins[1]);
   hDeltaDCAz                = new TH1D("hDeltaDCAz",         "", nErrBins,   rErrBins[0],   rErrBins[1]);
   hDeltaEta                 = new TH1D("hDeltaEta",          "", nErrBins,   rErrBins[0],   rErrBins[1]);
@@ -1303,7 +1312,8 @@ void STrackCutStudy::InitHists() {
   hTruthNTot                = new TH1D("hTruthNTot",         "", nNHitBins,   rNHitBins[0],   rNHitBins[1]);
   hTruthEta                 = new TH1D("hTruthEta",          "", nEtaBins,    rEtaBins[0],    rEtaBins[1]);
   hTruthPhi                 = new TH1D("hTruthPhi",          "", nPhiBins,    rPhiBins[0],    rPhiBins[1]);
-  hTruthPt                  = new TH1D("hTruthPt",           "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  //hTruthPt                  = new TH1D("hTruthPt",           "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  hTruthPt                  = new TH1D("hTruthPt",           "", nPtVarBins,  ptVarBins);
   hTruthVx                  = new TH1D("hTruthVx",           "", nXYVtxBins,  rXYVtxBins[0],  rXYVtxBins[1]);
   hTruthVy                  = new TH1D("hTruthVy",           "", nXYVtxBins,  rXYVtxBins[0],  rXYVtxBins[1]);
   hTruthVz                  = new TH1D("hTruthVz",           "", nZVtxBins,   rZVtxBins[0],   rZVtxBins[1]);
@@ -1365,7 +1375,8 @@ void STrackCutStudy::InitHists() {
   hWeirdVz                  = new TH1D("hWeirdVz",              "", nZVtxBins,   rZVtxBins[0],   rZVtxBins[1]);
   hWeirdEta                 = new TH1D("hWeirdEta",             "", nEtaBins,    rEtaBins[0],    rEtaBins[1]);
   hWeirdPhi                 = new TH1D("hWeirdPhi",             "", nPhiBins,    rPhiBins[0],    rPhiBins[1]);
-  hWeirdPt                  = new TH1D("hWeirdPt",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  //hWeirdPt                  = new TH1D("hWeirdPt",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  hWeirdPt                  = new TH1D("hWeirdPt",              "", nPtVarBins,  ptVarBins);
   hWeirdDeltaDCAxy          = new TH1D("hWeirdDeltaDCAxy",      "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hWeirdDeltaDCAz           = new TH1D("hWeirdDeltaDCAz",       "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hWeirdDeltaEta            = new TH1D("hWeirdDeltaEta",        "", nErrBins,    rErrBins[0],    rErrBins[1]);
@@ -1449,7 +1460,8 @@ void STrackCutStudy::InitHists() {
   hWeirdVz_SI               = new TH1D("hWeirdVz_SI",              "", nZVtxBins,   rZVtxBins[0],   rZVtxBins[1]);
   hWeirdEta_SI              = new TH1D("hWeirdEta_SI",             "", nEtaBins,    rEtaBins[0],    rEtaBins[1]);
   hWeirdPhi_SI              = new TH1D("hWeirdPhi_SI",             "", nPhiBins,    rPhiBins[0],    rPhiBins[1]);
-  hWeirdPt_SI               = new TH1D("hWeirdPt_SI",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  //hWeirdPt_SI               = new TH1D("hWeirdPt_SI",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  hWeirdPt_SI               = new TH1D("hWeirdPt_SI",              "", nPtVarBins,  ptVarBins);
   hWeirdDeltaDCAxy_SI       = new TH1D("hWeirdDeltaDCAxy_SI",      "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hWeirdDeltaDCAz_SI        = new TH1D("hWeirdDeltaDCAz_SI",       "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hWeirdDeltaEta_SI         = new TH1D("hWeirdDeltaEta_SI",        "", nErrBins,    rErrBins[0],    rErrBins[1]);
@@ -1533,7 +1545,8 @@ void STrackCutStudy::InitHists() {
   hWeirdVz_TPC              = new TH1D("hWeirdVz_TPC",              "", nZVtxBins,   rZVtxBins[0],   rZVtxBins[1]);
   hWeirdEta_TPC             = new TH1D("hWeirdEta_TPC",             "", nEtaBins,    rEtaBins[0],    rEtaBins[1]);
   hWeirdPhi_TPC             = new TH1D("hWeirdPhi_TPC",             "", nPhiBins,    rPhiBins[0],    rPhiBins[1]);
-  hWeirdPt_TPC              = new TH1D("hWeirdPt_TPC",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  //hWeirdPt_TPC              = new TH1D("hWeirdPt_TPC",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  hWeirdPt_TPC              = new TH1D("hWeirdPt_TPC",              "", nPtVarBins,  ptVarBins);
   hWeirdDeltaDCAxy_TPC      = new TH1D("hWeirdDeltaDCAxy_TPC",      "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hWeirdDeltaDCAz_TPC       = new TH1D("hWeirdDeltaDCAz_TPC",       "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hWeirdDeltaEta_TPC        = new TH1D("hWeirdDeltaEta_TPC",        "", nErrBins,    rErrBins[0],    rErrBins[1]);
@@ -1617,7 +1630,8 @@ void STrackCutStudy::InitHists() {
   hNormalVz                 = new TH1D("hNormalVz",              "", nXYVtxBins,  rXYVtxBins[0],  rXYVtxBins[1]);
   hNormalEta                = new TH1D("hNormalEta",             "", nEtaBins,    rEtaBins[0],    rEtaBins[1]);
   hNormalPhi                = new TH1D("hNormalPhi",             "", nPhiBins,    rPhiBins[0],    rPhiBins[1]);
-  hNormalPt                 = new TH1D("hNormalPt",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  //hNormalPt                 = new TH1D("hNormalPt",              "", nPtBins,     rPtBins[0],     rPtBins[1]);
+  hNormalPt                 = new TH1D("hNormalPt",              "", nPtVarBins,  ptVarBins);
   hNormalDeltaDCAxy         = new TH1D("hNormalDeltaDCAxy",      "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hNormalDeltaDCAz          = new TH1D("hNormalDeltaDCAz",       "", nErrBins,    rErrBins[0],    rErrBins[1]);
   hNormalDeltaEta           = new TH1D("hNormalDeltaEta",        "", nErrBins,    rErrBins[0],    rErrBins[1]);
@@ -14494,10 +14508,12 @@ void STrackCutStudy::FillTruthHistograms(const Int_t type, const Double_t recoTr
 
 
 
-Bool_t STrackCutStudy::ApplyCuts(const Double_t trkQuality) {
+Bool_t STrackCutStudy::ApplyCuts(const Double_t trkVz, const Double_t trkQuality) {
 
+  const Bool_t isInVzCut   = ((trkVz > vzMin) && (trkVz < vzMax));
   const Bool_t isInQualCut = ((trkQuality > qualityMin) && (trkQuality < qualityMax));
-  return isInQualCut;
+  const Bool_t isInTrkCut  = (isInVzCut && isInQualCut);
+  return isInTrkCut;
 
 }  // end 'ApplyCuts(Double_t)'
 

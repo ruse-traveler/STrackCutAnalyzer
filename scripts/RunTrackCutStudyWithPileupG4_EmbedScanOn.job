@@ -1,3 +1,4 @@
+# -----------------------------------------------------------------------------
 # 'RunTrackCutStudyWithPileupG4_EmbedScanOn.job'
 # Derek Anderson
 # 12.03.2022
@@ -5,6 +6,7 @@
 # Job file to run F4A macro for
 # track cut study (with pileup)
 # via Condor.
+# -----------------------------------------------------------------------------
 
 # generic parameters
 Universe     = vanilla

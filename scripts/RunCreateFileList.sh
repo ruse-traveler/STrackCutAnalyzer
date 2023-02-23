@@ -1,10 +1,12 @@
 #!/bin/bash
+# -----------------------------------------------------------------------------
 # 'RunCreateFileList.sh'
 # Derek Anderson
 # 11.10.2022
 #
 # Quick script to run CreateFileList.pl
 # with specified arguments.
+# -----------------------------------------------------------------------------
 
 # output parameter
 NAME="forTrackCutStudy_withPileup"

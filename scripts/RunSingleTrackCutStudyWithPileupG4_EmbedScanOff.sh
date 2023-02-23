@@ -1,4 +1,5 @@
 #!/bin/bash
+# -----------------------------------------------------------------------------
 # 'RunSingleTrackCutStudyWithPileupG4_EmbedScanOff.sh'
 # Derek Anderson
 # 12.03.2022
@@ -11,6 +12,7 @@
 # and 'G4setup_sPHENIX.C' are in
 # the same directory as you're
 # running this in!
+# -----------------------------------------------------------------------------
 
 # parameters
 build="ana.344"

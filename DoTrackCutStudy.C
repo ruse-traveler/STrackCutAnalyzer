@@ -40,9 +40,11 @@ void DoTrackCutStudy() {
   const TString sInFilePU("input/test/sPhenixG4_testWithPileup001_g4svtxEval.d18m12y2022.root");
   const TString sInTupleEO("ntp_track");
   const TString sInTuplePU("ntp_gtrack");
+  const TString sInClusterEO("ntp_cluster");
 
   // study parameters
   const Bool_t   doIntNorm(false);
+  const Bool_t   doAvgClusterCalc(true);
   const Double_t normalPtFracMin(0.20);
   const Double_t normalPtFracMax(1.20);
 
@@ -69,7 +71,7 @@ void DoTrackCutStudy() {
   STrackCutStudy *study = new STrackCutStudy();
   study -> SetInputOutputFiles(sInFileEO, sInFilePU, sOutFile);
   study -> SetInputTuples(sInTupleEO, sInTuplePU);
-  study -> SetStudyParameters(doIntNorm, normalPtFracMin, normalPtFracMax);
+  study -> SetStudyParameters(doIntNorm, doAvgClusterCalc, normalPtFracMin, normalPtFracMax);
   study -> SetCutFlags(doPrimaryCut, doMVtxCut, doVzCut, doDcaXyCut, doDcaZcut, doQualityCut);
   study -> SetTrackCuts(nMVtxRange, vzRange, dcaXyRange, dcaZrange, qualityRange);
   study -> SetPlotText(NTxt, NTxt, sTxtEO, sTxtPU);

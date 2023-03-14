@@ -11,6 +11,10 @@ submit_embedOnly/
 test/
 src/*
 !src/STrackCutStudy.cc
+!src/STrackCutStudy.io.h
+!src/STrackCutStudy.ana.h
+!src/STrackCutStudy.hist.h
+!src/STrackCutStudy.plot.h
 !src/STrackCutStudy.h
 !src/autogen.sh
 !src/configure.ac

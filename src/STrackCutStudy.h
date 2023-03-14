@@ -38,7 +38,7 @@ using namespace std;
 // global constants
 static const Ssiz_t NVtx(4);
 static const Ssiz_t NType(9);
-static const Ssiz_t NTrkVar(12);
+static const Ssiz_t NTrkVar(14);
 static const Ssiz_t NPhysVar(6);
 static const Ssiz_t NRange(2);
 static const Ssiz_t NPanel(2);
@@ -63,7 +63,9 @@ class STrackCutStudy {
       DCAXY    = 8,
       DCAZ     = 9,
       DELDCAXY = 10,
-      DELDCAZ  = 11
+      DELDCAZ  = 11,
+      NCLUST   = 12,
+      AVGCLUST = 13
     };
     enum PHYSVAR {
       PHI    = 0,
@@ -92,7 +94,7 @@ class STrackCutStudy {
     // public methods
     void SetInputOutputFiles(const TString sEmbedOnlyInput, const TString sPileupInput, const TString sOutput);
     void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple);
-    void SetStudyParameters(const Bool_t intNorm, const Double_t weirdFracMin, const Double_t weirdFracMax);
+    void SetStudyParameters(const Bool_t intNorm, const Bool_t avgClustCalc, const Double_t weirdFracMin, const Double_t weirdFracMax);
     void SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality);
     void SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange);
     void SetPlotText(const Ssiz_t nTxtE, const Ssiz_t nTxtP, const TString sTxtE[], const TString sTxtP[]);
@@ -107,7 +109,7 @@ class STrackCutStudy {
     const TString sTrkNames[NType]    = {"Track", "Truth", "AllWeird", "SiWeird", "TpcWeird", "Normal", "AllPileup", "PrimePileup", "NonPrimePileup"};
     const TString sTrkLabels[NType]   = {"All tracks", "Truth tracks", "Weird tracks (all)", "Weird tracks (Si seed)", "Weird tracks (TPC seed)",
                                          "Normal tracks", "Including pileup tracks (all)", "Including pileup tracks (only primary)", "Including pileup gracks (non-primary)"};
-    const TString sTrkVars[NTrkVar]   = {"Vx", "Vy", "Vz", "NMms", "NMap", "NInt", "NTpc", "Qual", "DcaXY", "DcaZ", "DeltaDcaXY", "DeltaDcaZ"};
+    const TString sTrkVars[NTrkVar]   = {"Vx", "Vy", "Vz", "NMms", "NMap", "NInt", "NTpc", "Qual", "DcaXY", "DcaZ", "DeltaDcaXY", "DeltaDcaZ", "NClust", "AvgClustSize"};
     const TString sPhysVars[NPhysVar] = {"Phi", "Eta", "Pt", "DeltaPhi", "DeltaEta", "DeltaPt"};
 
     // io members
@@ -149,6 +151,7 @@ class STrackCutStudy {
 
     // study parameters
     Bool_t   doIntNorm;
+    Bool_t   doAvgClustCalc;
     Double_t normalPtFracMin;
     Double_t normalPtFracMax;
 
@@ -363,19 +366,26 @@ class STrackCutStudy {
     Float_t pu_nclusmaps;
     Float_t pu_nclusmms;
 
-    // private methods
-    void   InitFiles();
-    void   InitTuples();
-    void   InitHists();
-    void   MakeCutText();
-    void   NormalizeHists();
-    void   SetHistStyles();
-    void   CreatePlots();
-    void   SaveHists();
-    void   FillTrackHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
-    void   FillTruthHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
-    void   ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDraw[], const TString sDirToSaveTo, const TString sPlotLabel);
+    // i/o methods [*.io.h]
+    void InitFiles();
+    void InitTuples();
+    void SaveHists();
+
+    // analysis methods [*.ana.h]
     Bool_t ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, const Double_t trkVz, const Double_t trkDcaXY, const Double_t trkDcaZ, const Double_t trkQuality);
+    Bool_t DoClusterCalculation();
+
+    // histogram methods [*.hist.h]
+    void InitHists();
+    void NormalizeHists();
+    void SetHistStyles();
+    void FillTrackHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
+    void FillTruthHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
+
+    // plot methods [*.plot.h]
+    void MakeCutText();
+    void CreatePlots();
+    void ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDraw[], const TString sDirToSaveTo, const TString sPlotLabel);
 
 };  // end STrackCutStudy definition
 

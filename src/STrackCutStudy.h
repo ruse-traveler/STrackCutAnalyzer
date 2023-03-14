@@ -16,6 +16,8 @@
 #include <cmath>
 #include <vector>
 #include <cassert>
+#include <cstdlib>
+#include <utility>
 #include <iostream>
 // root includes
 #include <TH1.h>
@@ -90,8 +92,9 @@ class STrackCutStudy {
     // public methods
     void SetInputOutputFiles(const TString sEmbedOnlyInput, const TString sPileupInput, const TString sOutput);
     void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple);
-    void SetStudyParameters(const Bool_t intNorm, const Bool_t onlyPrim, const Double_t weirdFracMin, const Double_t weirdFracMax);
-    void SetTrackCuts(const Double_t trkVzMin, const Double_t trkVzMax, const Double_t trkQualMin, const Double_t trkQualMax);
+    void SetStudyParameters(const Bool_t intNorm, const Double_t weirdFracMin, const Double_t weirdFracMax);
+    void SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality);
+    void SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange);
     void SetPlotText(const Ssiz_t nTxtE, const Ssiz_t nTxtP, const TString sTxtE[], const TString sTxtP[]);
     void Init();
     void Analyze();
@@ -138,22 +141,29 @@ class STrackCutStudy {
     TH2D *hPhysVarVsPtFrac[NType][NPhysVar];
 
     // text parameters
-    Ssiz_t          nTxtEO;
-    Ssiz_t          nTxtPU;
-    vector<TString> sTxtEO;
-    vector<TString> sTxtPU;
+    Ssiz_t           nTxtEO;
+    Ssiz_t           nTxtPU;
+    TPaveText       *ptCut;
+    vector<TString>  sTxtEO;
+    vector<TString>  sTxtPU;
 
     // study parameters
     Bool_t   doIntNorm;
-    Bool_t   useOnlyPrimary;
     Double_t normalPtFracMin;
     Double_t normalPtFracMax;
 
     // track cuts
-    Double_t vzMin;
-    Double_t vzMax;
-    Double_t qualityMin;
-    Double_t qualityMax;
+    Bool_t doPrimaryCut;
+    Bool_t doMVtxCut;
+    Bool_t doVzCut;
+    Bool_t doDcaXyCut;
+    Bool_t doDcaZCut;
+    Bool_t doQualityCut;
+    pair<Double_t, Double_t> nMVtxCut;
+    pair<Double_t, Double_t> vzCut;
+    pair<Double_t, Double_t> dcaXyCut;
+    pair<Double_t, Double_t> dcaZCut;
+    pair<Double_t, Double_t> qualityCut;
 
     // embed-only leaves
     Float_t event;
@@ -357,6 +367,7 @@ class STrackCutStudy {
     void   InitFiles();
     void   InitTuples();
     void   InitHists();
+    void   MakeCutText();
     void   NormalizeHists();
     void   SetHistStyles();
     void   CreatePlots();
@@ -364,7 +375,7 @@ class STrackCutStudy {
     void   FillTrackHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
     void   FillTruthHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]);
     void   ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDraw[], const TString sDirToSaveTo, const TString sPlotLabel);
-    Bool_t ApplyCuts(const Double_t trkVz, const Double_t trkQuality);
+    Bool_t ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, const Double_t trkVz, const Double_t trkDcaXY, const Double_t trkDcaZ, const Double_t trkQuality);
 
 };  // end STrackCutStudy definition
 

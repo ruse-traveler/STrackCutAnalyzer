@@ -22,12 +22,19 @@ using namespace std;
 
 STrackCutStudy::STrackCutStudy() {
 
+  sTxtEO.clear();
+  sTxtPU.clear();
+  nTxtEO          = 0;
+  nTxtPU          = 0;
   doIntNorm       = false;
-  useOnlyPrimary  = false; 
   normalPtFracMin = 0.;
   normalPtFracMax = 9999.;
-  qualityMin      = 0.;
-  qualityMax      = 9999.;
+  doPrimaryCut    = false;
+  doMVtxCut       = false;
+  doVzCut         = false;
+  doDcaXyCut      = false;
+  doDcaZCut       = false;
+  doQualityCut    = false;
   cout << "\n  Beginning track cut study."  << endl;
 
 }  // end ctor
@@ -81,10 +88,9 @@ void STrackCutStudy::SetInputTuples(const TString sEmbedOnlyTuple, const TString
 
 
 
-void STrackCutStudy::SetStudyParameters(const Bool_t intNorm, const Bool_t onlyPrim, const Double_t normalFracMin, const Double_t normalFracMax) {
+void STrackCutStudy::SetStudyParameters(const Bool_t intNorm, const Double_t normalFracMin, const Double_t normalFracMax) {
 
   doIntNorm       = intNorm;
-  useOnlyPrimary  = onlyPrim;
   normalPtFracMin = normalFracMin;
   normalPtFracMax = normalFracMax;
   cout << "    Set normal pT fraction:\n"
@@ -96,31 +102,52 @@ void STrackCutStudy::SetStudyParameters(const Bool_t intNorm, const Bool_t onlyP
   } else {
     cout << "    No normalization." << endl;
   }
-
-  if (useOnlyPrimary) {
-    cout << "    Considering only primary embed-only tracks." << endl;
-  } else {
-    cout << "    Considering all embed-only tracks." << endl;
-  }
   return;
 
 }  // end 'SetStudyParameters(bool, bool, double, double)'
 
 
 
-void STrackCutStudy::SetTrackCuts(const Double_t trkVzMin, const Double_t trkVzMax, const Double_t trkQualMin, const Double_t trkQualMax) {
+void STrackCutStudy::SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality) {
 
-  vzMin      = trkVzMin;
-  vzMax      = trkVzMax;
-  qualityMin = trkQualMin;
-  qualityMax = trkQualMax;
-  cout << "    Set track cuts:\n"
-       << "      z-vertex = (" << vzMin      << ", " << vzMax      << ")\n"
-       << "      quality  = (" << qualityMin << ", " << qualityMax << ")"
+  doPrimaryCut = doPrimary;
+  doMVtxCut    = doMVtx;
+  doVzCut      = doVz;
+  doDcaXyCut   = doDcaXY;
+  doDcaZCut    = doDcaZ;
+  doQualityCut = doQuality;
+  cout << "    Set cut flags:\n"
+       << "      doPrimaryCut = " << doPrimaryCut << "\n"
+       << "      doMVtxCut    = " << doMVtxCut    << "\n"
+       << "      doVzCut      = " << doVzCut      << "\n"
+       << "      doDcaXyCut   = " << doDcaXyCut   << "\n"
+       << "      doDCaZCut    = " << doDcaZCut    << "\n"
+       << "      doQualityCut = " << doQualityCut
        << endl;
   return;
 
-}  // end 'SetTrackCuts(double, double)'
+
+}  // end 'SetCutFlags(Bool_t, Bool_t, Bool_t, Bool_t, Bool_t, Bool_t)'
+
+
+
+void STrackCutStudy::SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange) {
+
+  nMVtxCut   = nMVtxRange;
+  vzCut      = vzRange;
+  dcaXyCut   = dcaXyRange;
+  dcaZCut    = dcaZRange;
+  qualityCut = qualityRange;
+  cout << "    Set track cuts:\n"
+       << "      mvtx hits = (" << nMVtxCut.first   << ", " << nMVtxCut.second   << ")\n"
+       << "      z-vertex  = (" << vzCut.first      << ", " << vzCut.second      << ")\n"
+       << "      dca (xy)  = (" << dcaXyCut.first   << ", " << dcaXyCut.second   << ")\n"
+       << "      dca (z)   = (" << dcaZCut.first    << ", " << dcaZCut.second    << ")\n"
+       << "      quality   = (" << qualityCut.first << ", " << qualityCut.second << ")"
+       << endl;
+  return;
+
+}  // end 'SetTrackCuts(pair<UInt_t, UInt_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>)'
 
 
 
@@ -148,6 +175,7 @@ void STrackCutStudy::Init() {
   InitFiles();
   InitTuples();
   InitHists();
+  MakeCutText();
   return;
 
 }  // end Init()
@@ -250,28 +278,25 @@ void STrackCutStudy::Analyze() {
     truePhysVars[PHYSVAR::DELETA] = deltaEta;
     truePhysVars[PHYSVAR::DELPT]  = deltaPt;
 
-    // [02.14.2023] TEST
-    const Bool_t isInMvtxCut = (nlmaps >= 2);
-    if (!isInMvtxCut) continue;
-
-    // select only primaries if need be
-    const Bool_t isPrimary = (gprimary == 1);
-    if (useOnlyPrimary && !isPrimary) continue;
-
-    // fill histograms
-    FillTrackHistograms(0, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
-    FillTruthHistograms(1, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
- 
-    // fill embed_only weird histograms
-    const Bool_t isWeirdTrack = ((ptFrac < normalPtFracMin) || (ptFrac > normalPtFracMax));
+    // apply cuts
     const Bool_t hasSiSeed    = (nmaps == 3);
     const Bool_t hasTpcSeed   = (nmaps == 0);
+    const Bool_t isPrimary    = (gprimary == 1);
+    const Bool_t isWeirdTrack = ((ptFrac < normalPtFracMin) || (ptFrac > normalPtFracMax));
+    const Bool_t isGoodTrk    = ApplyCuts(isPrimary, (UInt_t) nlmaps, vz, umDcaXY, umDcaZ, quality);
+    if (!isGoodTrk) continue;
+
+    // fill histograms
+    FillTrackHistograms(TYPE::TRACK, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    FillTruthHistograms(TYPE::TRUTH, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+ 
+    // fill embed_only weird histograms
     if (isWeirdTrack) {
-      FillTrackHistograms(2, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
-      if (hasSiSeed)  FillTrackHistograms(3, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
-      if (hasTpcSeed) FillTrackHistograms(4, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      FillTrackHistograms(TYPE::WEIRD_ALL, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      if (hasSiSeed)  FillTrackHistograms(TYPE::WEIRD_SI,  recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      if (hasTpcSeed) FillTrackHistograms(TYPE::WEIRD_TPC, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     } else {
-      FillTrackHistograms(5, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      FillTrackHistograms(TYPE::NORMAL, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     }
   }  // end embed-only entry loop
   cout << "      Finished embed-only entry loop." << endl;
@@ -309,9 +334,8 @@ void STrackCutStudy::Analyze() {
     const Double_t deltaPhi   = abs(pu_deltaphi / pu_phi);
     const Double_t deltaPt    = abs(pu_deltapt / pu_pt);
 
-    // check if values are defined & if primary or not
+    // check if values are defined
     const Bool_t thereAreNans = (isnan(pu_dca3dxy) || isnan(pu_dca3dz) || isnan(pu_eta) || isnan(pu_phi) || isnan(pu_pt));
-    const Bool_t isPrimary    = (pu_gprimary == 1);
     if (thereAreNans) continue;
 
     // set reco track variables
@@ -358,16 +382,17 @@ void STrackCutStudy::Analyze() {
     truePhysVars[PHYSVAR::DELETA] = deltaEta;
     truePhysVars[PHYSVAR::DELPT]  = deltaPt;
 
-    // [02.14.2023] TEST
-    const Bool_t isInMvtxCut = (pu_nlmaps >= 2);
-    if (!isInMvtxCut) continue;
+    // apply cuts
+    const Bool_t isPrimary = (pu_gprimary == 1);
+    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) pu_nlmaps, pu_vz, umDcaXY, umDcaZ, pu_quality);
+    if (!isGoodTrk) continue;
 
     // fill histograms
-    FillTrackHistograms(6, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    FillTrackHistograms(TYPE::PILEUP, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     if (isPrimary) {
-      FillTrackHistograms(7, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      FillTrackHistograms(TYPE::PRIMARY, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     } else {
-      FillTrackHistograms(6, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      FillTrackHistograms(TYPE::NONPRIM, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     }
   }  // end with-pileup entry loop
   cout << "      Finished with-pileup entry loop." << endl;
@@ -835,6 +860,83 @@ void STrackCutStudy::InitHists() {
   return;
 
 }  // end 'InitHits()'
+
+
+
+void STrackCutStudy::MakeCutText() {
+
+  // cut labels
+  const TString sPrimary("Is primary");
+  const TString sMVtxCut("MVTX hits = (");
+  const TString sVzCut("z-vertex = (");
+  const TString sDcaXyCut("DCA (XY) = (");
+  const TString sDcaZCut("DCA (Z) = (");
+  const TString sQualityCut("Quality = (");
+
+  // make text
+  TString sMVtxTxt     = sMVtxCut;
+  TString sVzTxt       = sVzCut;
+  TString sDcaXyTxt    = sDcaXyCut;
+  TString sDcaZTxt     = sDcaZCut;
+  TString sQualityTxt  = sQualityCut;
+  sMVtxTxt            += nMVtxCut.first;
+  sVzTxt              += vzCut.first;
+  sDcaXyTxt           += dcaXyCut.first;
+  sDcaZTxt            += dcaZCut.first;
+  sQualityTxt         += qualityCut.first;
+  sMVtxTxt            += ", ";
+  sVzTxt              += ", ";
+  sDcaXyTxt           += ", ";
+  sDcaZTxt            += ", ";
+  sQualityTxt         += ", ";
+  sMVtxTxt            += nMVtxCut.second;
+  sVzTxt              += vzCut.second;
+  sDcaXyTxt           += dcaXyCut.second;
+  sDcaZTxt            += dcaZCut.second;
+  sQualityTxt         += qualityCut.second;
+  sMVtxTxt            += ")";
+  sVzTxt              += ")";
+  sDcaXyTxt           += ")";
+  sDcaZTxt            += ")";
+  sQualityTxt         += ")";
+
+  // determine how many lines to add
+  UInt_t nCut(0);
+  if (doPrimaryCut) nCut++;
+  if (doMVtxCut)    nCut++;
+  if (doVzCut)      nCut++;
+  if (doDcaXyCut)   nCut++;
+  if (doDcaZCut)    nCut++;
+  if (doQualityCut) nCut++;
+
+  // make text box
+  const UInt_t  fTxtC       = 42;
+  const UInt_t  fAlnC       = 12;
+  const UInt_t  fColC       = 0;
+  const UInt_t  fLinC       = 1;
+  const UInt_t  fFilC       = 0;
+  const Float_t hCut        = 0.05 * nCut;
+  const Float_t yCut        = 0.1 + hCut;
+  const Float_t xyCut[NVtx] = {0.5, 0.1, 0.7, yCut};
+
+  ptCut = new TPaveText(xyCut[0], xyCut[1], xyCut[2], xyCut[3], "NDC NB");
+  ptCut -> SetFillColor(fColC);
+  ptCut -> SetFillStyle(fFilC);
+  ptCut -> SetLineColor(fColC);
+  ptCut -> SetLineStyle(fLinC);
+  ptCut -> SetTextFont(fTxtC);
+  ptCut -> SetTextAlign(fAlnC);
+  if (doPrimaryCut) ptCut -> AddText(sPrimary.Data());
+  if (doMVtxCut)    ptCut -> AddText(sMVtxTxt.Data());
+  if (doVzCut)      ptCut -> AddText(sVzTxt.Data());
+  if (doDcaXyCut)   ptCut -> AddText(sDcaXyTxt.Data());
+  if (doDcaZCut)    ptCut -> AddText(sDcaZTxt.Data());
+  if (doQualityCut) ptCut -> AddText(sQualityTxt.Data());
+
+  cout << "    Made text box for cuts." << endl;
+  return;
+
+}  // end 'MakeCutText()'
 
 
 
@@ -1400,7 +1502,6 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
   Ssiz_t nTxt(0);
   Bool_t hasPileup(false);
   for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
-    cout << "CHECK0 iType = " << typesToDraw[iToDraw] << ", isPileup? " << isPileup[typesToDraw[iToDraw]] << endl;
     if (isPileup[typesToDraw[iToDraw]]) {
       hasPileup = true;
       break;
@@ -1409,7 +1510,6 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
 
   if (hasPileup) {
     nTxt = nTxtPU;
-    cout << "CHECK1 nTxt = " << nTxt << endl;
   } else {
     nTxt = nTxtEO;
   }
@@ -1433,7 +1533,6 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
   ptTxt -> SetTextAlign(fAlnT);
   for (Ssiz_t iTxt = 0; iTxt < nTxt; iTxt++) {
     if (hasPileup) {
-      cout << "CHECK2 adding pileup text..." << endl;
       ptTxt -> AddText(sTxtPU[iTxt].Data());
     } else {
       ptTxt -> AddText(sTxtEO[iTxt].Data());
@@ -1596,6 +1695,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     }  // end to-draw loop
     leg              -> Draw();
     ptTxt            -> Draw();
+    ptCut            -> Draw();
     cTrkVar[iTrkVar] -> Write();
     cTrkVar[iTrkVar] -> Close();
 
@@ -1623,6 +1723,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     }  // end to-draw loop
     leg                  -> Draw();
     ptTxt                -> Draw();
+    ptCut                -> Draw();
     cTrkVarDiff[iTrkVar] -> Write();
     cTrkVarDiff[iTrkVar] -> Close();
 
@@ -1650,6 +1751,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     }  // end to-draw loop
     leg                  -> Draw();
     ptTxt                -> Draw();
+    ptCut                -> Draw();
     cTrkVarFrac[iTrkVar] -> Write();
     cTrkVarFrac[iTrkVar] -> Close();
 
@@ -1698,6 +1800,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     }  // end to-draw loop
     leg                       -> Draw();
     ptTxt                     -> Draw();
+    ptCut                     -> Draw();
     pTrkVarVsNTpc[iTrkVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -1754,6 +1857,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     }  // end to-draw loop
     leg                         -> Draw();
     ptTxt                       -> Draw();
+    ptCut                       -> Draw();
     pTrkVarVsPtReco[iTrkVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -1810,6 +1914,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     }  // end to-draw loop
     leg                         -> Draw();
     ptTxt                       -> Draw();
+    ptCut                       -> Draw();
     pTrkVarVsPtTrue[iTrkVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -1866,6 +1971,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     }  // end to-draw loop
     leg                         -> Draw();
     ptTxt                       -> Draw();
+    ptCut                       -> Draw();
     pTrkVarVsPtFrac[iTrkVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -1914,8 +2020,9 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
         hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
       }
     }  // end to-draw loop
-    leg              -> Draw();
-    ptTxt            -> Draw();
+    leg                -> Draw();
+    ptTxt              -> Draw();
+    ptCut              -> Draw();
     cPhysVar[iPhysVar] -> Write();
     cPhysVar[iPhysVar] -> Close();
 
@@ -1941,8 +2048,9 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
         hPhysVarDiff[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
       }
     }  // end to-draw loop
-    leg                  -> Draw();
-    ptTxt                -> Draw();
+    leg                    -> Draw();
+    ptTxt                  -> Draw();
+    ptCut                  -> Draw();
     cPhysVarDiff[iPhysVar] -> Write();
     cPhysVarDiff[iPhysVar] -> Close();
 
@@ -1968,8 +2076,9 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
         hPhysVarFrac[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
       }
     }  // end to-draw loop
-    leg                  -> Draw();
-    ptTxt                -> Draw();
+    leg                    -> Draw();
+    ptTxt                  -> Draw();
+    ptCut                  -> Draw();
     cPhysVarFrac[iPhysVar] -> Write();
     cPhysVarFrac[iPhysVar] -> Close();
 
@@ -2016,8 +2125,9 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
         hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
       }
     }  // end to-draw loop
-    leg                       -> Draw();
-    ptTxt                     -> Draw();
+    leg                         -> Draw();
+    ptTxt                       -> Draw();
+    ptCut                       -> Draw();
     pPhysVarVsNTpc[iPhysVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -2072,8 +2182,9 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
         hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
       }
     }  // end to-draw loop
-    leg                         -> Draw();
-    ptTxt                       -> Draw();
+    leg                           -> Draw();
+    ptTxt                         -> Draw();
+    ptCut                         -> Draw();
     pPhysVarVsPtReco[iPhysVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -2128,8 +2239,9 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
         hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
       }
     }  // end to-draw loop
-    leg                         -> Draw();
-    ptTxt                       -> Draw();
+    leg                           -> Draw();
+    ptTxt                         -> Draw();
+    ptCut                         -> Draw();
     pPhysVarVsPtTrue[iPhysVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -2184,8 +2296,9 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
         hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
       }
     }  // end to-draw loop
-    leg                         -> Draw();
-    ptTxt                       -> Draw();
+    leg                           -> Draw();
+    ptTxt                         -> Draw();
+    ptCut                         -> Draw();
     pPhysVarVsPtFrac[iPhysVar][1] -> cd();
     for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
       if (iToDraw == 0) {
@@ -2206,13 +2319,25 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
 
 
 
-Bool_t STrackCutStudy::ApplyCuts(const Double_t trkVz, const Double_t trkQuality) {
+Bool_t STrackCutStudy::ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, const Double_t trkVz, const Double_t trkDcaXY, const Double_t trkDcaZ, const Double_t trkQuality) {
 
-  const Bool_t isInVzCut   = ((trkVz > vzMin) && (trkVz < vzMax));
-  const Bool_t isInQualCut = ((trkQuality > qualityMin) && (trkQuality < qualityMax));
-  const Bool_t isInTrkCut  = (isInVzCut && isInQualCut);
+  // check if track falls in cuts
+  const Bool_t isInMVtxCut    = ((trkNMVtx   > nMVtxCut.first)   && (trkNMVtx   < nMVtxCut.second));
+  const Bool_t isInVzCut      = ((trkVz      > vzCut.first)      && (trkVz      < vzCut.second));
+  const Bool_t isInDcaXyCut   = ((trkDcaXY   > dcaXyCut.first)   && (trkDcaXY   < dcaXyCut.second));
+  const Bool_t isInDcaZCut    = ((trkDcaZ    > dcaZCut.first)    && (trkDcaZ    < dcaZCut.second));
+  const Bool_t isInQualityCut = ((trkQuality > qualityCut.first) && (trkQuality < qualityCut.second));
+
+  // determine which cuts to check against
+  Bool_t isInTrkCut(true);
+  if (doPrimaryCut && !isPrimary)      isInTrkCut = false;
+  if (doMVtxCut    && !isInMVtxCut)    isInTrkCut = false;
+  if (doVzCut      && !isInVzCut)      isInTrkCut = false;
+  if (doDcaXyCut   && !isInDcaXyCut)   isInTrkCut = false;
+  if (doDcaZCut    && !isInDcaZCut)    isInTrkCut = false;
+  if (doQualityCut && !isInQualityCut) isInTrkCut = false;
   return isInTrkCut;
 
-}  // end 'ApplyCuts(Double_t)'
+}  // end 'ApplyCuts(Bool_t, UInt_t, Double_t, Double_t, Double_t, Double_t)'
 
 // end ------------------------------------------------------------------------

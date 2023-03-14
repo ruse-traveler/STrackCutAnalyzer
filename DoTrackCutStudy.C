@@ -10,17 +10,21 @@
 #ifndef DOTRACKCUTSTUDY_C
 #define DOTRACKCUTSTUDY_C
 
+// standard c includes
+#include <cstdlib>
+#include <utility>
 // root includes
 #include <TROOT.h>
 #include <TString.h>
 // user includes
 #include </sphenix/user/danderson/install/include/strackcutstudy/STrackCutStudy.h>
 
+using namespace std;
+
 // load libraries
 R__LOAD_LIBRARY(/sphenix/user/danderson/install/lib/libstrackcutstudy.so)
 
 // global constants
-static const Ssiz_t NCut = 2;
 static const Ssiz_t NTxt = 3;
 
 
@@ -39,13 +43,23 @@ void DoTrackCutStudy() {
 
   // study parameters
   const Bool_t   doIntNorm(false);
-  const Bool_t   useOnlyPrimary(true);
   const Double_t normalPtFracMin(0.20);
   const Double_t normalPtFracMax(1.20);
 
+  // cut flags
+  const Bool_t doPrimaryCut = true;
+  const Bool_t doMVtxCut    = true;
+  const Bool_t doVzCut      = true;
+  const Bool_t doDcaXyCut   = true;
+  const Bool_t doDcaZcut    = true;
+  const Bool_t doQualityCut = true;
+
   // track cuts
-  const Double_t vzRange[NCut]      = {-5., 5.};
-  const Double_t qualityRange[NCut] = {0.,  2.};
+  const pair<UInt_t,   UInt_t>   nMVtxRange   = {0,    100};
+  const pair<Double_t, Double_t> vzRange      = {-5.,  5.};
+  const pair<Double_t, Double_t> dcaXyRange   = {-20., 20.};
+  const pair<Double_t, Double_t> dcaZrange    = {-20., 20.};
+  const pair<Double_t, Double_t> qualityRange = {0.,   10.};
 
   // text for plot
   const TString sTxtEO[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "single #pi^{-}, p_{T} #in (0, 20) GeV/c", "#bf{Embedded Only Tracks}"};
@@ -55,8 +69,9 @@ void DoTrackCutStudy() {
   STrackCutStudy *study = new STrackCutStudy();
   study -> SetInputOutputFiles(sInFileEO, sInFilePU, sOutFile);
   study -> SetInputTuples(sInTupleEO, sInTuplePU);
-  study -> SetStudyParameters(doIntNorm, useOnlyPrimary, normalPtFracMin, normalPtFracMax);
-  study -> SetTrackCuts(vzRange[0], vzRange[1], qualityRange[0], qualityRange[1]);
+  study -> SetStudyParameters(doIntNorm, normalPtFracMin, normalPtFracMax);
+  study -> SetCutFlags(doPrimaryCut, doMVtxCut, doVzCut, doDcaXyCut, doDcaZcut, doQualityCut);
+  study -> SetTrackCuts(nMVtxRange, vzRange, dcaXyRange, dcaZrange, qualityRange);
   study -> SetPlotText(NTxt, NTxt, sTxtEO, sTxtPU);
   study -> Init();
   study -> Analyze();

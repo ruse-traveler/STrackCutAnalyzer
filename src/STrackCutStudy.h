@@ -37,7 +37,7 @@ using namespace std;
 
 // global constants
 static const Ssiz_t NVtx(4);
-static const Ssiz_t NType(9);
+static const Ssiz_t NType(15);
 static const Ssiz_t NTrkVar(14);
 static const Ssiz_t NPhysVar(6);
 static const Ssiz_t NRange(2);
@@ -76,15 +76,21 @@ class STrackCutStudy {
       DELPT  = 5
     };
     enum TYPE {
-      TRACK     = 0,
-      TRUTH     = 1,
-      WEIRD_ALL = 2,
-      WEIRD_SI  = 3,
-      WEIRD_TPC = 4,
-      NORMAL    = 5,
-      PILEUP    = 6,
-      PRIMARY   = 7,
-      NONPRIM   = 8
+      TRACK         = 0,
+      TRUTH         = 1,
+      WEIRD_ALL     = 2,
+      WEIRD_SI      = 3,
+      WEIRD_TPC     = 4,
+      NORMAL        = 5,
+      PILEUP        = 6,
+      PRIMARY       = 7,
+      NONPRIM       = 8,
+      TRK_CUT       = 9,
+      TRU_CUT       = 10,
+      WEIRD_CUT     = 11,
+      WEIRD_SI_CUT  = 12,
+      WEIRD_TPC_CUT = 13,
+      NORM_CUT      = 14
     };
 
     // ctor/dtor
@@ -93,7 +99,7 @@ class STrackCutStudy {
 
     // public methods
     void SetInputOutputFiles(const TString sEmbedOnlyInput, const TString sPileupInput, const TString sOutput);
-    void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple);
+    void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple, const TString sEmbedOnlyClusterTuple="");
     void SetStudyParameters(const Bool_t intNorm, const Bool_t avgClustCalc, const Double_t weirdFracMin, const Double_t weirdFracMax);
     void SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality);
     void SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange);
@@ -104,14 +110,6 @@ class STrackCutStudy {
 
   private:
 
-    // track type/variable names/labels
-    const Bool_t  isPileup[NType]     = {false,   false,   false,      false,     false,      false,    true,        true,          true};
-    const TString sTrkNames[NType]    = {"Track", "Truth", "AllWeird", "SiWeird", "TpcWeird", "Normal", "AllPileup", "PrimePileup", "NonPrimePileup"};
-    const TString sTrkLabels[NType]   = {"All tracks", "Truth tracks", "Weird tracks (all)", "Weird tracks (Si seed)", "Weird tracks (TPC seed)",
-                                         "Normal tracks", "Including pileup tracks (all)", "Including pileup tracks (only primary)", "Including pileup gracks (non-primary)"};
-    const TString sTrkVars[NTrkVar]   = {"Vx", "Vy", "Vz", "NMms", "NMap", "NInt", "NTpc", "Qual", "DcaXY", "DcaZ", "DeltaDcaXY", "DeltaDcaZ", "NClust", "AvgClustSize"};
-    const TString sPhysVars[NPhysVar] = {"Phi", "Eta", "Pt", "DeltaPhi", "DeltaEta", "DeltaPt"};
-
     // io members
     TFile   *fOut;
     TFile   *fInEO;
@@ -120,9 +118,20 @@ class STrackCutStudy {
     TString  sInFilePU;
     TString  sInTupleEO;
     TString  sInTuplePU;
+    TString  sInClustEO;
     TString  sOutfile;
     TNtuple *ntTrkEO;
     TNtuple *ntTrkPU;
+    TNtuple *ntClustEO;
+
+    // track type/variable names/styles/labels [set in ctor, *.cc]
+    Bool_t  isPileup[NType];
+    UInt_t  fTypeCol[NType];
+    UInt_t  fTypeMar[NType];
+    TString sTrkNames[NType];
+    TString sTrkLabels[NType];
+    TString sTrkVars[NTrkVar];
+    TString sPhysVars[NPhysVar];
 
     // track-variable histograms
     TH1D *hTrkVar[NType][NTrkVar];

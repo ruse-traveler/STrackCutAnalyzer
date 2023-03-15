@@ -183,10 +183,10 @@ void STrackCutStudy::InitHists() {
       hTrkVar[iType][iTrkVar]         = new TH1D(sTrkVar[iType][iTrkVar].Data(),         "", nTrkBins[iTrkVar],     rTrkBins[iTrkVar][0],     rTrkBins[iTrkVar][1]);
       hTrkVarDiff[iType][iTrkVar]     = new TH1D(sTrkVarDiff[iType][iTrkVar].Data(),     "", nTrkDiffBins[iTrkVar], rTrkDiffBins[iTrkVar][0], rTrkDiffBins[iTrkVar][1]);
       hTrkVarFrac[iType][iTrkVar]     = new TH1D(sTrkVarFrac[iType][iTrkVar].Data(),     "", nTrkFracBins[iTrkVar], rTrkFracBins[iTrkVar][0], rTrkFracBins[iTrkVar][1]);
-      hTrkVarVsNTpc[iType][iTrkVar]   = new TH2D(sTrkVarVsNTpc[iType][iTrkVar].Data(),   "", nTrkBins[iTrkVar],     rTrkBins[iTrkVar][0],     rTrkBins[iTrkVar][1], nNHitBins,   rNHitBins[0],   rNHitBins[1]);
-      hTrkVarVsPtReco[iType][iTrkVar] = new TH2D(sTrkVarVsPtReco[iType][iTrkVar].Data(), "", nTrkBins[iTrkVar],     rTrkBins[iTrkVar][0],     rTrkBins[iTrkVar][1], nPtBins,     rPtBins[0],     rPtBins[1]);
-      hTrkVarVsPtTrue[iType][iTrkVar] = new TH2D(sTrkVarVsPtTrue[iType][iTrkVar].Data(), "", nTrkBins[iTrkVar],     rTrkBins[iTrkVar][0],     rTrkBins[iTrkVar][1], nPtBins,     rPtBins[0],     rPtBins[1]);
-      hTrkVarVsPtFrac[iType][iTrkVar] = new TH2D(sTrkVarVsPtFrac[iType][iTrkVar].Data(), "", nTrkBins[iTrkVar],     rTrkBins[iTrkVar][0],     rTrkBins[iTrkVar][1], nPtFracBins, rPtFracBins[0], rPtFracBins[1]);
+      hTrkVarVsNTpc[iType][iTrkVar]   = new TH2D(sTrkVarVsNTpc[iType][iTrkVar].Data(),   "", nNHitBins,             rNHitBins[0],             rNHitBins[1],   nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
+      hTrkVarVsPtReco[iType][iTrkVar] = new TH2D(sTrkVarVsPtReco[iType][iTrkVar].Data(), "", nPtBins,               rPtBins[0],               rPtBins[1],     nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
+      hTrkVarVsPtTrue[iType][iTrkVar] = new TH2D(sTrkVarVsPtTrue[iType][iTrkVar].Data(), "", nPtBins,               rPtBins[0],               rPtBins[1],     nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
+      hTrkVarVsPtFrac[iType][iTrkVar] = new TH2D(sTrkVarVsPtFrac[iType][iTrkVar].Data(), "", nPtFracBins,           rPtFracBins[0],           rPtFracBins[1], nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
       hTrkVar[iType][iTrkVar]         -> Sumw2();
       hTrkVarDiff[iType][iTrkVar]     -> Sumw2();
       hTrkVarFrac[iType][iTrkVar]     -> Sumw2();
@@ -199,10 +199,10 @@ void STrackCutStudy::InitHists() {
       hPhysVar[iType][iPhysVar]         = new TH1D(sPhysVar[iType][iPhysVar].Data(),         "", nPhysBins[iPhysVar],     rPhysBins[iPhysVar][0],     rPhysBins[iPhysVar][1]);
       hPhysVarDiff[iType][iPhysVar]     = new TH1D(sPhysVarDiff[iType][iPhysVar].Data(),     "", nPhysDiffBins[iPhysVar], rPhysDiffBins[iPhysVar][0], rPhysDiffBins[iPhysVar][1]);
       hPhysVarFrac[iType][iPhysVar]     = new TH1D(sPhysVarFrac[iType][iPhysVar].Data(),     "", nPhysFracBins[iPhysVar], rPhysFracBins[iPhysVar][0], rPhysFracBins[iPhysVar][1]);
-      hPhysVarVsNTpc[iType][iPhysVar]   = new TH2D(sPhysVarVsNTpc[iType][iPhysVar].Data(),   "", nPhysBins[iPhysVar],     rPhysBins[iPhysVar][0],     rPhysBins[iPhysVar][1], nNHitBins,   rNHitBins[0],   rNHitBins[1]);
-      hPhysVarVsPtReco[iType][iPhysVar] = new TH2D(sPhysVarVsPtReco[iType][iPhysVar].Data(), "", nPhysBins[iPhysVar],     rPhysBins[iPhysVar][0],     rPhysBins[iPhysVar][1], nPtBins,     rPtBins[0],     rPtBins[1]);
-      hPhysVarVsPtTrue[iType][iPhysVar] = new TH2D(sPhysVarVsPtTrue[iType][iPhysVar].Data(), "", nPhysBins[iPhysVar],     rPhysBins[iPhysVar][0],     rPhysBins[iPhysVar][1], nPtBins,     rPtBins[0],     rPtBins[1]);
-      hPhysVarVsPtFrac[iType][iPhysVar] = new TH2D(sPhysVarVsPtFrac[iType][iPhysVar].Data(), "", nPhysBins[iPhysVar],     rPhysBins[iPhysVar][0],     rPhysBins[iPhysVar][1], nPtFracBins, rPtFracBins[0], rPtFracBins[1]);
+      hPhysVarVsNTpc[iType][iPhysVar]   = new TH2D(sPhysVarVsNTpc[iType][iPhysVar].Data(),   "", nNHitBins,               rNHitBins[0],               rNHitBins[1],   nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
+      hPhysVarVsPtReco[iType][iPhysVar] = new TH2D(sPhysVarVsPtReco[iType][iPhysVar].Data(), "", nPtBins,                 rPtBins[0],                 rPtBins[1],     nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
+      hPhysVarVsPtTrue[iType][iPhysVar] = new TH2D(sPhysVarVsPtTrue[iType][iPhysVar].Data(), "", nPtBins,                 rPtBins[0],                 rPtBins[1],     nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
+      hPhysVarVsPtFrac[iType][iPhysVar] = new TH2D(sPhysVarVsPtFrac[iType][iPhysVar].Data(), "", nPtFracBins,             rPtFracBins[0],             rPtFracBins[1], nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
       hPhysVar[iType][iPhysVar]         -> Sumw2();
       hPhysVarDiff[iType][iPhysVar]     -> Sumw2();
       hPhysVarFrac[iType][iPhysVar]     -> Sumw2();
@@ -265,22 +265,6 @@ void STrackCutStudy::NormalizeHists() {
 void STrackCutStudy::SetHistStyles() {
 
   // plot parameters
-  const UInt_t  fColTrk(923);
-  const UInt_t  fColTru(618);
-  const UInt_t  fColOdd(635);
-  const UInt_t  fColOddSi(631);
-  const UInt_t  fColOddTpc(627);
-  const UInt_t  fColNorm(603);
-  const UInt_t  fColPrim(879);
-  const UInt_t  fColNoPr(799);
-  const UInt_t  fMarTrk(22);
-  const UInt_t  fMarTru(32);
-  const UInt_t  fMarOdd(5);
-  const UInt_t  fMarOddSi(5);
-  const UInt_t  fMarOddTpc(5);
-  const UInt_t  fMarNorm(24);
-  const UInt_t  fMarPrim(26);
-  const UInt_t  fMarNoPr(32);
   const UInt_t  fFil(0);
   const UInt_t  fLin(1);
   const Float_t fOffX(1.0);
@@ -362,10 +346,6 @@ void STrackCutStudy::SetHistStyles() {
   const TString sFracDeltaPt("IRRELEVANT");
   const TString sFracNClust("N_{clust}^{reco} / N_{clust}^{truth}");
   const TString sFracAvgClust("<cluster size>_{reco} / <cluster size>_{truth}");
-
-  // histograms styles
-  const UInt_t fTypeCol[NType] = {fColTrk, fColTru, fColOdd, fColOddSi, fColOddTpc, fColNorm, fColTrk, fColPrim, fColNoPr};
-  const UInt_t fTypeMar[NType] = {fMarTrk, fMarTru, fMarOdd, fMarOddSi, fMarOddTpc, fMarNorm, fMarTrk, fMarPrim, fMarNoPr};
 
   // track axis titles
   const TString sTrkTitles[NTrkVar]     = {sTrkVx,          sTrkVy,         sTrkVz,      sTrkNMms,   sTrkNMap,  sTrkNInt,  sTrkNTpc,  sTrkQuality, sTrkDCAxy,  sTrkDCAz,

@@ -33,14 +33,21 @@ void STrackCutStudy::SetInputOutputFiles(const TString sEmbedOnlyInput, const TS
 
 
 
-void STrackCutStudy::SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple) {
+void STrackCutStudy::SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple, const TString sEmbedOnlyClusterTuple) {
 
   sInTupleEO = sEmbedOnlyTuple;
   sInTuplePU = sPileupTuple;
-  cout << "    Set input tuples:\n"
+  sInClustEO = sEmbedOnlyClusterTuple;
+  cout << "    Set input track tuples:\n"
        << "      Embed Only  = " << sInTupleEO.Data() << "\n"
        << "      With Pileup = " << sInTuplePU.Data()
        << endl;
+
+  if (sEmbedOnlyClusterTuple != "") {
+    cout << "    Set input cluster tuples:\n"
+         << "      Embed-only cluster tuple = " << sInClustEO.Data()
+         << endl;
+  }
   return;
 
 }  // end 'SetInputTuples(TString, TString)'
@@ -163,6 +170,16 @@ void STrackCutStudy::InitTuples() {
          << "       ntTrkEO = " << ntTrkEO << ", ntTrkPU = " << ntTrkPU << "\n"
          << endl;
     assert(ntTrkEO && ntTrkPU);
+  }
+
+  if (doAvgClustCalc) {
+    ntClustEO = (TNtuple*) fInEO -> Get(sInClustEO.Data());
+    if (!ntClustEO) {
+      cerr << "PANIC: couldn't grab an input cluster NTuple!\n"
+           << "       ntClustEO = " << ntClustEO << "\n"
+           << endl;
+      assert(ntClustEO);
+    }
   }
   cout << "      Initialized input ntuples." << endl;
 

@@ -35,7 +35,7 @@ void DoTrackCutStudy() {
   gErrorIgnoreLevel = kWarning;
 
   // i/o parameters
-  const TString sOutFile("trackCutStudy.forMvtxCheck_withMvtxCut_finePtBinsWithNoIntNorm.pt020n5pim.d21m2y2023.root");
+  const TString sOutFile("trackCutStudy.applyCuts_mvtx2vz5dxy20dz20qual10prim.pt020n5pim.d15m3y2023.root");
   const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_forTrackCutStudy_embedOnly0t1099_g4svtxeval.pt020n5pim.d12m1y2023.root");
   const TString sInFilePU("input/test/sPhenixG4_testWithPileup001_g4svtxEval.d18m12y2022.root");
   const TString sInTupleEO("ntp_track");
@@ -44,7 +44,7 @@ void DoTrackCutStudy() {
 
   // study parameters
   const Bool_t   doIntNorm(false);
-  const Bool_t   doAvgClusterCalc(true);
+  const Bool_t   doAvgClusterCalc(false);
   const Double_t normalPtFracMin(0.20);
   const Double_t normalPtFracMax(1.20);
 
@@ -57,15 +57,15 @@ void DoTrackCutStudy() {
   const Bool_t doQualityCut = true;
 
   // track cuts
-  const pair<UInt_t,   UInt_t>   nMVtxRange   = {0,    100};
+  const pair<UInt_t,   UInt_t>   nMVtxRange   = {2,    100};
   const pair<Double_t, Double_t> vzRange      = {-5.,  5.};
   const pair<Double_t, Double_t> dcaXyRange   = {-20., 20.};
   const pair<Double_t, Double_t> dcaZrange    = {-20., 20.};
   const pair<Double_t, Double_t> qualityRange = {0.,   10.};
 
   // text for plot
-  const TString sTxtEO[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "single #pi^{-}, p_{T} #in (0, 20) GeV/c", "#bf{Embedded Only Tracks}"};
-  const TString sTxtPU[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "0-20 fm Hijing, 50 kHz pileup", "#bf{With Pileup Tracks}"};
+  const TString sTxtEO[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "5 #pi^{-}/event, p_{T} #in (0, 20) GeV/c", "#bf{Only #pi^{-}}"};
+  const TString sTxtPU[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "0-20 fm Hijing, 50 kHz pileup #oplus 5 #pi^{-}/event", "#bf{With pileup}"};
 
   // run track cut study
   STrackCutStudy *study = new STrackCutStudy();

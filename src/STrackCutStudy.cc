@@ -26,6 +26,7 @@ using namespace std;
 
 STrackCutStudy::STrackCutStudy() {
 
+  // clear member variables
   sTxtEO.clear();
   sTxtPU.clear();
   nTxtEO          = 0;
@@ -40,6 +41,115 @@ STrackCutStudy::STrackCutStudy() {
   doDcaXyCut      = false;
   doDcaZCut       = false;
   doQualityCut    = false;
+
+  // set whether or not type has pileup
+  isPileup[TYPE::TRACK]         = false;
+  isPileup[TYPE::TRUTH]         = false;
+  isPileup[TYPE::WEIRD_ALL]     = false;
+  isPileup[TYPE::WEIRD_SI]      = false;
+  isPileup[TYPE::WEIRD_TPC]     = false;
+  isPileup[TYPE::NORMAL]        = false;
+  isPileup[TYPE::PILEUP]        = true;
+  isPileup[TYPE::PRIMARY]       = true;
+  isPileup[TYPE::NONPRIM]       = true;
+  isPileup[TYPE::TRK_CUT]       = false;
+  isPileup[TYPE::TRU_CUT]       = false;
+  isPileup[TYPE::WEIRD_CUT]     = false;
+  isPileup[TYPE::WEIRD_SI_CUT]  = false;
+  isPileup[TYPE::WEIRD_TPC_CUT] = false;
+  isPileup[TYPE::NORM_CUT]      = false;
+
+  // set type colors
+  fTypeCol[TYPE::TRACK]         = 923;
+  fTypeCol[TYPE::TRUTH]         = 899;
+  fTypeCol[TYPE::WEIRD_ALL]     = 879;
+  fTypeCol[TYPE::WEIRD_SI]      = 809;
+  fTypeCol[TYPE::WEIRD_TPC]     = 849;
+  fTypeCol[TYPE::NORMAL]        = 889;
+  fTypeCol[TYPE::PILEUP]        = 923;
+  fTypeCol[TYPE::PRIMARY]       = 859;
+  fTypeCol[TYPE::NONPRIM]       = 799;
+  fTypeCol[TYPE::TRK_CUT]       = 923;
+  fTypeCol[TYPE::TRU_CUT]       = 899;
+  fTypeCol[TYPE::WEIRD_CUT]     = 879;
+  fTypeCol[TYPE::WEIRD_SI_CUT]  = 809;
+  fTypeCol[TYPE::WEIRD_TPC_CUT] = 849;
+  fTypeCol[TYPE::NORM_CUT]      = 889;
+
+  // set type markers
+  fTypeMar[TYPE::TRACK]         = 20;
+  fTypeMar[TYPE::TRUTH]         = 24;
+  fTypeMar[TYPE::WEIRD_ALL]     = 26;
+  fTypeMar[TYPE::WEIRD_SI]      = 5;
+  fTypeMar[TYPE::WEIRD_TPC]     = 2;
+  fTypeMar[TYPE::NORMAL]        = 32;
+  fTypeMar[TYPE::PILEUP]        = 20;
+  fTypeMar[TYPE::PRIMARY]       = 26;
+  fTypeMar[TYPE::NONPRIM]       = 32;
+  fTypeMar[TYPE::TRK_CUT]       = 20;
+  fTypeMar[TYPE::TRU_CUT]       = 24;
+  fTypeMar[TYPE::WEIRD_CUT]     = 26;
+  fTypeMar[TYPE::WEIRD_SI_CUT]  = 5;
+  fTypeMar[TYPE::WEIRD_TPC_CUT] = 2;
+  fTypeMar[TYPE::NORM_CUT]      = 32;
+
+  // set type names
+  sTrkNames[TYPE::TRACK]         = "AllTrack";
+  sTrkNames[TYPE::TRUTH]         = "AllTruth";
+  sTrkNames[TYPE::WEIRD_ALL]     = "AllWeird";
+  sTrkNames[TYPE::WEIRD_SI]      = "AllSiWeird";
+  sTrkNames[TYPE::WEIRD_TPC]     = "AllTpcWeird";
+  sTrkNames[TYPE::NORMAL]        = "AllNormal";
+  sTrkNames[TYPE::PILEUP]        = "CutPileup";
+  sTrkNames[TYPE::PRIMARY]       = "CutPrimePileup";
+  sTrkNames[TYPE::NONPRIM]       = "CutNonPrimePileup";
+  sTrkNames[TYPE::TRK_CUT]       = "CutTrack";
+  sTrkNames[TYPE::TRU_CUT]       = "CutTruth";
+  sTrkNames[TYPE::WEIRD_CUT]     = "CutWeird";
+  sTrkNames[TYPE::WEIRD_SI_CUT]  = "CutSiWeird";
+  sTrkNames[TYPE::WEIRD_TPC_CUT] = "CutTpcWeird";
+  sTrkNames[TYPE::NORM_CUT]      = "CutNormal";
+
+  // set type plot labels
+  sTrkLabels[TYPE::TRACK]         = "Tracks (before cuts)";
+  sTrkLabels[TYPE::TRUTH]         = "Truth tracks (before cuts)";
+  sTrkLabels[TYPE::WEIRD_ALL]     = "Weird tracks (before cuts)";
+  sTrkLabels[TYPE::WEIRD_SI]      = "Weird tracks (Si seed, before cuts)";
+  sTrkLabels[TYPE::WEIRD_TPC]     = "Weird tracks (TPC seed, before cuts)";
+  sTrkLabels[TYPE::NORMAL]        = "Normal tracks (before cuts)";
+  sTrkLabels[TYPE::PILEUP]        = "Including pileup tracks (all)";
+  sTrkLabels[TYPE::PRIMARY]       = "Including pileup tracks (only primary)";
+  sTrkLabels[TYPE::NONPRIM]       = "Including pileup gracks (non-primary)";
+  sTrkLabels[TYPE::TRK_CUT]       = "Tracks (after cuts)";
+  sTrkLabels[TYPE::TRU_CUT]       = "Truth tracks (after cuts)";
+  sTrkLabels[TYPE::WEIRD_CUT]     = "Weird tracks (after cuts)";
+  sTrkLabels[TYPE::WEIRD_SI_CUT]  = "Weird tracks (Si seed, after cuts)";
+  sTrkLabels[TYPE::WEIRD_TPC_CUT] = "Weird tracks (TPC seed, after cuts)";
+  sTrkLabels[TYPE::NORM_CUT]      = "Normal tracks (after cuts)";
+
+  // set track variable names
+  sTrkVars[TRKVAR::VX]       = "Vx";
+  sTrkVars[TRKVAR::VY]       = "Vy";
+  sTrkVars[TRKVAR::VZ]       = "Vz";
+  sTrkVars[TRKVAR::NMMS]     = "NMms";
+  sTrkVars[TRKVAR::NMAP]     = "NMap";
+  sTrkVars[TRKVAR::NINT]     = "NInt";
+  sTrkVars[TRKVAR::NTPC]     = "NTpc";
+  sTrkVars[TRKVAR::QUAL]     = "Qual";
+  sTrkVars[TRKVAR::DCAXY]    = "DcaXY";
+  sTrkVars[TRKVAR::DCAZ]     = "DcaZ";
+  sTrkVars[TRKVAR::DELDCAXY] = "DeltaDcaXY";
+  sTrkVars[TRKVAR::DELDCAZ]  = "DeltaDcaZ";
+  sTrkVars[TRKVAR::NCLUST]   = "NClust";
+  sTrkVars[TRKVAR::AVGCLUST] = "AvgClustSize";
+
+  // set physics variable names
+  sPhysVars[PHYSVAR::PHI]    = "Phi";
+  sPhysVars[PHYSVAR::ETA]    = "Eta";
+  sPhysVars[PHYSVAR::PT]     = "Pt";
+  sPhysVars[PHYSVAR::DELPHI] = "DeltaPhi";
+  sPhysVars[PHYSVAR::DELETA] = "DeltaEta";
+  sPhysVars[PHYSVAR::DELPT]  = "DeltaPt";
   cout << "\n  Beginning track cut study."  << endl;
 
 }  // end ctor
@@ -177,25 +287,40 @@ void STrackCutStudy::Analyze() {
     truePhysVars[PHYSVAR::DELETA] = deltaEta;
     truePhysVars[PHYSVAR::DELPT]  = deltaPt;
 
-    // apply cuts
+    // check for weird tracks
     const Bool_t hasSiSeed    = (nmaps == 3);
     const Bool_t hasTpcSeed   = (nmaps == 0);
     const Bool_t isPrimary    = (gprimary == 1);
     const Bool_t isWeirdTrack = ((ptFrac < normalPtFracMin) || (ptFrac > normalPtFracMax));
-    const Bool_t isGoodTrk    = ApplyCuts(isPrimary, (UInt_t) nlmaps, vz, umDcaXY, umDcaZ, quality);
-    if (!isGoodTrk) continue;
 
-    // fill histograms
+    // fill all track histograms
     FillTrackHistograms(TYPE::TRACK, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     FillTruthHistograms(TYPE::TRUTH, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
  
-    // fill embed_only weird histograms
+    // fill all embed_only weird histograms
     if (isWeirdTrack) {
       FillTrackHistograms(TYPE::WEIRD_ALL, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
       if (hasSiSeed)  FillTrackHistograms(TYPE::WEIRD_SI,  recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
       if (hasTpcSeed) FillTrackHistograms(TYPE::WEIRD_TPC, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     } else {
       FillTrackHistograms(TYPE::NORMAL, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    }
+
+    // apply cuts
+    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) nlmaps, vz, umDcaXY, umDcaZ, quality);
+    if (!isGoodTrk) continue;
+
+    // fill cut track histograms
+    FillTrackHistograms(TYPE::TRK_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    FillTruthHistograms(TYPE::TRU_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+ 
+    // fill cut embed_only weird histograms
+    if (isWeirdTrack) {
+      FillTrackHistograms(TYPE::WEIRD_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      if (hasSiSeed)  FillTrackHistograms(TYPE::WEIRD_SI_CUT,  recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+      if (hasTpcSeed) FillTrackHistograms(TYPE::WEIRD_TPC_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    } else {
+      FillTrackHistograms(TYPE::NORM_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     }
   }  // end embed-only entry loop
   cout << "      Finished embed-only entry loop." << endl;

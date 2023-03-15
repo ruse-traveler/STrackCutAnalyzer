@@ -97,20 +97,30 @@ void STrackCutStudy::MakeCutText() {
 void STrackCutStudy::CreatePlots(){
 
   // plot labels/directories to save in
-  const TString sLabelEO("EmbedOnly");
-  const TString sLabelPU("WithPileup");
-  const TString sDirPlotEO("EmbedOnlyPlots");
-  const TString sDirPlotPU("WithPileupPlots");
+  const TString sLabelAllEO("EmbedOnly_BeforeCuts");
+  const TString sLabelCutEO("EmbedOnly_AfterCuts");
+  const TString sLabelOddEO("EmbedONly_WeirdVsNormal");
+  const TString sLabelAllPU("WithPileup");
+  const TString sDirPlotAllEO("EmbedOnlyPlots_BeforeCuts");
+  const TString sDirPlotCutEO("EmbedOnlyPlots_AfterCuts");
+  const TString sDirPlotOddEO("EmbedOnlyPlots_WeirdVsNormal");
+  const TString sDirPlotAllPU("AllWithPileupPlots");
 
   // track types to plot together
-  const Ssiz_t nToDrawEO(6);
-  const Ssiz_t nToDrawPU(3);
-  const Int_t  sToDrawEO[nToDrawEO] = {TYPE::TRACK, TYPE::TRUTH, TYPE::WEIRD_ALL, TYPE::WEIRD_SI, TYPE::WEIRD_TPC, TYPE::NORMAL};
-  const Int_t  sToDrawPU[nToDrawPU] = {TYPE::PILEUP, TYPE::PRIMARY, TYPE::NONPRIM};
+  const Ssiz_t nToDrawAllEO(3);
+  const Ssiz_t nToDrawCutEO(3);
+  const Ssiz_t nToDrawOddEO(3);
+  const Ssiz_t nToDrawAllPU(3);
+  const Int_t  sToDrawAllEO[nToDrawAllEO] = {TYPE::TRACK,    TYPE::TRUTH,     TYPE::WEIRD_ALL};
+  const Int_t  sToDrawCutEO[nToDrawCutEO] = {TYPE::TRK_CUT,  TYPE::TRU_CUT,   TYPE::WEIRD_CUT};
+  const Int_t  sToDrawOddEO[nToDrawOddEO] = {TYPE::WEIRD_SI, TYPE::WEIRD_TPC, TYPE::NORMAL};
+  const Int_t  sToDrawAllPU[nToDrawAllPU] = {TYPE::PILEUP,   TYPE::PRIMARY,   TYPE::NONPRIM};
 
   // create desired plots
-  ConstructPlots(nToDrawEO, sToDrawEO, sDirPlotEO, sLabelEO);
-  ConstructPlots(nToDrawPU, sToDrawPU, sDirPlotPU, sLabelPU);
+  ConstructPlots(nToDrawAllEO, sToDrawAllEO, sDirPlotAllEO, sLabelAllEO);
+  ConstructPlots(nToDrawCutEO, sToDrawCutEO, sDirPlotCutEO, sLabelCutEO);
+  ConstructPlots(nToDrawOddEO, sToDrawOddEO, sDirPlotOddEO, sLabelOddEO);
+  ConstructPlots(nToDrawAllPU, sToDrawAllPU, sDirPlotAllPU, sLabelAllPU);
 
   cout << "      Created plots." << endl;
   return;
@@ -953,7 +963,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hPhysVarVsPtFrac[typesToDraw[iToDraw]][iPhysVar] -> Draw("colz");
       } else {
-        hPhysVarVsPtFrac[typesToDraw[iToDraw]][iPhysVar] -> Draw("p same");
+        hPhysVarVsPtFrac[typesToDraw[iToDraw]][iPhysVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cPhysVarVsPtFrac[iPhysVar] -> Write();

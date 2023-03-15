@@ -81,10 +81,11 @@ void STrackCutStudy::SetStudyParameters(const Bool_t intNorm, const Bool_t avgCl
 
 
 
-void STrackCutStudy::SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality) {
+void STrackCutStudy::SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, const Bool_t doTpc, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality) {
 
   doPrimaryCut = doPrimary;
   doMVtxCut    = doMVtx;
+  doTpcCut     = doTpc;
   doVzCut      = doVz;
   doDcaXyCut   = doDcaXY;
   doDcaZCut    = doDcaZ;
@@ -92,6 +93,7 @@ void STrackCutStudy::SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, co
   cout << "    Set cut flags:\n"
        << "      doPrimaryCut = " << doPrimaryCut << "\n"
        << "      doMVtxCut    = " << doMVtxCut    << "\n"
+       << "      doTpcCut     = " << doTpcCut     << "\n"
        << "      doVzCut      = " << doVzCut      << "\n"
        << "      doDcaXyCut   = " << doDcaXyCut   << "\n"
        << "      doDCaZCut    = " << doDcaZCut    << "\n"
@@ -100,19 +102,21 @@ void STrackCutStudy::SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, co
   return;
 
 
-}  // end 'SetCutFlags(Bool_t, Bool_t, Bool_t, Bool_t, Bool_t, Bool_t)'
+}  // end 'SetCutFlags(Bool_t, Bool_t, Bool_t, Bool_t, Bool_t, Bool_t, Bool_t)'
 
 
 
-void STrackCutStudy::SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange) {
+void STrackCutStudy::SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<UInt_t, UInt_t> nTpcRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange) {
 
   nMVtxCut   = nMVtxRange;
+  nTpcCut    = nTpcRange;
   vzCut      = vzRange;
   dcaXyCut   = dcaXyRange;
   dcaZCut    = dcaZRange;
   qualityCut = qualityRange;
   cout << "    Set track cuts:\n"
        << "      mvtx hits = (" << nMVtxCut.first   << ", " << nMVtxCut.second   << ")\n"
+       << "      tpc hits  = (" << nTpcCut.first    << ", " << nTpcCut.second    << ")\n"
        << "      z-vertex  = (" << vzCut.first      << ", " << vzCut.second      << ")\n"
        << "      dca (xy)  = (" << dcaXyCut.first   << ", " << dcaXyCut.second   << ")\n"
        << "      dca (z)   = (" << dcaZCut.first    << ", " << dcaZCut.second    << ")\n"
@@ -120,7 +124,7 @@ void STrackCutStudy::SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const p
        << endl;
   return;
 
-}  // end 'SetTrackCuts(pair<UInt_t, UInt_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>)'
+}  // end 'SetTrackCuts(pair<UInt_t, UInt_t>, pair<UInt_t, UInt_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>, pair<Double_t, Double_t>)'
 
 
 

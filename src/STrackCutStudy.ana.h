@@ -17,10 +17,11 @@ using namespace std;
 
 // analysis methods -----------------------------------------------------------
 
-Bool_t STrackCutStudy::ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, const Double_t trkVz, const Double_t trkDcaXY, const Double_t trkDcaZ, const Double_t trkQuality) {
+Bool_t STrackCutStudy::ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, const UInt_t trkNTpc, const Double_t trkVz, const Double_t trkDcaXY, const Double_t trkDcaZ, const Double_t trkQuality) {
 
   // check if track falls in cuts
   const Bool_t isInMVtxCut    = ((trkNMVtx   > nMVtxCut.first)   && (trkNMVtx   < nMVtxCut.second));
+  const Bool_t isInTpcCut     = ((trkNTpc    > nTpcCut.first)    && (trkNTpc    < nTpcCut.second));
   const Bool_t isInVzCut      = ((trkVz      > vzCut.first)      && (trkVz      < vzCut.second));
   const Bool_t isInDcaXyCut   = ((trkDcaXY   > dcaXyCut.first)   && (trkDcaXY   < dcaXyCut.second));
   const Bool_t isInDcaZCut    = ((trkDcaZ    > dcaZCut.first)    && (trkDcaZ    < dcaZCut.second));
@@ -30,13 +31,14 @@ Bool_t STrackCutStudy::ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, 
   Bool_t isInTrkCut(true);
   if (doPrimaryCut && !isPrimary)      isInTrkCut = false;
   if (doMVtxCut    && !isInMVtxCut)    isInTrkCut = false;
+  if (doTpcCut     && !isInTpcCut)     isInTrkCut = false;
   if (doVzCut      && !isInVzCut)      isInTrkCut = false;
   if (doDcaXyCut   && !isInDcaXyCut)   isInTrkCut = false;
   if (doDcaZCut    && !isInDcaZCut)    isInTrkCut = false;
   if (doQualityCut && !isInQualityCut) isInTrkCut = false;
   return isInTrkCut;
 
-}  // end 'ApplyCuts(Bool_t, UInt_t, Double_t, Double_t, Double_t, Double_t)'
+}  // end 'ApplyCuts(Bool_t, UInt_t, UInt_t, Double_t, Double_t, Double_t, Double_t)'
 
 
 

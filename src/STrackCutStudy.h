@@ -101,8 +101,8 @@ class STrackCutStudy {
     void SetInputOutputFiles(const TString sEmbedOnlyInput, const TString sPileupInput, const TString sOutput);
     void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple, const TString sEmbedOnlyClusterTuple="");
     void SetStudyParameters(const Bool_t intNorm, const Bool_t avgClustCalc, const Double_t weirdFracMin, const Double_t weirdFracMax);
-    void SetCutFlags(const Bool_t doPrimary, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality);
-    void SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange);
+    void SetCutFlags(const Bool_t doPrimary, const Bool_t doTpc, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality);
+    void SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<UInt_t, UInt_t> nTpcRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange);
     void SetPlotText(const Ssiz_t nTxtE, const Ssiz_t nTxtP, const TString sTxtE[], const TString sTxtP[]);
     void Init();
     void Analyze();
@@ -167,11 +167,13 @@ class STrackCutStudy {
     // track cuts
     Bool_t doPrimaryCut;
     Bool_t doMVtxCut;
+    Bool_t doTpcCut;
     Bool_t doVzCut;
     Bool_t doDcaXyCut;
     Bool_t doDcaZCut;
     Bool_t doQualityCut;
-    pair<Double_t, Double_t> nMVtxCut;
+    pair<UInt_t,   UInt_t>   nMVtxCut;
+    pair<UInt_t,   UInt_t>   nTpcCut;
     pair<Double_t, Double_t> vzCut;
     pair<Double_t, Double_t> dcaXyCut;
     pair<Double_t, Double_t> dcaZCut;
@@ -381,7 +383,7 @@ class STrackCutStudy {
     void SaveHists();
 
     // analysis methods [*.ana.h]
-    Bool_t ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, const Double_t trkVz, const Double_t trkDcaXY, const Double_t trkDcaZ, const Double_t trkQuality);
+    Bool_t ApplyCuts(const Bool_t isPrimary, const UInt_t trkNMVtx, const UInt_t trkNTpc, const Double_t trkVz, const Double_t trkDcaXY, const Double_t trkDcaZ, const Double_t trkQuality);
     Bool_t DoClusterCalculation();
 
     // histogram methods [*.hist.h]

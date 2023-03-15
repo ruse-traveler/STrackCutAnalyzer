@@ -307,7 +307,7 @@ void STrackCutStudy::Analyze() {
     }
 
     // apply cuts
-    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) nlmaps, vz, umDcaXY, umDcaZ, quality);
+    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) nlmaps, (UInt_t) ntpc, vz, umDcaXY, umDcaZ, quality);
     if (!isGoodTrk) continue;
 
     // fill cut track histograms
@@ -412,7 +412,7 @@ void STrackCutStudy::Analyze() {
 
     // apply cuts
     const Bool_t isPrimary = (pu_gprimary == 1);
-    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) pu_nlmaps, pu_vz, umDcaXY, umDcaZ, pu_quality);
+    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) pu_nlmaps, (UInt_t) pu_ntpc, pu_vz, umDcaXY, umDcaZ, pu_quality);
     if (!isGoodTrk) continue;
 
     // fill histograms

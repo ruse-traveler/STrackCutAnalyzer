@@ -35,7 +35,7 @@ void DoTrackCutStudy() {
   gErrorIgnoreLevel = kWarning;
 
   // i/o parameters
-  const TString sOutFile("trackCutStudy.applyCuts_mvtx2vz5dxy20dz20qual10prim.pt020n5pim.d15m3y2023.root");
+  const TString sOutFile("trackCutStudy.applyCuts_mvtx2tpc20vz10dxy20dz20qual10prim.pt020n5pim.d15m3y2023.root");
   const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_forTrackCutStudy_embedOnly0t1099_g4svtxeval.pt020n5pim.d12m1y2023.root");
   const TString sInFilePU("input/test/sPhenixG4_testWithPileup001_g4svtxEval.d18m12y2022.root");
   const TString sInTupleEO("ntp_track");
@@ -51,6 +51,7 @@ void DoTrackCutStudy() {
   // cut flags
   const Bool_t doPrimaryCut = true;
   const Bool_t doMVtxCut    = true;
+  const Bool_t doTpcCut     = true;
   const Bool_t doVzCut      = true;
   const Bool_t doDcaXyCut   = true;
   const Bool_t doDcaZcut    = true;
@@ -58,7 +59,8 @@ void DoTrackCutStudy() {
 
   // track cuts
   const pair<UInt_t,   UInt_t>   nMVtxRange   = {2,    100};
-  const pair<Double_t, Double_t> vzRange      = {-5.,  5.};
+  const pair<UInt_t,   UInt_t>   nTpcRange    = {20,   100};
+  const pair<Double_t, Double_t> vzRange      = {-10.,  10.};
   const pair<Double_t, Double_t> dcaXyRange   = {-20., 20.};
   const pair<Double_t, Double_t> dcaZrange    = {-20., 20.};
   const pair<Double_t, Double_t> qualityRange = {0.,   10.};
@@ -72,8 +74,8 @@ void DoTrackCutStudy() {
   study -> SetInputOutputFiles(sInFileEO, sInFilePU, sOutFile);
   study -> SetInputTuples(sInTupleEO, sInTuplePU);
   study -> SetStudyParameters(doIntNorm, doAvgClusterCalc, normalPtFracMin, normalPtFracMax);
-  study -> SetCutFlags(doPrimaryCut, doMVtxCut, doVzCut, doDcaXyCut, doDcaZcut, doQualityCut);
-  study -> SetTrackCuts(nMVtxRange, vzRange, dcaXyRange, dcaZrange, qualityRange);
+  study -> SetCutFlags(doPrimaryCut, doMVtxCut, doTpcCut, doVzCut, doDcaXyCut, doDcaZcut, doQualityCut);
+  study -> SetTrackCuts(nMVtxRange, nTpcRange, vzRange, dcaXyRange, dcaZrange, qualityRange);
   study -> SetPlotText(NTxt, NTxt, sTxtEO, sTxtPU);
   study -> Init();
   study -> Analyze();

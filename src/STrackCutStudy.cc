@@ -76,6 +76,30 @@ STrackCutStudy::STrackCutStudy() {
   isPileup[TYPE::WEIRD_TPC_CUT] = false;
   isPileup[TYPE::NORM_CUT]      = false;
 
+  // set whether or not track variable has a truth value
+  trkVarHasTruVal[TRKVAR::VX]       = true;
+  trkVarHasTruVal[TRKVAR::VY]       = true;
+  trkVarHasTruVal[TRKVAR::VZ]       = true;
+  trkVarHasTruVal[TRKVAR::NMMS]     = true;
+  trkVarHasTruVal[TRKVAR::NMAP]     = true;
+  trkVarHasTruVal[TRKVAR::NINT]     = true;
+  trkVarHasTruVal[TRKVAR::NTPC]     = true;
+  trkVarHasTruVal[TRKVAR::QUAL]     = false;
+  trkVarHasTruVal[TRKVAR::DCAXY]    = false;
+  trkVarHasTruVal[TRKVAR::DCAZ]     = false;
+  trkVarHasTruVal[TRKVAR::DELDCAXY] = false;
+  trkVarHasTruVal[TRKVAR::DELDCAZ]  = false;
+  trkVarHasTruVal[TRKVAR::NCLUST]   = true;
+  trkVarHasTruVal[TRKVAR::AVGCLUST] = true;
+
+  // set whether or not physics variable has a truth value
+  physVarHasTruVal[PHYSVAR::PHI]    = true;
+  physVarHasTruVal[PHYSVAR::ETA]    = true;
+  physVarHasTruVal[PHYSVAR::PT]     = true;
+  physVarHasTruVal[PHYSVAR::DELPHI] = false;
+  physVarHasTruVal[PHYSVAR::DELETA] = false;
+  physVarHasTruVal[PHYSVAR::DELPT]  = false;
+
   // set type colors
   fTypeCol[TYPE::TRACK]         = 923;
   fTypeCol[TYPE::TRUTH]         = 899;

@@ -127,6 +127,8 @@ class STrackCutStudy {
     // track type/variable names/styles/labels [set in ctor, *.cc]
     Bool_t  isTruth[NType];
     Bool_t  isPileup[NType];
+    Bool_t  trkVarHasTruVal[NTrkVar];
+    Bool_t  physVarHasTruVal[NPhysVar];
     UInt_t  fTypeCol[NType];
     UInt_t  fTypeMar[NType];
     TString sTrkNames[NType];

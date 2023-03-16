@@ -301,6 +301,7 @@ void STrackCutStudy::SetHistStyles() {
   // plot parameters
   const UInt_t  fFil(0);
   const UInt_t  fLin(1);
+  const UInt_t  fMar2D(1);
   const Float_t fOffX(1.0);
   const Float_t fOffY(1.2); 
   const Float_t fOffZ(1.0);
@@ -436,7 +437,7 @@ void STrackCutStudy::SetHistStyles() {
       hTrkVarFrac[iType][iTrkVar]     -> GetYaxis() -> SetTitleFont(FTxt);
       hTrkVarFrac[iType][iTrkVar]     -> GetYaxis() -> SetTitleOffset(fOffY);
       hTrkVarVsNTpc[iType][iTrkVar]   -> SetMarkerColor(fTypeCol[iType]);
-      hTrkVarVsNTpc[iType][iTrkVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsNTpc[iType][iTrkVar]   -> SetMarkerStyle(fMar2D);
       hTrkVarVsNTpc[iType][iTrkVar]   -> SetLineColor(fTypeCol[iType]);
       hTrkVarVsNTpc[iType][iTrkVar]   -> SetLineStyle(fLin);
       hTrkVarVsNTpc[iType][iTrkVar]   -> SetFillColor(fTypeCol[iType]);
@@ -452,7 +453,7 @@ void STrackCutStudy::SetHistStyles() {
       hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitleFont(FTxt);
       hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
       hTrkVarVsDcaXY[iType][iTrkVar]  -> SetMarkerColor(fTypeCol[iType]);
-      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetMarkerStyle(fMar2D);
       hTrkVarVsDcaXY[iType][iTrkVar]  -> SetLineColor(fTypeCol[iType]);
       hTrkVarVsDcaXY[iType][iTrkVar]  -> SetLineStyle(fLin);
       hTrkVarVsDcaXY[iType][iTrkVar]  -> SetFillColor(fTypeCol[iType]);
@@ -468,7 +469,7 @@ void STrackCutStudy::SetHistStyles() {
       hTrkVarVsDcaXY[iType][iTrkVar]  -> GetZaxis() -> SetTitleFont(FTxt);
       hTrkVarVsDcaXY[iType][iTrkVar]  -> GetZaxis() -> SetTitleOffset(fOffZ);
       hTrkVarVsDcaZ[iType][iTrkVar]   -> SetMarkerColor(fTypeCol[iType]);
-      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetMarkerStyle(fMar2D);
       hTrkVarVsDcaZ[iType][iTrkVar]   -> SetLineColor(fTypeCol[iType]);
       hTrkVarVsDcaZ[iType][iTrkVar]   -> SetLineStyle(fLin);
       hTrkVarVsDcaZ[iType][iTrkVar]   -> SetFillColor(fTypeCol[iType]);
@@ -484,7 +485,7 @@ void STrackCutStudy::SetHistStyles() {
       hTrkVarVsDcaZ[iType][iTrkVar]   -> GetZaxis() -> SetTitleFont(FTxt);
       hTrkVarVsDcaZ[iType][iTrkVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
       hTrkVarVsPtReco[iType][iTrkVar] -> SetMarkerColor(fTypeCol[iType]);
-      hTrkVarVsPtReco[iType][iTrkVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsPtReco[iType][iTrkVar] -> SetMarkerStyle(fMar2D);
       hTrkVarVsPtReco[iType][iTrkVar] -> SetLineColor(fTypeCol[iType]);
       hTrkVarVsPtReco[iType][iTrkVar] -> SetLineStyle(fLin);
       hTrkVarVsPtReco[iType][iTrkVar] -> SetFillColor(fTypeCol[iType]);
@@ -500,7 +501,7 @@ void STrackCutStudy::SetHistStyles() {
       hTrkVarVsPtReco[iType][iTrkVar] -> GetZaxis() -> SetTitleFont(FTxt);
       hTrkVarVsPtReco[iType][iTrkVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
       hTrkVarVsPtTrue[iType][iTrkVar] -> SetMarkerColor(fTypeCol[iType]);
-      hTrkVarVsPtTrue[iType][iTrkVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsPtTrue[iType][iTrkVar] -> SetMarkerStyle(fMar2D);
       hTrkVarVsPtTrue[iType][iTrkVar] -> SetLineColor(fTypeCol[iType]);
       hTrkVarVsPtTrue[iType][iTrkVar] -> SetLineStyle(fLin);
       hTrkVarVsPtTrue[iType][iTrkVar] -> SetFillColor(fTypeCol[iType]);
@@ -516,7 +517,7 @@ void STrackCutStudy::SetHistStyles() {
       hTrkVarVsPtTrue[iType][iTrkVar] -> GetZaxis() -> SetTitleFont(FTxt);
       hTrkVarVsPtTrue[iType][iTrkVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
       hTrkVarVsPtFrac[iType][iTrkVar] -> SetMarkerColor(fTypeCol[iType]);
-      hTrkVarVsPtFrac[iType][iTrkVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsPtFrac[iType][iTrkVar] -> SetMarkerStyle(fMar2D);
       hTrkVarVsPtFrac[iType][iTrkVar] -> SetLineColor(fTypeCol[iType]);
       hTrkVarVsPtFrac[iType][iTrkVar] -> SetLineStyle(fLin);
       hTrkVarVsPtFrac[iType][iTrkVar] -> SetFillColor(fTypeCol[iType]);
@@ -573,7 +574,7 @@ void STrackCutStudy::SetHistStyles() {
       hPhysVarFrac[iType][iPhysVar]     -> GetYaxis() -> SetTitleFont(FTxt);
       hPhysVarFrac[iType][iPhysVar]     -> GetYaxis() -> SetTitleOffset(fOffY);
       hPhysVarVsNTpc[iType][iPhysVar]   -> SetMarkerColor(fTypeCol[iType]);
-      hPhysVarVsNTpc[iType][iPhysVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsNTpc[iType][iPhysVar]   -> SetMarkerStyle(fMar2D);
       hPhysVarVsNTpc[iType][iPhysVar]   -> SetLineColor(fTypeCol[iType]);
       hPhysVarVsNTpc[iType][iPhysVar]   -> SetLineStyle(fLin);
       hPhysVarVsNTpc[iType][iPhysVar]   -> SetFillColor(fTypeCol[iType]);
@@ -589,7 +590,7 @@ void STrackCutStudy::SetHistStyles() {
       hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitleFont(FTxt);
       hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
       hPhysVarVsDcaXY[iType][iPhysVar]  -> SetMarkerColor(fTypeCol[iType]);
-      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetMarkerStyle(fMar2D);
       hPhysVarVsDcaXY[iType][iPhysVar]  -> SetLineColor(fTypeCol[iType]);
       hPhysVarVsDcaXY[iType][iPhysVar]  -> SetLineStyle(fLin);
       hPhysVarVsDcaXY[iType][iPhysVar]  -> SetFillColor(fTypeCol[iType]);
@@ -605,7 +606,7 @@ void STrackCutStudy::SetHistStyles() {
       hPhysVarVsDcaXY[iType][iPhysVar]  -> GetZaxis() -> SetTitleFont(FTxt);
       hPhysVarVsDcaXY[iType][iPhysVar]  -> GetZaxis() -> SetTitleOffset(fOffZ);
       hPhysVarVsDcaZ[iType][iPhysVar]   -> SetMarkerColor(fTypeCol[iType]);
-      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetMarkerStyle(fMar2D);
       hPhysVarVsDcaZ[iType][iPhysVar]   -> SetLineColor(fTypeCol[iType]);
       hPhysVarVsDcaZ[iType][iPhysVar]   -> SetLineStyle(fLin);
       hPhysVarVsDcaZ[iType][iPhysVar]   -> SetFillColor(fTypeCol[iType]);
@@ -621,7 +622,7 @@ void STrackCutStudy::SetHistStyles() {
       hPhysVarVsDcaZ[iType][iPhysVar]   -> GetZaxis() -> SetTitleFont(FTxt);
       hPhysVarVsDcaZ[iType][iPhysVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
       hPhysVarVsPtReco[iType][iPhysVar] -> SetMarkerColor(fTypeCol[iType]);
-      hPhysVarVsPtReco[iType][iPhysVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsPtReco[iType][iPhysVar] -> SetMarkerStyle(fMar2D);
       hPhysVarVsPtReco[iType][iPhysVar] -> SetLineColor(fTypeCol[iType]);
       hPhysVarVsPtReco[iType][iPhysVar] -> SetLineStyle(fLin);
       hPhysVarVsPtReco[iType][iPhysVar] -> SetFillColor(fTypeCol[iType]);
@@ -637,7 +638,7 @@ void STrackCutStudy::SetHistStyles() {
       hPhysVarVsPtReco[iType][iPhysVar] -> GetZaxis() -> SetTitleFont(FTxt);
       hPhysVarVsPtReco[iType][iPhysVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
       hPhysVarVsPtTrue[iType][iPhysVar] -> SetMarkerColor(fTypeCol[iType]);
-      hPhysVarVsPtTrue[iType][iPhysVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsPtTrue[iType][iPhysVar] -> SetMarkerStyle(fMar2D);
       hPhysVarVsPtTrue[iType][iPhysVar] -> SetLineColor(fTypeCol[iType]);
       hPhysVarVsPtTrue[iType][iPhysVar] -> SetLineStyle(fLin);
       hPhysVarVsPtTrue[iType][iPhysVar] -> SetFillColor(fTypeCol[iType]);
@@ -653,7 +654,7 @@ void STrackCutStudy::SetHistStyles() {
       hPhysVarVsPtTrue[iType][iPhysVar] -> GetZaxis() -> SetTitleFont(FTxt);
       hPhysVarVsPtTrue[iType][iPhysVar] -> GetZaxis() -> SetTitleOffset(fOffZ);
       hPhysVarVsPtFrac[iType][iPhysVar] -> SetMarkerColor(fTypeCol[iType]);
-      hPhysVarVsPtFrac[iType][iPhysVar] -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsPtFrac[iType][iPhysVar] -> SetMarkerStyle(fMar2D);
       hPhysVarVsPtFrac[iType][iPhysVar] -> SetLineColor(fTypeCol[iType]);
       hPhysVarVsPtFrac[iType][iPhysVar] -> SetLineStyle(fLin);
       hPhysVarVsPtFrac[iType][iPhysVar] -> SetFillColor(fTypeCol[iType]);
@@ -755,14 +756,11 @@ void STrackCutStudy::FillTruthHistograms(const Int_t type, const Double_t recoTr
   // fill track variable hists
   for (size_t iTrkVar = 0; iTrkVar < NTrkVar; iTrkVar++) {
 
-    // calculate difference and fraction
-    const auto trkVarDiff = recoTrkVars[iTrkVar] - trueTrkVars[iTrkVar];
-    const auto trkVarFrac = recoTrkVars[iTrkVar] / trueTrkVars[iTrkVar];
+    // make sure variable has truth value
+    if (!trkVarHasTruVal[iTrkVar]) continue;
 
     // fill hists
     hTrkVar[type][iTrkVar]         -> Fill(trueTrkVars[iTrkVar]);
-    hTrkVarDiff[type][iTrkVar]     -> Fill(trkVarDiff);
-    hTrkVarFrac[type][iTrkVar]     -> Fill(trkVarFrac);
     hTrkVarVsNTpc[type][iTrkVar]   -> Fill(nTpc,   trueTrkVars[iTrkVar]);
     hTrkVarVsDcaXY[type][iTrkVar]  -> Fill(dcaXY,  trueTrkVars[iTrkVar]);
     hTrkVarVsDcaZ[type][iTrkVar]   -> Fill(dcaZ,   trueTrkVars[iTrkVar]);
@@ -774,14 +772,11 @@ void STrackCutStudy::FillTruthHistograms(const Int_t type, const Double_t recoTr
   // fill track variable hists
   for (size_t iPhysVar = 0; iPhysVar < NPhysVar; iPhysVar++) {
 
-    // calculate difference and fraction
-    const auto trkVarDiff = recoPhysVars[iPhysVar] - truePhysVars[iPhysVar];
-    const auto trkVarFrac = recoPhysVars[iPhysVar] / truePhysVars[iPhysVar];
+    // make sure variable has truth value
+    if (!physVarHasTruVal[iPhysVar]) continue;
 
     // fill hists
     hPhysVar[type][iPhysVar]         -> Fill(truePhysVars[iPhysVar]);
-    hPhysVarDiff[type][iPhysVar]     -> Fill(trkVarDiff);
-    hPhysVarFrac[type][iPhysVar]     -> Fill(trkVarFrac);
     hPhysVarVsNTpc[type][iPhysVar]   -> Fill(nTpc,   truePhysVars[iPhysVar]);
     hPhysVarVsDcaXY[type][iPhysVar]  -> Fill(dcaXY,  truePhysVars[iPhysVar]);
     hPhysVarVsDcaZ[type][iPhysVar]   -> Fill(dcaZ,   truePhysVars[iPhysVar]);

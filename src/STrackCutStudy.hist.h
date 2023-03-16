@@ -52,6 +52,8 @@ void STrackCutStudy::InitHists() {
   TString sTrkVarDiff[NType][NTrkVar];
   TString sTrkVarFrac[NType][NTrkVar];
   TString sTrkVarVsNTpc[NType][NTrkVar];
+  TString sTrkVarVsDcaXY[NType][NTrkVar];
+  TString sTrkVarVsDcaZ[NType][NTrkVar];
   TString sTrkVarVsPtReco[NType][NTrkVar];
   TString sTrkVarVsPtTrue[NType][NTrkVar];
   TString sTrkVarVsPtFrac[NType][NTrkVar];
@@ -61,6 +63,8 @@ void STrackCutStudy::InitHists() {
   TString sPhysVarDiff[NType][NPhysVar];
   TString sPhysVarFrac[NType][NPhysVar];
   TString sPhysVarVsNTpc[NType][NPhysVar];
+  TString sPhysVarVsDcaXY[NType][NPhysVar];
+  TString sPhysVarVsDcaZ[NType][NPhysVar];
   TString sPhysVarVsPtReco[NType][NPhysVar];
   TString sPhysVarVsPtTrue[NType][NPhysVar];
   TString sPhysVarVsPtFrac[NType][NPhysVar];
@@ -69,6 +73,8 @@ void STrackCutStudy::InitHists() {
   const TString sDiffSuffix("Diff");
   const TString sFracSuffix("Frac");
   const TString sVsNTpcSuffix("VsNTpc");
+  const TString sVsDcaXySuffix("VsDcaXY");
+  const TString sVsDcaZSuffix("VsDcaZ");
   const TString sVsPtRecoSuffix("VsPtReco");
   const TString sVsPtTrueSuffix("VsPtTrue");
   const TString sVsPtFracSuffix("VsPtFrac");
@@ -98,12 +104,16 @@ void STrackCutStudy::InitHists() {
       sTrkVarDiff[iType][iTrkVar]     = sTrkVarName[iTrkVar].Data();
       sTrkVarFrac[iType][iTrkVar]     = sTrkVarName[iTrkVar].Data();
       sTrkVarVsNTpc[iType][iTrkVar]   = sTrkVarName[iTrkVar].Data();
+      sTrkVarVsDcaXY[iType][iTrkVar]  = sTrkVarName[iTrkVar].Data();
+      sTrkVarVsDcaZ[iType][iTrkVar]   = sTrkVarName[iTrkVar].Data();
       sTrkVarVsPtReco[iType][iTrkVar] = sTrkVarName[iTrkVar].Data();
       sTrkVarVsPtTrue[iType][iTrkVar] = sTrkVarName[iTrkVar].Data();
       sTrkVarVsPtFrac[iType][iTrkVar] = sTrkVarName[iTrkVar].Data();
       sTrkVarDiff[iType][iTrkVar].Append(sDiffSuffix.Data());
       sTrkVarFrac[iType][iTrkVar].Append(sFracSuffix.Data());
       sTrkVarVsNTpc[iType][iTrkVar].Append(sVsNTpcSuffix.Data());
+      sTrkVarVsDcaXY[iType][iTrkVar].Append(sVsDcaXySuffix.Data());
+      sTrkVarVsDcaZ[iType][iTrkVar].Append(sVsDcaZSuffix.Data());
       sTrkVarVsPtReco[iType][iTrkVar].Append(sVsPtRecoSuffix.Data());
       sTrkVarVsPtTrue[iType][iTrkVar].Append(sVsPtTrueSuffix.Data());
       sTrkVarVsPtFrac[iType][iTrkVar].Append(sVsPtFracSuffix.Data());
@@ -111,6 +121,8 @@ void STrackCutStudy::InitHists() {
       sTrkVarDiff[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
       sTrkVarFrac[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
       sTrkVarVsNTpc[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
+      sTrkVarVsDcaXY[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
+      sTrkVarVsDcaZ[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
       sTrkVarVsPtReco[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
       sTrkVarVsPtTrue[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
       sTrkVarVsPtFrac[iType][iTrkVar].Append(sTypeSuffix[iType].Data());
@@ -120,12 +132,16 @@ void STrackCutStudy::InitHists() {
       sPhysVarDiff[iType][iPhysVar]     = sPhysVarName[iPhysVar].Data();
       sPhysVarFrac[iType][iPhysVar]     = sPhysVarName[iPhysVar].Data();
       sPhysVarVsNTpc[iType][iPhysVar]   = sPhysVarName[iPhysVar].Data();
+      sPhysVarVsDcaXY[iType][iPhysVar]  = sPhysVarName[iPhysVar].Data();
+      sPhysVarVsDcaZ[iType][iPhysVar]   = sPhysVarName[iPhysVar].Data();
       sPhysVarVsPtReco[iType][iPhysVar] = sPhysVarName[iPhysVar].Data();
       sPhysVarVsPtTrue[iType][iPhysVar] = sPhysVarName[iPhysVar].Data();
       sPhysVarVsPtFrac[iType][iPhysVar] = sPhysVarName[iPhysVar].Data();
       sPhysVarDiff[iType][iPhysVar].Append(sDiffSuffix.Data());
       sPhysVarFrac[iType][iPhysVar].Append(sFracSuffix.Data());
       sPhysVarVsNTpc[iType][iPhysVar].Append(sVsNTpcSuffix.Data());
+      sPhysVarVsDcaXY[iType][iPhysVar].Append(sVsDcaXySuffix.Data());
+      sPhysVarVsDcaZ[iType][iPhysVar].Append(sVsDcaZSuffix.Data());
       sPhysVarVsPtReco[iType][iPhysVar].Append(sVsPtRecoSuffix.Data());
       sPhysVarVsPtTrue[iType][iPhysVar].Append(sVsPtTrueSuffix.Data());
       sPhysVarVsPtFrac[iType][iPhysVar].Append(sVsPtFracSuffix.Data());
@@ -133,6 +149,8 @@ void STrackCutStudy::InitHists() {
       sPhysVarDiff[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
       sPhysVarFrac[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
       sPhysVarVsNTpc[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
+      sPhysVarVsDcaXY[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
+      sPhysVarVsDcaZ[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
       sPhysVarVsPtReco[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
       sPhysVarVsPtTrue[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
       sPhysVarVsPtFrac[iType][iPhysVar].Append(sTypeSuffix[iType].Data());
@@ -184,6 +202,8 @@ void STrackCutStudy::InitHists() {
       hTrkVarDiff[iType][iTrkVar]     = new TH1D(sTrkVarDiff[iType][iTrkVar].Data(),     "", nTrkDiffBins[iTrkVar], rTrkDiffBins[iTrkVar][0], rTrkDiffBins[iTrkVar][1]);
       hTrkVarFrac[iType][iTrkVar]     = new TH1D(sTrkVarFrac[iType][iTrkVar].Data(),     "", nTrkFracBins[iTrkVar], rTrkFracBins[iTrkVar][0], rTrkFracBins[iTrkVar][1]);
       hTrkVarVsNTpc[iType][iTrkVar]   = new TH2D(sTrkVarVsNTpc[iType][iTrkVar].Data(),   "", nNHitBins,             rNHitBins[0],             rNHitBins[1],   nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
+      hTrkVarVsDcaXY[iType][iTrkVar]  = new TH2D(sTrkVarVsDcaXY[iType][iTrkVar].Data(),  "", nDcaBins,              rDcaBins[0],              rDcaBins[1],    nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
+      hTrkVarVsDcaZ[iType][iTrkVar]   = new TH2D(sTrkVarVsDcaZ[iType][iTrkVar].Data(),   "", nDcaBins,              rDcaBins[0],              rDcaBins[1],    nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
       hTrkVarVsPtReco[iType][iTrkVar] = new TH2D(sTrkVarVsPtReco[iType][iTrkVar].Data(), "", nPtBins,               rPtBins[0],               rPtBins[1],     nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
       hTrkVarVsPtTrue[iType][iTrkVar] = new TH2D(sTrkVarVsPtTrue[iType][iTrkVar].Data(), "", nPtBins,               rPtBins[0],               rPtBins[1],     nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
       hTrkVarVsPtFrac[iType][iTrkVar] = new TH2D(sTrkVarVsPtFrac[iType][iTrkVar].Data(), "", nPtFracBins,           rPtFracBins[0],           rPtFracBins[1], nTrkBins[iTrkVar], rTrkBins[iTrkVar][0], rTrkBins[iTrkVar][1]);
@@ -191,6 +211,8 @@ void STrackCutStudy::InitHists() {
       hTrkVarDiff[iType][iTrkVar]     -> Sumw2();
       hTrkVarFrac[iType][iTrkVar]     -> Sumw2();
       hTrkVarVsNTpc[iType][iTrkVar]   -> Sumw2();
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> Sumw2();
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> Sumw2();
       hTrkVarVsPtReco[iType][iTrkVar] -> Sumw2();
       hTrkVarVsPtTrue[iType][iTrkVar] -> Sumw2();
       hTrkVarVsPtFrac[iType][iTrkVar] -> Sumw2();
@@ -200,6 +222,8 @@ void STrackCutStudy::InitHists() {
       hPhysVarDiff[iType][iPhysVar]     = new TH1D(sPhysVarDiff[iType][iPhysVar].Data(),     "", nPhysDiffBins[iPhysVar], rPhysDiffBins[iPhysVar][0], rPhysDiffBins[iPhysVar][1]);
       hPhysVarFrac[iType][iPhysVar]     = new TH1D(sPhysVarFrac[iType][iPhysVar].Data(),     "", nPhysFracBins[iPhysVar], rPhysFracBins[iPhysVar][0], rPhysFracBins[iPhysVar][1]);
       hPhysVarVsNTpc[iType][iPhysVar]   = new TH2D(sPhysVarVsNTpc[iType][iPhysVar].Data(),   "", nNHitBins,               rNHitBins[0],               rNHitBins[1],   nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
+      hPhysVarVsDcaXY[iType][iPhysVar]  = new TH2D(sPhysVarVsDcaXY[iType][iPhysVar].Data(),  "", nDcaBins,                rDcaBins[0],                rDcaBins[1],    nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
+      hPhysVarVsDcaZ[iType][iPhysVar]   = new TH2D(sPhysVarVsDcaZ[iType][iPhysVar].Data(),   "", nDcaBins,                rDcaBins[0],                rDcaBins[1],    nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
       hPhysVarVsPtReco[iType][iPhysVar] = new TH2D(sPhysVarVsPtReco[iType][iPhysVar].Data(), "", nPtBins,                 rPtBins[0],                 rPtBins[1],     nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
       hPhysVarVsPtTrue[iType][iPhysVar] = new TH2D(sPhysVarVsPtTrue[iType][iPhysVar].Data(), "", nPtBins,                 rPtBins[0],                 rPtBins[1],     nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
       hPhysVarVsPtFrac[iType][iPhysVar] = new TH2D(sPhysVarVsPtFrac[iType][iPhysVar].Data(), "", nPtFracBins,             rPtFracBins[0],             rPtFracBins[1], nPhysBins[iPhysVar], rPhysBins[iPhysVar][0], rPhysBins[iPhysVar][1]);
@@ -207,6 +231,8 @@ void STrackCutStudy::InitHists() {
       hPhysVarDiff[iType][iPhysVar]     -> Sumw2();
       hPhysVarFrac[iType][iPhysVar]     -> Sumw2();
       hPhysVarVsNTpc[iType][iPhysVar]   -> Sumw2();
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> Sumw2();
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> Sumw2();
       hPhysVarVsPtReco[iType][iPhysVar] -> Sumw2();
       hPhysVarVsPtTrue[iType][iPhysVar] -> Sumw2();
       hPhysVarVsPtFrac[iType][iPhysVar] -> Sumw2();
@@ -227,6 +253,8 @@ void STrackCutStudy::NormalizeHists() {
       const Double_t intTrkVarDiff     = hTrkVarDiff[iType][iTrkVar]     -> Integral();
       const Double_t intTrkVarFrac     = hTrkVarFrac[iType][iTrkVar]     -> Integral();
       const Double_t intTrkVarVsNTpc   = hTrkVarVsNTpc[iType][iTrkVar]   -> Integral();
+      const Double_t intTrkVarVsDcaXY  = hTrkVarVsDcaXY[iType][iTrkVar]  -> Integral();
+      const Double_t intTrkVarVsDcaZ   = hTrkVarVsDcaZ[iType][iTrkVar]   -> Integral();
       const Double_t intTrkVarVsPtReco = hTrkVarVsPtReco[iType][iTrkVar] -> Integral();
       const Double_t intTrkVarVsPtTrue = hTrkVarVsPtTrue[iType][iTrkVar] -> Integral();
       const Double_t intTrkVarVsPtFrac = hTrkVarVsPtFrac[iType][iTrkVar] -> Integral();
@@ -234,6 +262,8 @@ void STrackCutStudy::NormalizeHists() {
       if (intTrkVarDiff     > 0.) hTrkVarDiff[iType][iTrkVar]     -> Scale(1. / intTrkVarDiff);
       if (intTrkVarFrac     > 0.) hTrkVarFrac[iType][iTrkVar]     -> Scale(1. / intTrkVarFrac);
       if (intTrkVarVsNTpc   > 0.) hTrkVarVsNTpc[iType][iTrkVar]   -> Scale(1. / intTrkVarVsNTpc);
+      if (intTrkVarVsDcaXY  > 0.) hTrkVarVsDcaXY[iType][iTrkVar]  -> Scale(1. / intTrkVarVsDcaXY);
+      if (intTrkVarVsDcaZ   > 0.) hTrkVarVsDcaZ[iType][iTrkVar]   -> Scale(1. / intTrkVarVsDcaZ);
       if (intTrkVarVsPtReco > 0.) hTrkVarVsPtReco[iType][iTrkVar] -> Scale(1. / intTrkVarVsPtReco);
       if (intTrkVarVsPtTrue > 0.) hTrkVarVsPtTrue[iType][iTrkVar] -> Scale(1. / intTrkVarVsPtTrue);
       if (intTrkVarVsPtFrac > 0.) hTrkVarVsPtFrac[iType][iTrkVar] -> Scale(1. / intTrkVarVsPtFrac);
@@ -243,6 +273,8 @@ void STrackCutStudy::NormalizeHists() {
       const Double_t intPhysVarDiff     = hPhysVarDiff[iType][iPhysVar]     -> Integral();
       const Double_t intPhysVarFrac     = hPhysVarFrac[iType][iPhysVar]     -> Integral();
       const Double_t intPhysVarVsNTpc   = hPhysVarVsNTpc[iType][iPhysVar]   -> Integral();
+      const Double_t intPhysVarVsDcaXY  = hPhysVarVsDcaXY[iType][iPhysVar]  -> Integral();
+      const Double_t intPhysVarVsDcaZ   = hPhysVarVsDcaZ[iType][iPhysVar]   -> Integral();
       const Double_t intPhysVarVsPtReco = hPhysVarVsPtReco[iType][iPhysVar] -> Integral();
       const Double_t intPhysVarVsPtTrue = hPhysVarVsPtTrue[iType][iPhysVar] -> Integral();
       const Double_t intPhysVarVsPtFrac = hPhysVarVsPtFrac[iType][iPhysVar] -> Integral();
@@ -250,6 +282,8 @@ void STrackCutStudy::NormalizeHists() {
       if (intPhysVarDiff     > 0.) hPhysVarDiff[iType][iPhysVar]     -> Scale(1. / intPhysVarDiff);
       if (intPhysVarFrac     > 0.) hPhysVarFrac[iType][iPhysVar]     -> Scale(1. / intPhysVarFrac);
       if (intPhysVarVsNTpc   > 0.) hPhysVarVsNTpc[iType][iPhysVar]   -> Scale(1. / intPhysVarVsNTpc);
+      if (intPhysVarVsDcaXY  > 0.) hPhysVarVsDcaXY[iType][iPhysVar]  -> Scale(1. / intPhysVarVsDcaXY);
+      if (intPhysVarVsDcaZ   > 0.) hPhysVarVsDcaZ[iType][iPhysVar]   -> Scale(1. / intPhysVarVsDcaZ);
       if (intPhysVarVsPtReco > 0.) hPhysVarVsPtReco[iType][iPhysVar] -> Scale(1. / intPhysVarVsPtReco);
       if (intPhysVarVsPtTrue > 0.) hPhysVarVsPtTrue[iType][iPhysVar] -> Scale(1. / intPhysVarVsPtTrue);
       if (intPhysVarVsPtFrac > 0.) hPhysVarVsPtFrac[iType][iPhysVar] -> Scale(1. / intPhysVarVsPtFrac);
@@ -417,6 +451,38 @@ void STrackCutStudy::SetHistStyles() {
       hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitle(sCountToUse.Data());
       hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitleFont(FTxt);
       hTrkVarVsNTpc[iType][iTrkVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetLineColor(fTypeCol[iType]);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetLineStyle(fLin);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetFillColor(fTypeCol[iType]);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetFillStyle(fFil);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> SetTitleFont(FTxt);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetXaxis() -> SetTitle(sTrkDCAxy.Data());
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetYaxis() -> SetTitle(sTrkTitles[iTrkVar].Data());
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetZaxis() -> SetTitle(sCountToUse.Data());
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetZaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsDcaXY[iType][iTrkVar]  -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetMarkerColor(fTypeCol[iType]);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetLineColor(fTypeCol[iType]);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetLineStyle(fLin);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetFillColor(fTypeCol[iType]);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetFillStyle(fFil);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> SetTitleFont(FTxt);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetXaxis() -> SetTitle(sTrkDCAz.Data());
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetXaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetXaxis() -> SetTitleOffset(fOffX);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetYaxis() -> SetTitle(sTrkTitles[iTrkVar].Data());
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetYaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetYaxis() -> SetTitleOffset(fOffY);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetZaxis() -> SetTitle(sCountToUse.Data());
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetZaxis() -> SetTitleFont(FTxt);
+      hTrkVarVsDcaZ[iType][iTrkVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
       hTrkVarVsPtReco[iType][iTrkVar] -> SetMarkerColor(fTypeCol[iType]);
       hTrkVarVsPtReco[iType][iTrkVar] -> SetMarkerStyle(fTypeMar[iType]);
       hTrkVarVsPtReco[iType][iTrkVar] -> SetLineColor(fTypeCol[iType]);
@@ -522,6 +588,38 @@ void STrackCutStudy::SetHistStyles() {
       hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitle(sCountToUse.Data());
       hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitleFont(FTxt);
       hPhysVarVsNTpc[iType][iPhysVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetLineColor(fTypeCol[iType]);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetLineStyle(fLin);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetFillColor(fTypeCol[iType]);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetFillStyle(fFil);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> SetTitleFont(FTxt);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetXaxis() -> SetTitle(sTrkDCAxy.Data());
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetYaxis() -> SetTitle(sPhysTitles[iPhysVar].Data());
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetZaxis() -> SetTitle(sCountToUse.Data());
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetZaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsDcaXY[iType][iPhysVar]  -> GetZaxis() -> SetTitleOffset(fOffZ);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetMarkerColor(fTypeCol[iType]);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetMarkerStyle(fTypeMar[iType]);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetLineColor(fTypeCol[iType]);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetLineStyle(fLin);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetFillColor(fTypeCol[iType]);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetFillStyle(fFil);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> SetTitleFont(FTxt);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetXaxis() -> SetTitle(sTrkDCAz.Data());
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetXaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetXaxis() -> SetTitleOffset(fOffX);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetYaxis() -> SetTitle(sPhysTitles[iPhysVar].Data());
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetYaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetYaxis() -> SetTitleOffset(fOffY);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetZaxis() -> SetTitle(sCountToUse.Data());
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetZaxis() -> SetTitleFont(FTxt);
+      hPhysVarVsDcaZ[iType][iPhysVar]   -> GetZaxis() -> SetTitleOffset(fOffZ);
       hPhysVarVsPtReco[iType][iPhysVar] -> SetMarkerColor(fTypeCol[iType]);
       hPhysVarVsPtReco[iType][iPhysVar] -> SetMarkerStyle(fTypeMar[iType]);
       hPhysVarVsPtReco[iType][iPhysVar] -> SetLineColor(fTypeCol[iType]);
@@ -581,8 +679,16 @@ void STrackCutStudy::SetHistStyles() {
 
 void STrackCutStudy::FillTrackHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]) {
 
+  // make sure you're filling a non-truth-type histogram
+  if (isTruth[type]) {
+    cerr << "PANIC: trying to fill truth histograms in non-truth style! Check what you wrote!\n" << endl;
+    assert(!isTruth[type]);
+  }
+
   // grab 2d x-axes
   const auto nTpc   = recoTrkVars[TRKVAR::NTPC];
+  const auto dcaXY  = recoTrkVars[TRKVAR::DCAXY];
+  const auto dcaZ   = recoTrkVars[TRKVAR::DCAZ];
   const auto ptRec  = recoPhysVars[PHYSVAR::PT];
   const auto ptTrue = truePhysVars[PHYSVAR::PT];
   const auto ptFrac = ptRec / ptTrue;
@@ -599,6 +705,8 @@ void STrackCutStudy::FillTrackHistograms(const Int_t type, const Double_t recoTr
     hTrkVarDiff[type][iTrkVar]     -> Fill(trkVarDiff);
     hTrkVarFrac[type][iTrkVar]     -> Fill(trkVarFrac);
     hTrkVarVsNTpc[type][iTrkVar]   -> Fill(nTpc,   recoTrkVars[iTrkVar]);
+    hTrkVarVsDcaXY[type][iTrkVar]  -> Fill(dcaXY,  recoTrkVars[iTrkVar]);
+    hTrkVarVsDcaZ[type][iTrkVar]   -> Fill(dcaZ,   recoTrkVars[iTrkVar]);
     hTrkVarVsPtReco[type][iTrkVar] -> Fill(ptRec,  recoTrkVars[iTrkVar]);
     hTrkVarVsPtTrue[type][iTrkVar] -> Fill(ptTrue, recoTrkVars[iTrkVar]);
     hTrkVarVsPtFrac[type][iTrkVar] -> Fill(ptFrac, recoTrkVars[iTrkVar]); 
@@ -616,6 +724,8 @@ void STrackCutStudy::FillTrackHistograms(const Int_t type, const Double_t recoTr
     hPhysVarDiff[type][iPhysVar]     -> Fill(trkVarDiff);
     hPhysVarFrac[type][iPhysVar]     -> Fill(trkVarFrac);
     hPhysVarVsNTpc[type][iPhysVar]   -> Fill(nTpc,   recoPhysVars[iPhysVar]);
+    hPhysVarVsDcaXY[type][iPhysVar]  -> Fill(dcaXY,  recoPhysVars[iPhysVar]);
+    hPhysVarVsDcaZ[type][iPhysVar]   -> Fill(dcaZ,   recoPhysVars[iPhysVar]);
     hPhysVarVsPtReco[type][iPhysVar] -> Fill(ptRec,  recoPhysVars[iPhysVar]);
     hPhysVarVsPtTrue[type][iPhysVar] -> Fill(ptTrue, recoPhysVars[iPhysVar]);
     hPhysVarVsPtFrac[type][iPhysVar] -> Fill(ptFrac, recoPhysVars[iPhysVar]); 
@@ -628,8 +738,16 @@ void STrackCutStudy::FillTrackHistograms(const Int_t type, const Double_t recoTr
 
 void STrackCutStudy::FillTruthHistograms(const Int_t type, const Double_t recoTrkVars[], const Double_t trueTrkVars[], const Double_t recoPhysVars[], const Double_t truePhysVars[]) {
 
+  // make sure you're filling a truth-type histogram
+  if (!isTruth[type]) {
+    cerr << "PANIC: trying to fill non-truth histograms in truth style! Check what you wrote!\n" << endl;
+    assert(isTruth[type]);
+  }
+
   // grab 2d x-axes
   const auto nTpc   = recoTrkVars[TRKVAR::NTPC];
+  const auto dcaXY  = recoTrkVars[TRKVAR::DCAXY];
+  const auto dcaZ   = recoTrkVars[TRKVAR::DCAZ];
   const auto ptRec  = recoPhysVars[PHYSVAR::PT];
   const auto ptTrue = truePhysVars[PHYSVAR::PT];
   const auto ptFrac = ptRec / ptTrue;
@@ -646,6 +764,8 @@ void STrackCutStudy::FillTruthHistograms(const Int_t type, const Double_t recoTr
     hTrkVarDiff[type][iTrkVar]     -> Fill(trkVarDiff);
     hTrkVarFrac[type][iTrkVar]     -> Fill(trkVarFrac);
     hTrkVarVsNTpc[type][iTrkVar]   -> Fill(nTpc,   trueTrkVars[iTrkVar]);
+    hTrkVarVsDcaXY[type][iTrkVar]  -> Fill(dcaXY,  trueTrkVars[iTrkVar]);
+    hTrkVarVsDcaZ[type][iTrkVar]   -> Fill(dcaZ,   trueTrkVars[iTrkVar]);
     hTrkVarVsPtReco[type][iTrkVar] -> Fill(ptRec,  trueTrkVars[iTrkVar]);
     hTrkVarVsPtTrue[type][iTrkVar] -> Fill(ptTrue, trueTrkVars[iTrkVar]);
     hTrkVarVsPtFrac[type][iTrkVar] -> Fill(ptFrac, trueTrkVars[iTrkVar]); 
@@ -663,6 +783,8 @@ void STrackCutStudy::FillTruthHistograms(const Int_t type, const Double_t recoTr
     hPhysVarDiff[type][iPhysVar]     -> Fill(trkVarDiff);
     hPhysVarFrac[type][iPhysVar]     -> Fill(trkVarFrac);
     hPhysVarVsNTpc[type][iPhysVar]   -> Fill(nTpc,   truePhysVars[iPhysVar]);
+    hPhysVarVsDcaXY[type][iPhysVar]  -> Fill(dcaXY,  truePhysVars[iPhysVar]);
+    hPhysVarVsDcaZ[type][iPhysVar]   -> Fill(dcaZ,   truePhysVars[iPhysVar]);
     hPhysVarVsPtReco[type][iPhysVar] -> Fill(ptRec,  truePhysVars[iPhysVar]);
     hPhysVarVsPtTrue[type][iPhysVar] -> Fill(ptTrue, truePhysVars[iPhysVar]);
     hPhysVarVsPtFrac[type][iPhysVar] -> Fill(ptFrac, truePhysVars[iPhysVar]); 

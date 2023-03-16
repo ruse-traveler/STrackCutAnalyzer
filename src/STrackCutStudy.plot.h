@@ -22,42 +22,54 @@ void STrackCutStudy::MakeCutText() {
   // cut labels
   const TString sPrimary("Is primary");
   const TString sMVtxCut("MVTX hits = (");
+  const TString sNTpcCut("TPC hits = (");
   const TString sVzCut("z-vertex = (");
   const TString sDcaXyCut("DCA (XY) = (");
   const TString sDcaZCut("DCA (Z) = (");
   const TString sQualityCut("Quality = (");
+  const TString sVzUnits("cm");
+  const TString sDcaUnits("#mum");
 
   // make text
   TString sMVtxTxt     = sMVtxCut;
+  TString sNTpcTxt     = sNTpcCut;
   TString sVzTxt       = sVzCut;
   TString sDcaXyTxt    = sDcaXyCut;
   TString sDcaZTxt     = sDcaZCut;
   TString sQualityTxt  = sQualityCut;
   sMVtxTxt            += nMVtxCut.first;
+  sNTpcTxt            += nTpcCut.first;
   sVzTxt              += vzCut.first;
   sDcaXyTxt           += dcaXyCut.first;
   sDcaZTxt            += dcaZCut.first;
   sQualityTxt         += qualityCut.first;
   sMVtxTxt            += ", ";
+  sNTpcTxt            += ", ";
   sVzTxt              += ", ";
   sDcaXyTxt           += ", ";
   sDcaZTxt            += ", ";
   sQualityTxt         += ", ";
   sMVtxTxt            += nMVtxCut.second;
+  sNTpcTxt            += nTpcCut.second;
   sVzTxt              += vzCut.second;
   sDcaXyTxt           += dcaXyCut.second;
   sDcaZTxt            += dcaZCut.second;
   sQualityTxt         += qualityCut.second;
   sMVtxTxt            += ")";
-  sVzTxt              += ")";
-  sDcaXyTxt           += ")";
-  sDcaZTxt            += ")";
+  sNTpcTxt            += ")";
+  sVzTxt              += ") ";
+  sDcaXyTxt           += ") ";
+  sDcaZTxt            += ") ";
   sQualityTxt         += ")";
+  sVzTxt              += sVzUnits.Data();
+  sDcaXyTxt           += sDcaUnits.Data();
+  sDcaZTxt            += sDcaUnits.Data();
 
   // determine how many lines to add
   UInt_t nCut(0);
   if (doPrimaryCut) nCut++;
   if (doMVtxCut)    nCut++;
+  if (doTpcCut)     nCut++;
   if (doVzCut)      nCut++;
   if (doDcaXyCut)   nCut++;
   if (doDcaZCut)    nCut++;
@@ -82,6 +94,7 @@ void STrackCutStudy::MakeCutText() {
   ptCut -> SetTextAlign(fAlnC);
   if (doPrimaryCut) ptCut -> AddText(sPrimary.Data());
   if (doMVtxCut)    ptCut -> AddText(sMVtxTxt.Data());
+  if (doTpcCut)     ptCut -> AddText(sNTpcTxt.Data());
   if (doVzCut)      ptCut -> AddText(sVzTxt.Data());
   if (doDcaXyCut)   ptCut -> AddText(sDcaXyTxt.Data());
   if (doDcaZCut)    ptCut -> AddText(sDcaZTxt.Data());
@@ -223,6 +236,8 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
   const TString sDiffSuffix("Diff");
   const TString sFracSuffix("Frac");
   const TString sVsNTpcSuffix("VsNTpc");
+  const TString sVsDcaXySuffix("VsDcaXY");
+  const TString sVsDcaZSuffix("VsDcaZ");
   const TString sVsPtRecoSuffix("VsPtReco");
   const TString sVsPtTrueSuffix("VsPtTrue");
   const TString sVsPtFracSuffix("VsPtFrac");
@@ -232,6 +247,8 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
   TString sTrkVarDiff[NTrkVar];
   TString sTrkVarFrac[NTrkVar];
   TString sTrkVarVsNTpc[NTrkVar];
+  TString sTrkVarVsDcaXY[NTrkVar];
+  TString sTrkVarVsDcaZ[NTrkVar];
   TString sTrkVarVsPtReco[NTrkVar];
   TString sTrkVarVsPtTrue[NTrkVar];
   TString sTrkVarVsPtFrac[NTrkVar];
@@ -241,6 +258,8 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
   TString sPhysVarDiff[NPhysVar];
   TString sPhysVarFrac[NPhysVar];
   TString sPhysVarVsNTpc[NPhysVar];
+  TString sPhysVarVsDcaXY[NPhysVar];
+  TString sPhysVarVsDcaZ[NPhysVar];
   TString sPhysVarVsPtReco[NPhysVar];
   TString sPhysVarVsPtTrue[NPhysVar];
   TString sPhysVarVsPtFrac[NPhysVar];
@@ -262,12 +281,16 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     sTrkVarDiff[iTrkVar]     = sTrkVarName[iTrkVar].Data();
     sTrkVarFrac[iTrkVar]     = sTrkVarName[iTrkVar].Data();
     sTrkVarVsNTpc[iTrkVar]   = sTrkVarName[iTrkVar].Data();
+    sTrkVarVsDcaXY[iTrkVar]  = sTrkVarName[iTrkVar].Data();
+    sTrkVarVsDcaZ[iTrkVar]   = sTrkVarName[iTrkVar].Data();
     sTrkVarVsPtReco[iTrkVar] = sTrkVarName[iTrkVar].Data();
     sTrkVarVsPtTrue[iTrkVar] = sTrkVarName[iTrkVar].Data();
     sTrkVarVsPtFrac[iTrkVar] = sTrkVarName[iTrkVar].Data();
     sTrkVarDiff[iTrkVar].Append(sDiffSuffix.Data());
     sTrkVarFrac[iTrkVar].Append(sFracSuffix.Data());
     sTrkVarVsNTpc[iTrkVar].Append(sVsNTpcSuffix.Data());
+    sTrkVarVsDcaXY[iTrkVar].Append(sVsDcaXySuffix.Data());
+    sTrkVarVsDcaZ[iTrkVar].Append(sVsDcaZSuffix.Data());
     sTrkVarVsPtReco[iTrkVar].Append(sVsPtRecoSuffix.Data());
     sTrkVarVsPtTrue[iTrkVar].Append(sVsPtTrueSuffix.Data());
     sTrkVarVsPtFrac[iTrkVar].Append(sVsPtFracSuffix.Data());
@@ -275,6 +298,8 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     sTrkVarDiff[iTrkVar].Append("_");
     sTrkVarFrac[iTrkVar].Append("_");
     sTrkVarVsNTpc[iTrkVar].Append("_");
+    sTrkVarVsDcaXY[iTrkVar].Append("_");
+    sTrkVarVsDcaZ[iTrkVar].Append("_");
     sTrkVarVsPtReco[iTrkVar].Append("_");
     sTrkVarVsPtTrue[iTrkVar].Append("_");
     sTrkVarVsPtFrac[iTrkVar].Append("_");
@@ -282,6 +307,8 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     sTrkVarDiff[iTrkVar].Append(sPlotLabel.Data());
     sTrkVarFrac[iTrkVar].Append(sPlotLabel.Data());
     sTrkVarVsNTpc[iTrkVar].Append(sPlotLabel.Data());
+    sTrkVarVsDcaXY[iTrkVar].Append(sPlotLabel.Data());
+    sTrkVarVsDcaZ[iTrkVar].Append(sPlotLabel.Data());
     sTrkVarVsPtReco[iTrkVar].Append(sPlotLabel.Data());
     sTrkVarVsPtTrue[iTrkVar].Append(sPlotLabel.Data());
     sTrkVarVsPtFrac[iTrkVar].Append(sPlotLabel.Data());
@@ -291,12 +318,16 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     sPhysVarDiff[iPhysVar]     = sPhysVarName[iPhysVar].Data();
     sPhysVarFrac[iPhysVar]     = sPhysVarName[iPhysVar].Data();
     sPhysVarVsNTpc[iPhysVar]   = sPhysVarName[iPhysVar].Data();
+    sPhysVarVsDcaXY[iPhysVar]  = sPhysVarName[iPhysVar].Data();
+    sPhysVarVsDcaZ[iPhysVar]   = sPhysVarName[iPhysVar].Data();
     sPhysVarVsPtReco[iPhysVar] = sPhysVarName[iPhysVar].Data();
     sPhysVarVsPtTrue[iPhysVar] = sPhysVarName[iPhysVar].Data();
     sPhysVarVsPtFrac[iPhysVar] = sPhysVarName[iPhysVar].Data();
     sPhysVarDiff[iPhysVar].Append(sDiffSuffix.Data());
     sPhysVarFrac[iPhysVar].Append(sFracSuffix.Data());
     sPhysVarVsNTpc[iPhysVar].Append(sVsNTpcSuffix.Data());
+    sPhysVarVsDcaXY[iPhysVar].Append(sVsDcaXySuffix.Data());
+    sPhysVarVsDcaZ[iPhysVar].Append(sVsDcaZSuffix.Data());
     sPhysVarVsPtReco[iPhysVar].Append(sVsPtRecoSuffix.Data());
     sPhysVarVsPtTrue[iPhysVar].Append(sVsPtTrueSuffix.Data());
     sPhysVarVsPtFrac[iPhysVar].Append(sVsPtFracSuffix.Data());
@@ -304,6 +335,8 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     sPhysVarDiff[iPhysVar].Append("_");
     sPhysVarFrac[iPhysVar].Append("_");
     sPhysVarVsNTpc[iPhysVar].Append("_");
+    sPhysVarVsDcaXY[iPhysVar].Append("_");
+    sPhysVarVsDcaZ[iPhysVar].Append("_");
     sPhysVarVsPtReco[iPhysVar].Append("_");
     sPhysVarVsPtTrue[iPhysVar].Append("_");
     sPhysVarVsPtFrac[iPhysVar].Append("_");
@@ -311,6 +344,8 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
     sPhysVarDiff[iPhysVar].Append(sPlotLabel.Data());
     sPhysVarFrac[iPhysVar].Append(sPlotLabel.Data());
     sPhysVarVsNTpc[iPhysVar].Append(sPlotLabel.Data());
+    sPhysVarVsDcaXY[iPhysVar].Append(sPlotLabel.Data());
+    sPhysVarVsDcaZ[iPhysVar].Append(sPlotLabel.Data());
     sPhysVarVsPtReco[iPhysVar].Append(sPlotLabel.Data());
     sPhysVarVsPtTrue[iPhysVar].Append(sPlotLabel.Data());
     sPhysVarVsPtFrac[iPhysVar].Append(sPlotLabel.Data());
@@ -321,10 +356,14 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
   TCanvas *cTrkVarDiff[NTrkVar];
   TCanvas *cTrkVarFrac[NTrkVar];
   TCanvas *cTrkVarVsNTpc[NTrkVar];
+  TCanvas *cTrkVarVsDcaXY[NTrkVar];
+  TCanvas *cTrkVarVsDcaZ[NTrkVar];
   TCanvas *cTrkVarVsPtReco[NTrkVar];
   TCanvas *cTrkVarVsPtTrue[NTrkVar];
   TCanvas *cTrkVarVsPtFrac[NTrkVar];
   TPad    *pTrkVarVsNTpc[NTrkVar][NPanel];
+  TPad    *pTrkVarVsDcaXY[NTrkVar][NPanel];
+  TPad    *pTrkVarVsDcaZ[NTrkVar][NPanel];
   TPad    *pTrkVarVsPtReco[NTrkVar][NPanel];
   TPad    *pTrkVarVsPtTrue[NTrkVar][NPanel];
   TPad    *pTrkVarVsPtFrac[NTrkVar][NPanel];
@@ -465,11 +504,125 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hTrkVarVsNTpc[typesToDraw[iToDraw]][iTrkVar] -> Draw("colz");
       } else {
-        hTrkVarVsNTpc[typesToDraw[iToDraw]][iTrkVar] -> Draw("p same");
+        hTrkVarVsNTpc[typesToDraw[iToDraw]][iTrkVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cTrkVarVsNTpc[iTrkVar] -> Write();
     cTrkVarVsNTpc[iTrkVar] -> Close();
+
+    // 2d track variables vs. dcaxy
+    cTrkVarVsDcaXY[iTrkVar]    = new TCanvas(sTrkVarVsDcaXY[iTrkVar].Data(), "", fWidth2P, fHeight2P);
+    pTrkVarVsDcaXY[iTrkVar][0] = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]);
+    pTrkVarVsDcaXY[iTrkVar][1] = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]);
+    cTrkVarVsDcaXY[iTrkVar]    -> SetGrid(fGrid, fGrid);
+    cTrkVarVsDcaXY[iTrkVar]    -> SetTicks(fTick, fTick);
+    cTrkVarVsDcaXY[iTrkVar]    -> SetBorderMode(fMode);
+    cTrkVarVsDcaXY[iTrkVar]    -> SetBorderSize(fBord);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetGrid(fGrid, fGrid);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetTicks(fTick, fTick);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetLogx(fLogX);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetLogy(fLogY);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetLogz(fLogZ);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetBorderMode(fMode);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetBorderSize(fBord);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetFrameBorderMode(fFrame);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetLeftMargin(fMarginL);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetRightMargin(fMarginR1);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetTopMargin(fMarginT);
+    pTrkVarVsDcaXY[iTrkVar][0] -> SetBottomMargin(fMarginB);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetGrid(fGrid, fGrid);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetTicks(fTick, fTick);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetLogx(fLogX);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetLogy(fLogY);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetLogz(fLogZ);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetBorderMode(fMode);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetBorderSize(fBord);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetFrameBorderMode(fFrame);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetLeftMargin(fMarginL);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetRightMargin(fMarginR2);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetTopMargin(fMarginT);
+    pTrkVarVsDcaXY[iTrkVar][1] -> SetBottomMargin(fMarginB);
+    cTrkVarVsDcaXY[iTrkVar]    -> cd();
+    pTrkVarVsDcaXY[iTrkVar][0] -> Draw();
+    pTrkVarVsDcaXY[iTrkVar][1] -> Draw();
+    pTrkVarVsDcaXY[iTrkVar][0] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hTrkVar[typesToDraw[iToDraw]][iTrkVar] -> Draw();
+      } else {
+        hTrkVar[typesToDraw[iToDraw]][iTrkVar] -> Draw("same");
+      }
+    }  // end to-draw loop
+    leg                        -> Draw();
+    ptTxt                      -> Draw();
+    ptCut                      -> Draw();
+    pTrkVarVsDcaXY[iTrkVar][1] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hTrkVarVsDcaXY[typesToDraw[iToDraw]][iTrkVar] -> Draw("colz");
+      } else {
+        hTrkVarVsDcaXY[typesToDraw[iToDraw]][iTrkVar] -> Draw("scat same");
+      }
+    }  // end to-draw loop
+    cTrkVarVsDcaXY[iTrkVar] -> Write();
+    cTrkVarVsDcaXY[iTrkVar] -> Close();
+
+    // 2d track variables vs. dcaz
+    cTrkVarVsDcaZ[iTrkVar]    = new TCanvas(sTrkVarVsDcaZ[iTrkVar].Data(), "", fWidth2P, fHeight2P);
+    pTrkVarVsDcaZ[iTrkVar][0] = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]);
+    pTrkVarVsDcaZ[iTrkVar][1] = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]);
+    cTrkVarVsDcaZ[iTrkVar]    -> SetGrid(fGrid, fGrid);
+    cTrkVarVsDcaZ[iTrkVar]    -> SetTicks(fTick, fTick);
+    cTrkVarVsDcaZ[iTrkVar]    -> SetBorderMode(fMode);
+    cTrkVarVsDcaZ[iTrkVar]    -> SetBorderSize(fBord);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetGrid(fGrid, fGrid);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetTicks(fTick, fTick);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetLogx(fLogX);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetLogy(fLogY);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetLogz(fLogZ);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetBorderMode(fMode);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetBorderSize(fBord);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetFrameBorderMode(fFrame);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetLeftMargin(fMarginL);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetRightMargin(fMarginR1);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetTopMargin(fMarginT);
+    pTrkVarVsDcaZ[iTrkVar][0] -> SetBottomMargin(fMarginB);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetGrid(fGrid, fGrid);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetTicks(fTick, fTick);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetLogx(fLogX);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetLogy(fLogY);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetLogz(fLogZ);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetBorderMode(fMode);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetBorderSize(fBord);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetFrameBorderMode(fFrame);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetLeftMargin(fMarginL);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetRightMargin(fMarginR2);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetTopMargin(fMarginT);
+    pTrkVarVsDcaZ[iTrkVar][1] -> SetBottomMargin(fMarginB);
+    cTrkVarVsDcaZ[iTrkVar]    -> cd();
+    pTrkVarVsDcaZ[iTrkVar][0] -> Draw();
+    pTrkVarVsDcaZ[iTrkVar][1] -> Draw();
+    pTrkVarVsDcaZ[iTrkVar][0] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hTrkVar[typesToDraw[iToDraw]][iTrkVar] -> Draw();
+      } else {
+        hTrkVar[typesToDraw[iToDraw]][iTrkVar] -> Draw("same");
+      }
+    }  // end to-draw loop
+    leg                       -> Draw();
+    ptTxt                     -> Draw();
+    ptCut                     -> Draw();
+    pTrkVarVsDcaZ[iTrkVar][1] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hTrkVarVsDcaZ[typesToDraw[iToDraw]][iTrkVar] -> Draw("colz");
+      } else {
+        hTrkVarVsDcaZ[typesToDraw[iToDraw]][iTrkVar] -> Draw("scat same");
+      }
+    }  // end to-draw loop
+    cTrkVarVsDcaZ[iTrkVar] -> Write();
+    cTrkVarVsDcaZ[iTrkVar] -> Close();
 
     // 2d track variables vs. ptreco
     cTrkVarVsPtReco[iTrkVar]    = new TCanvas(sTrkVarVsPtReco[iTrkVar].Data(), "", fWidth2P, fHeight2P);
@@ -522,7 +675,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hTrkVarVsPtReco[typesToDraw[iToDraw]][iTrkVar] -> Draw("colz");
       } else {
-        hTrkVarVsPtReco[typesToDraw[iToDraw]][iTrkVar] -> Draw("p same");
+        hTrkVarVsPtReco[typesToDraw[iToDraw]][iTrkVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cTrkVarVsPtReco[iTrkVar] -> Write();
@@ -579,7 +732,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hTrkVarVsPtTrue[typesToDraw[iToDraw]][iTrkVar] -> Draw("colz");
       } else {
-        hTrkVarVsPtTrue[typesToDraw[iToDraw]][iTrkVar] -> Draw("p same");
+        hTrkVarVsPtTrue[typesToDraw[iToDraw]][iTrkVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cTrkVarVsPtTrue[iTrkVar] -> Write();
@@ -636,7 +789,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hTrkVarVsPtFrac[typesToDraw[iToDraw]][iTrkVar] -> Draw("colz");
       } else {
-        hTrkVarVsPtFrac[typesToDraw[iToDraw]][iTrkVar] -> Draw("p same");
+        hTrkVarVsPtFrac[typesToDraw[iToDraw]][iTrkVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cTrkVarVsPtFrac[iTrkVar] -> Write();
@@ -648,10 +801,14 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
   TCanvas *cPhysVarDiff[NPhysVar];
   TCanvas *cPhysVarFrac[NPhysVar];
   TCanvas *cPhysVarVsNTpc[NPhysVar];
+  TCanvas *cPhysVarVsDcaXY[NPhysVar];
+  TCanvas *cPhysVarVsDcaZ[NPhysVar];
   TCanvas *cPhysVarVsPtReco[NPhysVar];
   TCanvas *cPhysVarVsPtTrue[NPhysVar];
   TCanvas *cPhysVarVsPtFrac[NPhysVar];
   TPad    *pPhysVarVsNTpc[NPhysVar][NPanel];
+  TPad    *pPhysVarVsDcaXY[NPhysVar][NPanel];
+  TPad    *pPhysVarVsDcaZ[NPhysVar][NPanel];
   TPad    *pPhysVarVsPtReco[NPhysVar][NPanel];
   TPad    *pPhysVarVsPtTrue[NPhysVar][NPanel];
   TPad    *pPhysVarVsPtFrac[NPhysVar][NPanel];
@@ -792,11 +949,125 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hPhysVarVsNTpc[typesToDraw[iToDraw]][iPhysVar] -> Draw("colz");
       } else {
-        hPhysVarVsNTpc[typesToDraw[iToDraw]][iPhysVar] -> Draw("p same");
+        hPhysVarVsNTpc[typesToDraw[iToDraw]][iPhysVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cPhysVarVsNTpc[iPhysVar] -> Write();
     cPhysVarVsNTpc[iPhysVar] -> Close();
+
+    // 2d physics variables vs. dcaxy
+    cPhysVarVsDcaXY[iPhysVar]    = new TCanvas(sPhysVarVsDcaXY[iPhysVar].Data(), "", fWidth2P, fHeight2P);
+    pPhysVarVsDcaXY[iPhysVar][0] = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]);
+    pPhysVarVsDcaXY[iPhysVar][1] = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]);
+    cPhysVarVsDcaXY[iPhysVar]    -> SetGrid(fGrid, fGrid);
+    cPhysVarVsDcaXY[iPhysVar]    -> SetTicks(fTick, fTick);
+    cPhysVarVsDcaXY[iPhysVar]    -> SetBorderMode(fMode);
+    cPhysVarVsDcaXY[iPhysVar]    -> SetBorderSize(fBord);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetGrid(fGrid, fGrid);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetTicks(fTick, fTick);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetLogx(fLogX);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetLogy(fLogY);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetLogz(fLogZ);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetBorderMode(fMode);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetBorderSize(fBord);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetFrameBorderMode(fFrame);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetLeftMargin(fMarginL);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetRightMargin(fMarginR1);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetTopMargin(fMarginT);
+    pPhysVarVsDcaXY[iPhysVar][0] -> SetBottomMargin(fMarginB);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetGrid(fGrid, fGrid);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetTicks(fTick, fTick);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetLogx(fLogX);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetLogy(fLogY);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetLogz(fLogZ);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetBorderMode(fMode);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetBorderSize(fBord);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetFrameBorderMode(fFrame);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetLeftMargin(fMarginL);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetRightMargin(fMarginR2);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetTopMargin(fMarginT);
+    pPhysVarVsDcaXY[iPhysVar][1] -> SetBottomMargin(fMarginB);
+    cPhysVarVsDcaXY[iPhysVar]    -> cd();
+    pPhysVarVsDcaXY[iPhysVar][0] -> Draw();
+    pPhysVarVsDcaXY[iPhysVar][1] -> Draw();
+    pPhysVarVsDcaXY[iPhysVar][0] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw();
+      } else {
+        hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
+      }
+    }  // end to-draw loop
+    leg                          -> Draw();
+    ptTxt                        -> Draw();
+    ptCut                        -> Draw();
+    pPhysVarVsDcaXY[iPhysVar][1] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hPhysVarVsDcaXY[typesToDraw[iToDraw]][iPhysVar] -> Draw("colz");
+      } else {
+        hPhysVarVsDcaXY[typesToDraw[iToDraw]][iPhysVar] -> Draw("scat same");
+      }
+    }  // end to-draw loop
+    cPhysVarVsDcaXY[iPhysVar] -> Write();
+    cPhysVarVsDcaXY[iPhysVar] -> Close();
+
+    // 2d physics variables vs. dcaz
+    cPhysVarVsDcaZ[iPhysVar]    = new TCanvas(sPhysVarVsDcaZ[iPhysVar].Data(), "", fWidth2P, fHeight2P);
+    pPhysVarVsDcaZ[iPhysVar][0] = new TPad(sOneVsTwoDimPanels[0].Data(), "", padXY[0][0], padXY[0][1], padXY[0][2], padXY[0][3]);
+    pPhysVarVsDcaZ[iPhysVar][1] = new TPad(sOneVsTwoDimPanels[1].Data(), "", padXY[1][0], padXY[1][1], padXY[1][2], padXY[1][3]);
+    cPhysVarVsDcaZ[iPhysVar]    -> SetGrid(fGrid, fGrid);
+    cPhysVarVsDcaZ[iPhysVar]    -> SetTicks(fTick, fTick);
+    cPhysVarVsDcaZ[iPhysVar]    -> SetBorderMode(fMode);
+    cPhysVarVsDcaZ[iPhysVar]    -> SetBorderSize(fBord);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetGrid(fGrid, fGrid);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetTicks(fTick, fTick);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetLogx(fLogX);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetLogy(fLogY);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetLogz(fLogZ);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetBorderMode(fMode);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetBorderSize(fBord);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetFrameBorderMode(fFrame);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetLeftMargin(fMarginL);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetRightMargin(fMarginR1);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetTopMargin(fMarginT);
+    pPhysVarVsDcaZ[iPhysVar][0] -> SetBottomMargin(fMarginB);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetGrid(fGrid, fGrid);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetTicks(fTick, fTick);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetLogx(fLogX);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetLogy(fLogY);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetLogz(fLogZ);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetBorderMode(fMode);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetBorderSize(fBord);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetFrameBorderMode(fFrame);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetLeftMargin(fMarginL);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetRightMargin(fMarginR2);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetTopMargin(fMarginT);
+    pPhysVarVsDcaZ[iPhysVar][1] -> SetBottomMargin(fMarginB);
+    cPhysVarVsDcaZ[iPhysVar]    -> cd();
+    pPhysVarVsDcaZ[iPhysVar][0] -> Draw();
+    pPhysVarVsDcaZ[iPhysVar][1] -> Draw();
+    pPhysVarVsDcaZ[iPhysVar][0] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw();
+      } else {
+        hPhysVar[typesToDraw[iToDraw]][iPhysVar] -> Draw("same");
+      }
+    }  // end to-draw loop
+    leg                         -> Draw();
+    ptTxt                       -> Draw();
+    ptCut                       -> Draw();
+    pPhysVarVsDcaZ[iPhysVar][1] -> cd();
+    for (Ssiz_t iToDraw = 0; iToDraw < nToDraw; iToDraw++) {
+      if (iToDraw == 0) {
+        hPhysVarVsDcaZ[typesToDraw[iToDraw]][iPhysVar] -> Draw("colz");
+      } else {
+        hPhysVarVsDcaZ[typesToDraw[iToDraw]][iPhysVar] -> Draw("scat same");
+      }
+    }  // end to-draw loop
+    cPhysVarVsDcaZ[iPhysVar] -> Write();
+    cPhysVarVsDcaZ[iPhysVar] -> Close();
 
     // 2d physics variables vs. ptreco
     cPhysVarVsPtReco[iPhysVar]    = new TCanvas(sPhysVarVsPtReco[iPhysVar].Data(), "", fWidth2P, fHeight2P);
@@ -849,7 +1120,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hPhysVarVsPtReco[typesToDraw[iToDraw]][iPhysVar] -> Draw("colz");
       } else {
-        hPhysVarVsPtReco[typesToDraw[iToDraw]][iPhysVar] -> Draw("p same");
+        hPhysVarVsPtReco[typesToDraw[iToDraw]][iPhysVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cPhysVarVsPtReco[iPhysVar] -> Write();
@@ -906,7 +1177,7 @@ void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDra
       if (iToDraw == 0) {
         hPhysVarVsPtTrue[typesToDraw[iToDraw]][iPhysVar] -> Draw("colz");
       } else {
-        hPhysVarVsPtTrue[typesToDraw[iToDraw]][iPhysVar] -> Draw("p same");
+        hPhysVarVsPtTrue[typesToDraw[iToDraw]][iPhysVar] -> Draw("scat same");
       }
     }  // end to-draw loop
     cPhysVarVsPtTrue[iPhysVar] -> Write();

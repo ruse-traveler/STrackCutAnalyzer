@@ -125,6 +125,7 @@ class STrackCutStudy {
     TNtuple *ntClustEO;
 
     // track type/variable names/styles/labels [set in ctor, *.cc]
+    Bool_t  isTruth[NType];
     Bool_t  isPileup[NType];
     UInt_t  fTypeCol[NType];
     UInt_t  fTypeMar[NType];
@@ -138,6 +139,8 @@ class STrackCutStudy {
     TH1D *hTrkVarDiff[NType][NTrkVar];
     TH1D *hTrkVarFrac[NType][NTrkVar];
     TH2D *hTrkVarVsNTpc[NType][NTrkVar];
+    TH2D *hTrkVarVsDcaXY[NType][NTrkVar];
+    TH2D *hTrkVarVsDcaZ[NType][NTrkVar];
     TH2D *hTrkVarVsPtReco[NType][NTrkVar];
     TH2D *hTrkVarVsPtTrue[NType][NTrkVar];
     TH2D *hTrkVarVsPtFrac[NType][NTrkVar];
@@ -147,6 +150,8 @@ class STrackCutStudy {
     TH1D *hPhysVarDiff[NType][NPhysVar];
     TH1D *hPhysVarFrac[NType][NPhysVar];
     TH2D *hPhysVarVsNTpc[NType][NPhysVar];
+    TH2D *hPhysVarVsDcaXY[NType][NPhysVar];
+    TH2D *hPhysVarVsDcaZ[NType][NPhysVar];
     TH2D *hPhysVarVsPtReco[NType][NPhysVar];
     TH2D *hPhysVarVsPtTrue[NType][NPhysVar];
     TH2D *hPhysVarVsPtFrac[NType][NPhysVar];

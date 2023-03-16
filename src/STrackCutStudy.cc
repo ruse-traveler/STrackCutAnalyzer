@@ -42,6 +42,23 @@ STrackCutStudy::STrackCutStudy() {
   doDcaZCut       = false;
   doQualityCut    = false;
 
+  // set whether or not type is truth
+  isTruth[TYPE::TRACK]         = false;
+  isTruth[TYPE::TRUTH]         = true;
+  isTruth[TYPE::WEIRD_ALL]     = false;
+  isTruth[TYPE::WEIRD_SI]      = false;
+  isTruth[TYPE::WEIRD_TPC]     = false;
+  isTruth[TYPE::NORMAL]        = false;
+  isTruth[TYPE::PILEUP]        = false;
+  isTruth[TYPE::PRIMARY]       = false;
+  isTruth[TYPE::NONPRIM]       = false;
+  isTruth[TYPE::TRK_CUT]       = false;
+  isTruth[TYPE::TRU_CUT]       = true;
+  isTruth[TYPE::WEIRD_CUT]     = false;
+  isTruth[TYPE::WEIRD_SI_CUT]  = false;
+  isTruth[TYPE::WEIRD_TPC_CUT] = false;
+  isTruth[TYPE::NORM_CUT]      = false;
+
   // set whether or not type has pileup
   isPileup[TYPE::TRACK]         = false;
   isPileup[TYPE::TRUTH]         = false;

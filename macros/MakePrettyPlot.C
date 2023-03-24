@@ -22,7 +22,7 @@
 using namespace std;
 
 // global constants
-static const UInt_t NNumer(1);
+static const UInt_t NNumer(6);
 static const UInt_t NPlot(2);
 static const UInt_t NPad(2);
 static const UInt_t NVtx(4);
@@ -36,18 +36,43 @@ void MakePrettyPlot() {
   cout << "\n  Beginning plot macro..." << endl;
 
   // output and denominator parameters
-  const TString sOutput("trkPt_inclusiveVsMvtxCut_withFineBins.pt020n5pim.d21m2y2023.root");
-  const TString sDenom("trackCutStudy.forMvtxCheck_noMvtxCut_finePtBinsWithNoIntNorm.pt020n5pim.d21m2y2023.root");
-  const TString sHistDenom("Old/Track/hTrackPt");
-  const TString sNameDenom("hInclusive");
-  const TString sLabelDenom("inclusive (N^{layer}_{MVTX} #geq 0)");
+  const TString sOutput("trkEffWithHardCuts_steppingThroughCuts_mvtx2tpc20vz10dxy20dz20qual10.low_occupancy.pt020n5pim.d16m3y2023.root");
+  const TString sDenom("output/truthPtHist.d15m3y2023.root");
+  const TString sHistDenom("hPtTruth");
+  const TString sNameDenom("hPtTruth");
+  const TString sLabelDenom("Truth (#pi^{-})");
 
   // numerator parameters
-  const TString sNumer[NNumer]      = {"trackCutStudy.forMvtxCheck_withMvtxCut_finePtBinsWithNoIntNorm.pt020n5pim.d21m2y2023.root"};
-  const TString sHistNumer[NNumer]  = {"Old/Track/hTrackPt"};
-  const TString sNameNumer[NNumer]  = {"hMvtxCut"};
-  const TString sNameRatio[NNumer]  = {"hRatio"};
-  const TString sLabelNumer[NNumer] = {"with cut (N^{layer}_{MVTX} #geq 2)"};
+  const TString sNumer[NNumer]      = {"trackCutStudy.applyCuts_onlyMvtxCut_mvtx2.pt020n5pim.d16m3y2023.root",
+                                       "trackCutStudy.applyCuts_mvtxAndTpcCuts_mvtx2tpc20.pt020n5pim.d16m3y2023.root",
+                                       "trackCutStudy.applyCuts_mvtxTpcAndVzCuts_mvtx2tpc20vz10.pt020n5pim.d16m3y2023.root",
+                                       "trackCutStudy.applyCuts_mvtxTpcVzAndDcaXyCuts_mvtx2tpc20vz10dxy20.pt020n5pim.d16m3y2023.root",
+                                       "trackCutStudy.applyCuts_mvtxTpcVzDcaXyAndDcaZCuts_mvtx2tpc20vz10dxy20dz20.pt020n5pim.d16m3y2023.root",
+                                       "trackCutStudy.applyCuts_mvtxTpcVzDcaXyDcaZandQualCuts_mvtx2tpc20vz10dxy20dz20qua10.pt020n5pim.d16m3y2023.root"};
+  const TString sHistNumer[NNumer]  = {"CutTruth/hPt_CutTruth",
+                                       "CutTruth/hPt_CutTruth",
+                                       "CutTruth/hPt_CutTruth",
+                                       "CutTruth/hPt_CutTruth",
+                                       "CutTruth/hPt_CutTruth",
+                                       "CutTruth/hPt_CutTruth"};
+  const TString sNameNumer[NNumer]  = {"hPtReco_AfterCuts_mvtx",
+                                       "hPtReco_AfterCuts_addTpc",
+                                       "hPtReco_AfterCuts_addVz",
+                                       "hPtReco_AfterCuts_addDcaXY",
+                                       "hPtReco_AfterCuts_addDcaZ",
+                                       "hPtReco_AfterCuts_addQual"};
+  const TString sNameRatio[NNumer]  = {"hEff_AfterCuts_mvtx",
+                                       "hEff_AfterCuts_addTpc",
+                                       "hEff_AfterCuts_addVz",
+                                       "hEff_AfterCuts_addDcaXY",
+                                       "hEff_AfterCuts_addDcaZ",
+                                       "hEff_AfterCuts_addQual"};
+  const TString sLabelNumer[NNumer] = {"Only MVTX cut #bf{#color[809]{[N_{hit}^{MVTX} > 2]}}",
+                                       "Add TPC cut #bf{#color[899]{[N_{hit}^{TPC} > 20]}}",
+                                       "Add Vz cut #bf{#color[909]{[|v_{z}| < 10 cm]}}",
+                                       "Add DCA_{xy} cut #bf{#color[879]{[|DCA_{xy}| < 20 #mum]}}",
+                                       "Add DCA_{z} cut #bf{#color[889]{[|DCA_{z}| < 20 #mum]}}",
+                                       "Add quality cut #bf{#color[859]{[Quality < 10]}}"};
 
   // rebin parameters
   const UInt_t nRebin(2);
@@ -55,24 +80,24 @@ void MakePrettyPlot() {
 
   // plot parameters
   const TString sOptDenom("");
-  const TString sOptNumer[NNumer] = {"SAME"};
-  const TString sOptRatio[NNumer] = {"",   };
-  const Float_t xPlotRange[NPlot] = {0., 20.};
+  const TString sOptNumer[NNumer] = {"SAME", "SAME", "SAME", "SAME", "SAME", "SAME"};
+  const TString sOptRatio[NNumer] = {"",     "SAME", "SAME", "SAME", "SAME", "SAME"};
+  const Float_t xPlotRange[NPlot] = {0., 30.};
 
   // style parameters
   const TString sTitle("");
-  const TString sTitleX("p_{T}^{reco} [GeV/c]");
+  const TString sTitleX("p_{T}^{truth} [GeV/c]");
   const TString sTitleY("counts");
-  const TString sTitleR("cut / inclusive");
+  const TString sTitleR("efficiency");
   const UInt_t  fColDen(923);
   const UInt_t  fMarDen(20);
-  const UInt_t  fColNum[NNumer] = {899};
-  const UInt_t  fMarNum[NNumer] = {25};
+  const UInt_t  fColNum[NNumer] = {809, 899, 909, 879, 889, 859};
+  const UInt_t  fMarNum[NNumer] = {24,  26,  32,  25,  27,  28};
 
   // text parameters
   const TString sSys("#bf{#it{sPHENIX}} Simulation, single #pi^{-}");
-  const TString sTrg("20 #pi^{-} per event, p_{T} #in (0, 20) GeV/c");
-  const TString sJet("#bf{Embedded only tracks}");
+  const TString sTrg("5 #pi^{-}/event, p_{T} #in (0, 20) GeV/c");
+  const TString sJet("#bf{Only #pi^{-} in event}");
   const TString sTyp("");
   const TString sHeader("");
 

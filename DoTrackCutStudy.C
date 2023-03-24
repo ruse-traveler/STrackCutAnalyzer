@@ -35,9 +35,9 @@ void DoTrackCutStudy() {
   gErrorIgnoreLevel = kWarning;
 
   // i/o parameters
-  const TString sOutFile("trackCutStudy.applyCuts_mvtx2tpc20vz10dxy20dz20qual10prim.pt020n5pim.d15m3y2023.root");
-  const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_forTrackCutStudy_embedOnly0t1099_g4svtxeval.pt020n5pim.d12m1y2023.root");
-  const TString sInFilePU("input/test/sPhenixG4_testWithPileup001_g4svtxEval.d18m12y2022.root");
+  const TString sOutFile("trackCutStudy.varyingPionNum_forDCA.pt020n5pim.d24m3y2023.root");
+  const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_run6hijing50khz_embedScanOn_embedOnly.pt020n5pim.d17m3y2023.root");
+  const TString sInFilePU("input/with_pileup/merged/sPhenixG4_forTrackCutStudy_hijing50khz_embedOnly0t19_g4svtxeval.d14m11y2022.root");
   const TString sInTupleEO("ntp_track");
   const TString sInTuplePU("ntp_gtrack");
   const TString sInClusterEO("ntp_cluster");
@@ -49,12 +49,12 @@ void DoTrackCutStudy() {
   const Double_t normalPtFracMax(1.20);
 
   // cut flags
-  const Bool_t doPrimaryCut = true;
+  const Bool_t doPrimaryCut = false;
   const Bool_t doMVtxCut    = true;
   const Bool_t doTpcCut     = true;
   const Bool_t doVzCut      = true;
-  const Bool_t doDcaXyCut   = true;
-  const Bool_t doDcaZcut    = true;
+  const Bool_t doDcaXyCut   = false;
+  const Bool_t doDcaZcut    = false;
   const Bool_t doQualityCut = true;
 
   // track cuts

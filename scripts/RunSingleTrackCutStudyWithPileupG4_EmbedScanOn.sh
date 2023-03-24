@@ -15,14 +15,13 @@
 # -----------------------------------------------------------------------------
 
 # parameters
-build="ana.344"
 nSkip=0
 
 # set up environment
 export USER="$(id -u -n)"
 export LOGNAME=${USER}
 export HOME=/sphenix/u/${LOGNAME}
-source /opt/sphenix/core/bin/sphenix_setup.sh -n $build
+source /opt/sphenix/core/bin/sphenix_setup.sh
 printenv
 
 # run macro

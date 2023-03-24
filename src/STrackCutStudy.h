@@ -37,7 +37,7 @@ using namespace std;
 
 // global constants
 static const Ssiz_t NVtx(4);
-static const Ssiz_t NType(15);
+static const Ssiz_t NType(18);
 static const Ssiz_t NTrkVar(14);
 static const Ssiz_t NPhysVar(6);
 static const Ssiz_t NRange(2);
@@ -90,7 +90,10 @@ class STrackCutStudy {
       WEIRD_CUT     = 11,
       WEIRD_SI_CUT  = 12,
       WEIRD_TPC_CUT = 13,
-      NORM_CUT      = 14
+      NORM_CUT      = 14,
+      PILE_CUT      = 15,
+      PRIM_CUT      = 16,
+      NONPRIM_CUT   = 17
     };
 
     // ctor/dtor
@@ -402,7 +405,6 @@ class STrackCutStudy {
 
     // plot methods [*.plot.h]
     void MakeCutText();
-    void CreatePlots();
     void ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDraw[], const TString sDirToSaveTo, const TString sPlotLabel);
 
 };  // end STrackCutStudy definition

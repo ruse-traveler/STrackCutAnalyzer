@@ -58,6 +58,9 @@ STrackCutStudy::STrackCutStudy() {
   isTruth[TYPE::WEIRD_SI_CUT]  = false;
   isTruth[TYPE::WEIRD_TPC_CUT] = false;
   isTruth[TYPE::NORM_CUT]      = false;
+  isTruth[TYPE::PILE_CUT]      = false;
+  isTruth[TYPE::PRIM_CUT]      = false;
+  isTruth[TYPE::NONPRIM_CUT]   = false;
 
   // set whether or not type has pileup
   isPileup[TYPE::TRACK]         = false;
@@ -75,6 +78,9 @@ STrackCutStudy::STrackCutStudy() {
   isPileup[TYPE::WEIRD_SI_CUT]  = false;
   isPileup[TYPE::WEIRD_TPC_CUT] = false;
   isPileup[TYPE::NORM_CUT]      = false;
+  isPileup[TYPE::PILE_CUT]      = true;
+  isPileup[TYPE::PRIM_CUT]      = true;
+  isPileup[TYPE::NONPRIM_CUT]   = true;
 
   // set whether or not track variable has a truth value
   trkVarHasTruVal[TRKVAR::VX]       = true;
@@ -116,6 +122,9 @@ STrackCutStudy::STrackCutStudy() {
   fTypeCol[TYPE::WEIRD_SI_CUT]  = 809;
   fTypeCol[TYPE::WEIRD_TPC_CUT] = 849;
   fTypeCol[TYPE::NORM_CUT]      = 889;
+  fTypeCol[TYPE::PILE_CUT]      = 923;
+  fTypeCol[TYPE::PRIM_CUT]      = 859;
+  fTypeCol[TYPE::NONPRIM_CUT]   = 799;
 
   // set type markers
   fTypeMar[TYPE::TRACK]         = 20;
@@ -133,6 +142,9 @@ STrackCutStudy::STrackCutStudy() {
   fTypeMar[TYPE::WEIRD_SI_CUT]  = 5;
   fTypeMar[TYPE::WEIRD_TPC_CUT] = 2;
   fTypeMar[TYPE::NORM_CUT]      = 32;
+  fTypeMar[TYPE::PILE_CUT]      = 20;
+  fTypeMar[TYPE::PRIM_CUT]      = 26;
+  fTypeMar[TYPE::NONPRIM_CUT]   = 32;
 
   // set type names
   sTrkNames[TYPE::TRACK]         = "AllTrack";
@@ -141,15 +153,18 @@ STrackCutStudy::STrackCutStudy() {
   sTrkNames[TYPE::WEIRD_SI]      = "AllSiWeird";
   sTrkNames[TYPE::WEIRD_TPC]     = "AllTpcWeird";
   sTrkNames[TYPE::NORMAL]        = "AllNormal";
-  sTrkNames[TYPE::PILEUP]        = "CutPileup";
-  sTrkNames[TYPE::PRIMARY]       = "CutPrimePileup";
-  sTrkNames[TYPE::NONPRIM]       = "CutNonPrimePileup";
+  sTrkNames[TYPE::PILEUP]        = "AllPileup";
+  sTrkNames[TYPE::PRIMARY]       = "AllPrimePileup";
+  sTrkNames[TYPE::NONPRIM]       = "AllNonPrimePileup";
   sTrkNames[TYPE::TRK_CUT]       = "CutTrack";
   sTrkNames[TYPE::TRU_CUT]       = "CutTruth";
   sTrkNames[TYPE::WEIRD_CUT]     = "CutWeird";
   sTrkNames[TYPE::WEIRD_SI_CUT]  = "CutSiWeird";
   sTrkNames[TYPE::WEIRD_TPC_CUT] = "CutTpcWeird";
   sTrkNames[TYPE::NORM_CUT]      = "CutNormal";
+  sTrkNames[TYPE::PILE_CUT]      = "CutPileup";
+  sTrkNames[TYPE::PRIM_CUT]      = "CutPrimePileup";
+  sTrkNames[TYPE::NONPRIM_CUT]   = "CutNonPrimePileup"; 
 
   // set type plot labels
   sTrkLabels[TYPE::TRACK]         = "Tracks (before cuts)";
@@ -158,15 +173,18 @@ STrackCutStudy::STrackCutStudy() {
   sTrkLabels[TYPE::WEIRD_SI]      = "Weird tracks (Si seed, before cuts)";
   sTrkLabels[TYPE::WEIRD_TPC]     = "Weird tracks (TPC seed, before cuts)";
   sTrkLabels[TYPE::NORMAL]        = "Normal tracks (before cuts)";
-  sTrkLabels[TYPE::PILEUP]        = "Including pileup tracks (all)";
-  sTrkLabels[TYPE::PRIMARY]       = "Including pileup tracks (only primary)";
-  sTrkLabels[TYPE::NONPRIM]       = "Including pileup gracks (non-primary)";
+  sTrkLabels[TYPE::PILEUP]        = "Including pileup tracks (all, before cuts)";
+  sTrkLabels[TYPE::PRIMARY]       = "Including pileup tracks (only primary, before cuts)";
+  sTrkLabels[TYPE::NONPRIM]       = "Including pileup gracks (non-primary, before cuts)";
   sTrkLabels[TYPE::TRK_CUT]       = "Tracks (after cuts)";
   sTrkLabels[TYPE::TRU_CUT]       = "Truth tracks (after cuts)";
   sTrkLabels[TYPE::WEIRD_CUT]     = "Weird tracks (after cuts)";
   sTrkLabels[TYPE::WEIRD_SI_CUT]  = "Weird tracks (Si seed, after cuts)";
   sTrkLabels[TYPE::WEIRD_TPC_CUT] = "Weird tracks (TPC seed, after cuts)";
   sTrkLabels[TYPE::NORM_CUT]      = "Normal tracks (after cuts)";
+  sTrkLabels[TYPE::PILE_CUT]      = "Including pileup tracks (all, after cuts)";
+  sTrkLabels[TYPE::PRIM_CUT]      = "Including pileup tracks (only primary, after cuts)";
+  sTrkLabels[TYPE::NONPRIM_CUT]   = "Including pileup gracks (non-primary, after cuts)";
 
   // set track variable names
   sTrkVars[TRKVAR::VX]       = "Vx";
@@ -451,17 +469,27 @@ void STrackCutStudy::Analyze() {
     truePhysVars[PHYSVAR::DELETA] = deltaEta;
     truePhysVars[PHYSVAR::DELPT]  = deltaPt;
 
-    // apply cuts
+    // check for primary tracks
     const Bool_t isPrimary = (pu_gprimary == 1);
-    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) pu_nlmaps, (UInt_t) pu_ntpc, pu_vz, umDcaXY, umDcaZ, pu_quality);
-    if (!isGoodTrk) continue;
 
-    // fill histograms
+    // fill all histograms
     FillTrackHistograms(TYPE::PILEUP, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     if (isPrimary) {
       FillTrackHistograms(TYPE::PRIMARY, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     } else {
       FillTrackHistograms(TYPE::NONPRIM, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    }
+
+    // apply cuts
+    const Bool_t isGoodTrk = ApplyCuts(isPrimary, (UInt_t) pu_nlmaps, (UInt_t) pu_ntpc, pu_vz, umDcaXY, umDcaZ, pu_quality);
+    if (!isGoodTrk) continue;
+
+    // fill cut histograms
+    FillTrackHistograms(TYPE::PILE_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    if (isPrimary) {
+      FillTrackHistograms(TYPE::PRIM_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
+    } else {
+      FillTrackHistograms(TYPE::NONPRIM_CUT, recoTrkVars, trueTrkVars, recoPhysVars, truePhysVars);
     }
   }  // end with-pileup entry loop
   cout << "      Finished with-pileup entry loop." << endl;
@@ -478,8 +506,43 @@ void STrackCutStudy::End() {
 
   // announce method
   cout << "    Ending:" << endl;
+
+  // set histogram styles
   SetHistStyles();
-  CreatePlots();
+
+  // plot labels/directories to save in
+  const TString sLabelAllEO("EmbedOnly_BeforeCuts");
+  const TString sLabelCutEO("EmbedOnly_AfterCuts");
+  const TString sLabelOddEO("EmbedONly_WeirdVsNormal");
+  const TString sLabelAllPU("WithPileup_BeforeCuts");
+  const TString sLabelCutPU("WithPileup_AfterCuts");
+  const TString sDirPlotAllEO("EmbedOnlyPlots_BeforeCuts");
+  const TString sDirPlotCutEO("EmbedOnlyPlots_AfterCuts");
+  const TString sDirPlotOddEO("EmbedOnlyPlots_WeirdVsNormal");
+  const TString sDirPlotAllPU("AllWithPileupPlots");
+  const TString sDirPlotCutPU("CutWithPileupPlots");
+
+  // track types to plot together
+  const Ssiz_t nToDrawAllEO(3);
+  const Ssiz_t nToDrawCutEO(3);
+  const Ssiz_t nToDrawOddEO(3);
+  const Ssiz_t nToDrawAllPU(3);
+  const Ssiz_t nToDrawCutPU(3);
+  const Int_t  sToDrawAllEO[nToDrawAllEO] = {TYPE::TRACK,    TYPE::TRUTH,     TYPE::WEIRD_ALL};
+  const Int_t  sToDrawCutEO[nToDrawCutEO] = {TYPE::TRK_CUT,  TYPE::TRU_CUT,   TYPE::WEIRD_CUT};
+  const Int_t  sToDrawOddEO[nToDrawOddEO] = {TYPE::WEIRD_SI_CUT, TYPE::WEIRD_TPC_CUT, TYPE::NORM_CUT};
+  const Int_t  sToDrawAllPU[nToDrawAllPU] = {TYPE::PILEUP,   TYPE::PRIMARY,   TYPE::NONPRIM};
+  const Int_t  sToDrawCutPU[nToDrawCutPU] = {TYPE::PILE_CUT, TYPE::PRIM_CUT,  TYPE::NONPRIM_CUT};
+
+  // create desired plots
+  ConstructPlots(nToDrawAllEO, sToDrawAllEO, sDirPlotAllEO, sLabelAllEO);
+  ConstructPlots(nToDrawCutEO, sToDrawCutEO, sDirPlotCutEO, sLabelCutEO);
+  ConstructPlots(nToDrawOddEO, sToDrawOddEO, sDirPlotOddEO, sLabelOddEO);
+  ConstructPlots(nToDrawAllPU, sToDrawAllPU, sDirPlotAllPU, sLabelAllPU);
+  ConstructPlots(nToDrawCutPU, sToDrawCutPU, sDirPlotCutPU, sLabelCutPU);
+  cout << "      Created plots." << endl;
+
+  // save histograms
   SaveHists();
 
   // close files

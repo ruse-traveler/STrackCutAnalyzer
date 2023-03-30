@@ -109,7 +109,7 @@ void STrackCutStudy::MakeCutText() {
 
 void STrackCutStudy::ConstructPlots(const Ssiz_t nToDraw, const Int_t typesToDraw[], const TString sDirToSaveTo, const TString sPlotLabel) {
 
-  // check if saving directory is made, if so, recruse into it
+  // check if saving directory is made, if so, recurse into it
   Bool_t dirIsThere = fOut -> cd(sDirToSaveTo.Data());
   if (!dirIsThere) {
     fOut -> mkdir(sDirToSaveTo.Data());

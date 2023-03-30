@@ -15,7 +15,7 @@ source /opt/sphenix/core/bin/sphenix_setup.sh
 printenv
 
 # run macro
-root -b -q DoTrackCutStudy.C
+root -b -q "DoTrackCutStudy.C(true)"
 
 # end -------------------------------------------------------------------------
 

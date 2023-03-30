@@ -101,9 +101,10 @@ class STrackCutStudy {
     ~STrackCutStudy();
 
     // public methods
+    void SetBatchMode(const Bool_t doBatch=false);
     void SetInputOutputFiles(const TString sEmbedOnlyInput, const TString sPileupInput, const TString sOutput);
     void SetInputTuples(const TString sEmbedOnlyTuple, const TString sPileupTuple, const TString sEmbedOnlyClusterTuple="");
-    void SetStudyParameters(const Bool_t intNorm, const Bool_t avgClustCalc, const Double_t weirdFracMin, const Double_t weirdFracMax);
+    void SetStudyParameters(const Bool_t plots, const Bool_t pileup, const Bool_t intNorm, const Bool_t beforeCuts, const Bool_t avgClustCalc, const Double_t weirdFracMin, const Double_t weirdFracMax);
     void SetCutFlags(const Bool_t doPrimary, const Bool_t doTpc, const Bool_t doMVtx, const Bool_t doVz, const Bool_t doDcaXY, const Bool_t doDcaZ, const Bool_t doQuality);
     void SetTrackCuts(const pair<UInt_t, UInt_t> nMVtxRange, const pair<UInt_t, UInt_t> nTpcRange, const pair<Double_t, Double_t> vzRange, const pair<Double_t, Double_t> dcaXyRange, const pair <Double_t, Double_t> dcaZRange, const pair<Double_t, Double_t> qualityRange);
     void SetPlotText(const Ssiz_t nTxtE, const Ssiz_t nTxtP, const TString sTxtE[], const TString sTxtP[]);
@@ -113,10 +114,11 @@ class STrackCutStudy {
 
   private:
 
-    // io members
+    // io/sys members
     TFile   *fOut;
     TFile   *fInEO;
     TFile   *fInPU;
+    Bool_t   inBatchMode;
     TString  sInFileEO;
     TString  sInFilePU;
     TString  sInTupleEO;
@@ -130,6 +132,7 @@ class STrackCutStudy {
     // track type/variable names/styles/labels [set in ctor, *.cc]
     Bool_t  isTruth[NType];
     Bool_t  isPileup[NType];
+    Bool_t  isBeforeCuts[NType];
     Bool_t  trkVarHasTruVal[NTrkVar];
     Bool_t  physVarHasTruVal[NPhysVar];
     UInt_t  fTypeCol[NType];
@@ -169,19 +172,22 @@ class STrackCutStudy {
     vector<TString>  sTxtPU;
 
     // study parameters
+    Bool_t   makePlots;
+    Bool_t   doPileup;
     Bool_t   doIntNorm;
+    Bool_t   doBeforeCuts;
     Bool_t   doAvgClustCalc;
     Double_t normalPtFracMin;
     Double_t normalPtFracMax;
 
     // track cuts
-    Bool_t doPrimaryCut;
-    Bool_t doMVtxCut;
-    Bool_t doTpcCut;
-    Bool_t doVzCut;
-    Bool_t doDcaXyCut;
-    Bool_t doDcaZCut;
-    Bool_t doQualityCut;
+    Bool_t                   doPrimaryCut;
+    Bool_t                   doMVtxCut;
+    Bool_t                   doTpcCut;
+    Bool_t                   doVzCut;
+    Bool_t                   doDcaXyCut;
+    Bool_t                   doDcaZCut;
+    Bool_t                   doQualityCut;
     pair<UInt_t,   UInt_t>   nMVtxCut;
     pair<UInt_t,   UInt_t>   nTpcCut;
     pair<Double_t, Double_t> vzCut;

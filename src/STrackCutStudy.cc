@@ -273,7 +273,9 @@ void STrackCutStudy::Init() {
 void STrackCutStudy::Analyze() {
 
   // check for tree and announce method
-  const bool doTuplesExist = (ntTrkEO && ntTrkPU);
+  const bool isEmbedGood   = ntTrkEO;
+  const bool isPileGood    = !(doPileup && ntTrkPU);
+  const bool doTuplesExist = (isEmbedGood && isPileGood);
   if (!doTuplesExist) {
     cerr << "PANIC: no input tuples!\n"
          << "        ntTrkEO = " << ntTrkEO << ", ntTrkPU = " << ntTrkPU
@@ -319,8 +321,8 @@ void STrackCutStudy::Analyze() {
     // perform calculations
     const Double_t umDcaXY    = dca3dxy * 10000;
     const Double_t umDcaZ     = dca3dz * 10000;
-    const Double_t deltaDcaXY = abs(dca3dxysigma / dca3dxy);
-    const Double_t deltaDcaZ  = abs(dca3dzsigma / dca3dz);
+    const Double_t deltaDcaXY = abs(dca3dxy / dca3dxysigma);
+    const Double_t deltaDcaZ  = abs(dca3dz / dca3dzsigma);
     const Double_t deltaEta   = abs(deltaeta / eta);
     const Double_t deltaPhi   = abs(deltaphi / phi);
     const Double_t deltaPt    = abs(deltapt / pt);
@@ -446,8 +448,8 @@ void STrackCutStudy::Analyze() {
       // perform calculations
       const Double_t umDcaXY    = pu_dca3dxy * 10000;
       const Double_t umDcaZ     = pu_dca3dz * 10000;
-      const Double_t deltaDcaXY = abs(pu_dca3dxysigma / pu_dca3dxy);
-      const Double_t deltaDcaZ  = abs(pu_dca3dzsigma / pu_dca3dz);
+      const Double_t deltaDcaXY = abs(pu_dca3dxy / pu_dca3dxysigma);
+      const Double_t deltaDcaZ  = abs(pu_dca3dz / pu_dca3dzsigma);
       const Double_t deltaEta   = abs(pu_deltaeta / pu_eta);
       const Double_t deltaPhi   = abs(pu_deltaphi / pu_phi);
       const Double_t deltaPt    = abs(pu_deltapt / pu_pt);

@@ -36,15 +36,15 @@ void DoFastTrackCutStudy(const Bool_t inBatchMode = DefBatch) {
   gErrorIgnoreLevel = kWarning;
 
   // i/o parameters
-  const TString sOutFile("trackCutStudy.testFastCutStudy_fast.pt020n20pim.d30m3y2023.root");
-  const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_run6hijing50khz_embedScanOn_embedOnly.pt020n20pim.d24m3y2023.root");
+  const TString sOutFile("trackCutStudy.forDcaVsNPion.pt020n100pim.d4m4y2023.root");
+  const TString sInFileEO("input/embed_only/final_merge/sPhenixG4_run6hijing50khz_embedScanOn_embedOnly.pt020n100pim.d3m4y2023.root");
   const TString sInFilePU("input/with_pileup/merged/sPhenixG4_forTrackCutStudy_hijing50khz_embedOnly0t19_g4svtxeval.d14m11y2022.root");
   const TString sInTupleEO("ntp_track");
   const TString sInTuplePU("ntp_gtrack");
   const TString sInClusterEO("ntp_cluster");
 
   // study parameters
-  const Bool_t   makePlots(true);
+  const Bool_t   makePlots(false);
   const Bool_t   doPileup(false);
   const Bool_t   doIntNorm(false);
   const Bool_t   doBeforeCuts(false);
@@ -70,7 +70,7 @@ void DoFastTrackCutStudy(const Bool_t inBatchMode = DefBatch) {
   const pair<Double_t, Double_t> qualityRange = {0.,   10.};
 
   // text for plot
-  const TString sTxtEO[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "20 #pi^{-}/event, p_{T} #in (0, 20) GeV/c", "#bf{Only #pi^{-}}"};
+  const TString sTxtEO[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "100 #pi^{-}/event, p_{T} #in (0, 20) GeV/c", "#bf{Only #pi^{-}}"};
   const TString sTxtPU[NTxt] = {"#bf{#it{sPHENIX}} Simulation", "0-20 fm Hijing, 50 kHz pileup #oplus 5 #pi^{-}/event", "#bf{With pileup}"};
 
   // run track cut study

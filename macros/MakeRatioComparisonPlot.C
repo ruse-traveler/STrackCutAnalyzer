@@ -22,7 +22,7 @@
 using namespace std;
 
 // global constants
-static const UInt_t NHist(7);
+static const UInt_t NHist(3);
 static const UInt_t NPlot(2);
 static const UInt_t NPad(2);
 static const UInt_t NVtx(4);
@@ -37,92 +37,60 @@ void MakeRatioComparisonPlot() {
   cout << "\n  Beginning plot macro..." << endl;
 
   // file parameters
-  const TString sOutput("dcaXY.allVsWeirdTrks_steppingThroughCuts.pt020n5pim.d17m3y2023.root");
-  const TString sInDenom[NHist] = {"output/trackCutStudy.applyCuts_onlyMvtxCut_mvtx2.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxAndTpcCuts_mvtx2tpc20.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcAndVzCuts_mvtx2tpc20vz10.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcVzAndDcaXyCuts_mvtx2tpc20vz10dxy20.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcVzDcaXyAndDcaZCuts_mvtx2tpc20vz10dxy20dz20.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcVzDcaXyDcaZandQualCuts_mvtx2tpc20vz10dxy20dz20qua10.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_withVsDcaPlots_mvtx2tpc20vz10dxy20dz20qual10prim.pt020n5pim.d16m3y2023.root"};
-  const TString sInNumer[NHist] = {"output/trackCutStudy.applyCuts_onlyMvtxCut_mvtx2.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxAndTpcCuts_mvtx2tpc20.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcAndVzCuts_mvtx2tpc20vz10.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcVzAndDcaXyCuts_mvtx2tpc20vz10dxy20.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcVzDcaXyAndDcaZCuts_mvtx2tpc20vz10dxy20dz20.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_mvtxTpcVzDcaXyDcaZandQualCuts_mvtx2tpc20vz10dxy20dz20qua10.pt020n5pim.d16m3y2023.root",
-                                   "output/trackCutStudy.applyCuts_withVsDcaPlots_mvtx2tpc20vz10dxy20dz20qual10prim.pt020n5pim.d16m3y2023.root"};
+  const TString sOutput("dcaXY_varyingNumPion.pt020n5x10x20pim.d29m3y2023.root");
+  const TString sInDenom[NHist] = {"output/fastTrackCutStudy.varyingPionNum_dcaOverDeltaDca_onlyCutHists.pt020n5pim.d28m3y2023.root",
+                                   "output/fastTrackCutStudy.varyingPionNum_dcaOverDeltaDca_onlyCutHists.pt020n10pim.d28m3y2023.root",
+                                   "output/fastTrackCutStudy.varyingPionNum_dcaOverDeltaDca_onlyCutHists.pt020n20pim.d28m3y2023.root"};
+  const TString sInNumer[NHist] = {"output/fastTrackCutStudy.varyingPionNum_dcaOverDeltaDca_onlyCutHists.pt020n5pim.d28m3y2023.root",
+                                   "output/fastTrackCutStudy.varyingPionNum_dcaOverDeltaDca_onlyCutHists.pt020n10pim.d28m3y2023.root",
+                                   "output/fastTrackCutStudy.varyingPionNum_dcaOverDeltaDca_onlyCutHists.pt020n20pim.d28m3y2023.root"};
 
   // denominator parameters
   const TString sHeadDenom("#bf{All tracks}");
   const TString sHistDenom[NHist]  = {"CutTrack/hDcaXY_CutTrack",
                                       "CutTrack/hDcaXY_CutTrack",
-                                      "CutTrack/hDcaXY_CutTrack",
-                                      "CutTrack/hDcaXY_CutTrack",
-                                      "CutTrack/hDcaXY_CutTrack",
-                                      "CutTrack/hDcaXY_CutTrack",
                                       "CutTrack/hDcaXY_CutTrack"};
-  const TString sNameDenom[NHist]  = {"hAllTrackDcaXY_onlyMvtx",
-                                      "hAllTrackDcaXY_addTpc",
-                                      "hAllTrackDcaXY_addVz",
-                                      "hAllTrackDcaXY_addDcaXY",
-                                      "hAllTrackDcaXY_addDcaZ",
-                                      "hAllTrackDcaXY_addQual",
-                                      "hAllTrackDcaXY_addPrim"};
-  const TString sLabelDenom[NHist] = {"Only MVTX cut #bf{#color[809]{[N_{hit}^{MVTX} > 2]}}",
-                                      "Add TPC cut #bf{#color[899]{[N_{hit}^{TPC} > 20]}}",
-                                      "Add Vz cut #bf{#color[909]{[|v_{z}| < 10 cm]}}",
-                                      "Add DCA_{xy} cut #bf{#color[879]{[|DCA_{xy}| < 20 #mum]}}",
-                                      "Add DCA_{z} cut #bf{#color[889]{[|DCA_{z}| < 20 #mum]}}",
-                                      "Add quality cut #bf{#color[859]{[Quality < 10]}}",
-                                      "Add 'Is Primary?'"};
+  const TString sNameDenom[NHist]  = {"hAllTrackDcaXY_nPi5",
+                                      "hAllTrackDcaXY_nPi10",
+                                      "hAllTrackDcaXY_nPi20"};
+  const TString sLabelDenom[NHist] = {"5 #pi^{-}/event",
+                                      "10 #pi^{-}/event",
+                                      "20 #pi^{-}/event"};
 
   // numerator parameters
   const TString sHeadNumer("#bf{Weird tracks}");
   const TString sHistNumer[NHist]  = {"CutWeird/hDcaXY_CutWeird",
                                       "CutWeird/hDcaXY_CutWeird",
-                                      "CutWeird/hDcaXY_CutWeird",
-                                      "CutWeird/hDcaXY_CutWeird",
-                                      "CutWeird/hDcaXY_CutWeird",
-                                      "CutWeird/hDcaXY_CutWeird",
                                       "CutWeird/hDcaXY_CutWeird"};
-  const TString sNameNumer[NHist]  = {"hOddTrackDcaXY_onlyMvtx",
-                                      "hOddTrackDcaXY_addTpc",
-                                      "hOddTrackDcaXY_addVz",
-                                      "hOddTrackDcaXY_addDcaXY",
-                                      "hOddTrackDcaXY_addDcaZ",
-                                      "hOddTrackDcaXY_addQual",
-                                      "hOddTrackDcaXY_addPrim"};
-  const TString sLabelNumer[NHist] = {"Only MVTX cut #bf{#color[809]{[N_{hit}^{MVTX} > 2]}}",
-                                      "Add TPC cut #bf{#color[899]{[N_{hit}^{TPC} > 20]}}",
-                                      "Add Vz cut #bf{#color[909]{[|v_{z}| < 10 cm]}}",
-                                      "Add DCA_{xy} cut #bf{#color[879]{[|DCA_{xy}| < 20 #mum]}}",
-                                      "Add DCA_{z} cut #bf{#color[889]{[|DCA_{z}| < 20 #mum]}}",
-                                      "Add quality cut #bf{#color[859]{[Quality < 10]}}",
-                                      "Add 'Is Primary?'"};
+  const TString sNameNumer[NHist]  = {"hOddTrackDcaXY_nPi5",
+                                      "hOddTrackDcaXY_nPi10",
+                                      "hOddTrackDcaXY_nPi20"};
+  const TString sLabelNumer[NHist] = {"5 #pi^{-}/event",
+                                      "10 #pi^{-}/event",
+                                      "20 #pi^{-}/event"};
 
   // plot parameters
   const TString sTitle("");
   const TString sTitleX("DCA_{xy} [#mum]");
   const TString sTitleY("counts");
   const TString sTitleR("[weird tracks] / [all tracks]");
-  const TString sNameRatio[NHist] = {"hRatio_onlyMvtx", "hRatio_addTpc", "hRatio_addVz", "hRatio_addDcaXY", "hRatio_addDcaZ", "hRatio_addQual", "hRatio_addPrim"};
-  const TString sOptDenom[NHist]  = {"",                "same",          "same",         "same",            "same",           "same",           "same"};
-  const TString sOptNumer[NHist]  = {"same",            "same",          "same",         "same",            "same",           "same",           "same"};
-  const TString sOptRatio[NHist]  = {"",                "same",          "same",         "same",            "same",           "same",           "same"};
-  const TString sText[NTxt]       = {"#bf{#it{sPHENIX}}Simulation, single #pi^{-}", "5 #pi^{-}/event, p_{T} #in (0, 20) GeV/c", "#bf{Only #pi^{-} in event}"};
+  const TString sNameRatio[NHist] = {"hRatio_nPi5", "hRatio_nPi10", "hRatio_nPi20"};
+  const TString sOptDenom[NHist]  = {"",            "sames",         "sames"};
+  const TString sOptNumer[NHist]  = {"sames",       "sames",         "sames"};
+  const TString sOptRatio[NHist]  = {"",            "sames",         "sames"};
+  const TString sText[NTxt]       = {"#bf{#it{sPHENIX}}Simulation, single #pi^{-}", "5/10/20 #pi^{-}/event, p_{T} #in (0, 20) GeV/c", "#bf{Only #pi^{-} in event}"};
   const Float_t xPlotRange[NPlot] = {-100., 100.};
-  const UInt_t  fColDen[NHist]    = {799, 899, 879, 859, 839, 819, 923};
-  const UInt_t  fColNum[NHist]    = {798, 898, 878, 858, 838, 818, 921};
-  const UInt_t  fMarDen[NHist]    = {20,  22,  23,  21,  33,  34,  29};
-  const UInt_t  fMarNum[NHist]    = {24,  26,  32,  25,  27,  28,  30};
+  const UInt_t  fColDen[NHist]    = {893, 863, 813};
+  const UInt_t  fColNum[NHist]    = {898, 858, 818};
+  const UInt_t  fMarDen[NHist]    = {20,  22,  23};
+  const UInt_t  fMarNum[NHist]    = {24,  26,  32};
 
   // norm/rebin parameters
   const Bool_t doIntNorm(false);
-  const Bool_t doRebinDenom[NHist] = {true, true, true, true, true, true, true};
-  const Bool_t doRebinNumer[NHist] = {true, true, true, true, true, true, true};
-  const UInt_t nRebinDenom[NHist]  = {10, 10, 10, 10, 10, 10, 10};
-  const UInt_t nRebinNumer[NHist]  = {10, 10, 10, 10, 10, 10, 10};
+  const Bool_t doRebinDenom[NHist] = {true, true, true};
+  const Bool_t doRebinNumer[NHist] = {true, true, true};
+  const UInt_t nRebinDenom[NHist]  = {10, 10, 10};
+  const UInt_t nRebinNumer[NHist]  = {10, 10, 10};
 
   // open files
   TFile *fOutput = new TFile(sOutput.Data(), "recreate");

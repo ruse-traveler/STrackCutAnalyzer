@@ -17,14 +17,22 @@
 #include <G4_ParticleFlow.C>
 #include <G4_Production.C>
 #include <G4_TopoClusterReco.C>
-#include <G4_Tracking.C>
+
+#include <Trkr_RecoInit.C>
+#include <Trkr_Clustering.C>
+#include <Trkr_LaserClustering.C>
+#include <Trkr_Reco.C>
+#include <Trkr_Eval.C>
+#include <Trkr_QA.C>
+
+#include <Trkr_Diagnostics.C>
 #include <G4_User.C>
 #include <QA.C>
 
 #include <ffamodules/FlagHandler.h>
 #include <ffamodules/HeadReco.h>
 #include <ffamodules/SyncReco.h>
-#include <ffamodules/XploadInterface.h>
+#include <ffamodules/CDBInterface.h>
 
 #include <fun4all/Fun4AllDstOutputManager.h>
 #include <fun4all/Fun4AllOutputManager.h>
@@ -40,10 +48,10 @@ R__LOAD_LIBRARY(libffamodules.so)
 // try inputFile = /sphenix/sim/sim01/sphnxpro/sHijing_HepMC/sHijing_0-12fm.dat
 
 int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
-    const int nEvents = 50,
-    const string &inputFile = "/sphenix/lustre01/sphnxpro/mdc2/shijing_hepmc/fm_0_20/g4hits/G4Hits_sHijing_0_20fm-0000000040-00000.root",
-    const string &outputFile = "sPhenixG4.forPileupQualityCheck_auau020fmNevt50_embedScanOn.pt020n5pim.d10m2y2023.root",
-    const string &embed_input_file = "/sphenix/lustre01/sphnxpro/mdc2/shijing_hepmc/fm_0_20/g4hits/G4Hits_sHijing_0_20fm-0000000040-00000.root",
+    const int nEvents = 1,
+    const string &inputFile = "https://www.phenix.bnl.gov/WWW/publish/phnxbld/sPHENIX/files/sPHENIX_G4Hits_sHijing_9-11fm_00000_00010.root",
+    const string &outputFile = "G4sPHENIX.root",
+    const string &embed_input_file = "https://www.phenix.bnl.gov/WWW/publish/phnxbld/sPHENIX/files/sPHENIX_G4Hits_sHijing_9-11fm_00000_00010.root",
     const int skip = 0,
     const string &outdir = ".")
 {
@@ -94,6 +102,9 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   Input::SIMPLE = true;
   // Input::SIMPLE_NUMBER = 2; // if you need 2 of them
   // Input::SIMPLE_VERBOSITY = 1;
+
+  // Enable this is emulating the nominal pp/pA/AA collision vertex distribution
+  // Input::BEAM_CONFIGURATION = Input::AA_COLLISION; // Input::AA_COLLISION (default), Input::pA_COLLISION, Input::pp_COLLISION
 
   //  Input::PYTHIA6 = true;
 
@@ -182,13 +193,13 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   // pythia6
   if (Input::PYTHIA6)
   {
-    //! apply sPHENIX nominal beam parameter with 2mrad crossing as defined in sPH-TRG-2020-001
+    //! Nominal collision geometry is selected by Input::BEAM_CONFIGURATION
     Input::ApplysPHENIXBeamParameter(INPUTGENERATOR::Pythia6);
   }
   // pythia8
   if (Input::PYTHIA8)
   {
-    //! apply sPHENIX nominal beam parameter with 2mrad crossing as defined in sPH-TRG-2020-001
+    //! Nominal collision geometry is selected by Input::BEAM_CONFIGURATION
     Input::ApplysPHENIXBeamParameter(INPUTGENERATOR::Pythia8);
   }
 
@@ -199,7 +210,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
 
   if (Input::HEPMC)
   {
-    //! apply sPHENIX nominal beam parameter with 2mrad crossing as defined in sPH-TRG-2020-001
+    //! Nominal collision geometry is selected by Input::BEAM_CONFIGURATION
     Input::ApplysPHENIXBeamParameter(INPUTMANAGER::HepMCInputManager);
 
     // optional overriding beam parameters
@@ -222,7 +233,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   }
   if (Input::PILEUPRATE > 0)
   {
-    //! apply sPHENIX nominal beam parameter with 2mrad crossing as defined in sPH-TRG-2020-001
+    //! Nominal collision geometry is selected by Input::BEAM_CONFIGURATION
     Input::ApplysPHENIXBeamParameter(INPUTMANAGER::HepMCPileupInputManager);
   }
   // register all input generators with Fun4All
@@ -267,8 +278,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   //======================
 
   // QA, main switch
-  //Enable::QA = false;
-  Enable::QA = false;  // No Need [Derek, 12.02.2022]
+  Enable::QA = true;
 
   // Global options (enabled for all enables subsystems - if implemented)
   //  Enable::ABSORBER = true;
@@ -277,6 +287,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
 
   // Enable::BBC = true;
   // Enable::BBC_SUPPORT = true; // save hist in bbc support structure
+  // Enable::BBCRECO = Enable::BBC && true
   Enable::BBCFAKE = true;  // Smeared vtx and t0, use if you don't want real BBC in simulation
 
   Enable::PIPE = true;
@@ -310,6 +321,11 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   Enable::TRACKING_EVAL = Enable::TRACKING_TRACK && true;
   Enable::TRACKING_QA = Enable::TRACKING_TRACK && Enable::QA && true;
 
+  //Additional tracking tools 
+  //Enable::TRACKING_DIAGNOSTICS = Enable::TRACKING_TRACK && true;
+  //G4TRACKING::filter_conversion_electrons = true;
+
+
   //  cemc electronics + thin layer of W-epoxy to get albedo from cemc
   //  into the tracking, cannot run together with CEMC
   //  Enable::CEMCALBEDO = true;
@@ -319,8 +335,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   Enable::CEMC_CELL = Enable::CEMC && true;
   Enable::CEMC_TOWER = Enable::CEMC_CELL && true;
   Enable::CEMC_CLUSTER = Enable::CEMC_TOWER && true;
-  //Enable::CEMC_EVAL = Enable::CEMC_CLUSTER && true;
-  Enable::CEMC_EVAL = false;  // No Need [Derek, 12.02.2022]
+  Enable::CEMC_EVAL = Enable::CEMC_CLUSTER && true;
   Enable::CEMC_QA = Enable::CEMC_CLUSTER && Enable::QA && true;
 
   Enable::HCALIN = true;
@@ -328,8 +343,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   Enable::HCALIN_CELL = Enable::HCALIN && true;
   Enable::HCALIN_TOWER = Enable::HCALIN_CELL && true;
   Enable::HCALIN_CLUSTER = Enable::HCALIN_TOWER && true;
-  //Enable::HCALIN_EVAL = Enable::HCALIN_CLUSTER && true;
-  Enable::HCALIN_EVAL = false;  // No Need [Derek, 12.02.2022]
+  Enable::HCALIN_EVAL = Enable::HCALIN_CLUSTER && true;
   Enable::HCALIN_QA = Enable::HCALIN_CLUSTER && Enable::QA && true;
 
   Enable::MAGNET = true;
@@ -340,11 +354,11 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   Enable::HCALOUT_CELL = Enable::HCALOUT && true;
   Enable::HCALOUT_TOWER = Enable::HCALOUT_CELL && true;
   Enable::HCALOUT_CLUSTER = Enable::HCALOUT_TOWER && true;
-  //Enable::HCALOUT_EVAL = Enable::HCALOUT_CLUSTER && true;
-  Enable::HCALOUT_EVAL = false;  // No Need [Derek, 12.02.2022]
+  Enable::HCALOUT_EVAL = Enable::HCALOUT_CLUSTER && true;
   Enable::HCALOUT_QA = Enable::HCALOUT_CLUSTER && Enable::QA && true;
 
   Enable::EPD = true;
+  Enable::EPD_TILE = Enable::EPD && true;
 
   Enable::BEAMLINE = true;
 //  Enable::BEAMLINE_ABSORBER = true;  // makes the beam line magnets sensitive volumes
@@ -353,8 +367,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
 //  Enable::ZDC_ABSORBER = true;
 //  Enable::ZDC_SUPPORT = true;
   Enable::ZDC_TOWER = Enable::ZDC && true;
-  //Enable::ZDC_EVAL = Enable::ZDC_TOWER && true;
-  Enable::ZDC_EVAL = false;  // No Need [Derek, 12.02.2022]
+  Enable::ZDC_EVAL = Enable::ZDC_TOWER && true;
 
   //! forward flux return plug door. Out of acceptance and off by default.
   //Enable::PLUGDOOR = true;
@@ -371,8 +384,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   Enable::CALOTRIGGER = Enable::CEMC_TOWER && Enable::HCALIN_TOWER && Enable::HCALOUT_TOWER && false;
 
   Enable::JETS = (Enable::GLOBAL_RECO || Enable::GLOBAL_FASTSIM) && true;
-  //Enable::JETS_EVAL = Enable::JETS && true;
-  Enable::JETS_EVAL = false;  // No Need [Derek, 12.02.2022]
+  Enable::JETS_EVAL = Enable::JETS && true;
   Enable::JETS_QA = Enable::JETS && Enable::QA && true;
 
   // HI Jet Reco for p+Au / Au+Au collisions (default is false for
@@ -399,14 +411,11 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   //===============
   // conditions DB flags
   //===============
-  //Enable::XPLOAD = true;
-  // tag
-  rc->set_StringFlag("XPLOAD_TAG",XPLOAD::tag);
-  // database config
-  rc->set_StringFlag("XPLOAD_CONFIG",XPLOAD::config);
+  Enable::CDB = true;
+  // global tag
+  rc->set_StringFlag("CDB_GLOBALTAG",CDB::global_tag);
   // 64 bit timestamp
-  rc->set_uint64Flag("TIMESTAMP",XPLOAD::timestamp);
-
+  rc->set_uint64Flag("TIMESTAMP",CDB::timestamp);
   //---------------
   // World Settings
   //---------------
@@ -444,7 +453,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   // Detector Division
   //------------------
 
-  if (Enable::BBC || Enable::BBCFAKE) Bbc_Reco();
+  if ((Enable::BBC && Enable::BBCRECO) || Enable::BBCFAKE) Bbc_Reco();
 
   if (Enable::MVTX_CELL) Mvtx_Cells();
   if (Enable::INTT_CELL) Intt_Cells();
@@ -463,6 +472,12 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
 
   if (Enable::CEMC_TOWER) CEMC_Towers();
   if (Enable::CEMC_CLUSTER) CEMC_Clusters();
+
+  //--------------
+  // EPD tile reconstruction
+  //--------------
+
+  if (Enable::EPD_TILE) EPD_Tiles();
 
   //-----------------------------
   // HCAL towering and clustering
@@ -486,13 +501,33 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
     }
   if (Enable::MVTX_CLUSTER) Mvtx_Clustering();
   if (Enable::INTT_CLUSTER) Intt_Clustering();
-  if (Enable::TPC_CLUSTER) TPC_Clustering();
+  if (Enable::TPC_CLUSTER)
+    {
+      if(G4TPC::ENABLE_DIRECT_LASER_HITS || G4TPC::ENABLE_CENTRAL_MEMBRANE_HITS)
+	{
+	  TPC_LaserClustering();
+	}
+      else
+	{
+	  TPC_Clustering();
+	}
+    }
   if (Enable::MICROMEGAS_CLUSTER) Micromegas_Clustering();
 
   if (Enable::TRACKING_TRACK)
   {
     Tracking_Reco();
   }
+
+  if(Enable::TRACKING_DIAGNOSTICS)
+    {
+      const std::string kshortFile = "./kshort_" + outputFile;
+      const std::string residualsFile = "./residuals_" + outputFile;
+ 
+      G4KshortReconstruction(kshortFile);
+      seedResiduals(residualsFile);
+    }
+
   //-----------------
   // Global Vertexing
   //-----------------
@@ -549,9 +584,6 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
     outputroot.erase(pos, remove_this.length());
   }
 
-  //if (Enable::TRACKING_EVAL) Tracking_Eval(outputroot + "_g4svtx_eval.root");
-
-  // Make embed_scan is OFF [Derek, 12.02.2022]
   if (Enable::TRACKING_EVAL) {
 
     // create output name
@@ -566,12 +598,12 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
                              G4MICROMEGAS::n_micromegas_layer);
 
     // turn on evaluations
-    eval -> do_cluster_eval(true);
-    eval -> do_g4hit_eval(true);
-    eval -> do_hit_eval(true);  // enable to see the hits that includes the chamber physics...
-    eval -> do_gpoint_eval(true);
-    eval -> do_vtx_eval_light(false);
-    eval -> do_eval_light(false);
+    eval -> do_cluster_eval(false);
+    eval -> do_g4hit_eval(false);
+    eval -> do_hit_eval(false);  // enable to see the hits that includes the chamber physics...
+    eval -> do_gpoint_eval(false);
+    eval -> do_vtx_eval_light(true);
+    eval -> do_eval_light(true);
     eval -> set_use_initial_vertex(G4TRACKING::g4eval_use_initial_vertex);
 
     // turn off embed scan
@@ -602,6 +634,10 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   if (Enable::DSTREADER) G4DSTreader(outputroot + "_DSTReader.root");
 
   if (Enable::USER) UserAnalysisInit();
+
+  // Writes electrons from conversions to a new track map on the node tree
+  // the ntuple file is for diagnostics, it is produced only if the flag is set in G4_Tracking.C
+  if(G4TRACKING::filter_conversion_electrons) Filter_Conversion_Electrons(outputroot + "_secvert_ntuple.root");
 
   //======================
   // Run KFParticle on evt
@@ -695,6 +731,7 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   // Exit
   //-----
 
+//  CDBInterface::instance()->Print(); // print used DB files
   se->End();
   std::cout << "All done" << std::endl;
   delete se;
@@ -704,7 +741,6 @@ int Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn(
   }
 
   gSystem->Exit(0);
-  std::cout << "DONE DONE DONE" << std::endl;
   return 0;
 }
 #endif

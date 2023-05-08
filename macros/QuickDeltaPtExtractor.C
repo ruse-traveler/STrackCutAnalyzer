@@ -22,22 +22,26 @@
 #include "TNtuple.h"
 #include "TLegend.h"
 #include "TPaveText.h"
+#include "TDirectory.h"
 
 using namespace std;
 
 // global constants
 static const Ssiz_t  NTxt     = 3;
 static const Ssiz_t  NPad     = 2;
+static const Ssiz_t  NPar     = 3;
 static const Ssiz_t  NVtx     = 4;
-static const Ssiz_t  NCuts    = 7;
 static const Ssiz_t  NRange   = 2;
+static const Ssiz_t  NProj    = 6;
 static const Ssiz_t  NTrkCuts = 6;
+static const Ssiz_t  NDPtCuts = 7;
+static const Ssiz_t  NSigCuts = 3;
 static const TString SInTrack = "ntp_track";
 static const TString SInTruth = "ntp_gtrack";
 
 // default parameters
 static const TString SInDef  = "input/embed_only/final_merge/sPhenixG4_forSectorCheck_embedScanOn_embedOnly.pt020n5pim.d11m4y2023.root";
-static const TString SOutDef = "varyDeltaPtCut.withInttCutAndPtDeltaVsTrack.pt020n5pim.d4m5y2023.root";
+static const TString SOutDef = "varyDeltaPtCut.withPtDependentDeltaPtCut.pt020n5pim.d8m5y2023.root";
 
 
 
@@ -48,24 +52,33 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   cout << "\n  Beginning delta-pt extractor script..." << endl;
 
   // cut parameters
-  const UInt_t   nInttTrkMin       = 1;
-  const UInt_t   nMVtxTrkMin       = 2;
-  const UInt_t   nTpcTrkMin        = 35;
-  const Double_t qualTrkMax        = 10.;
-  const Double_t vzTrkMax          = 10.;
-  const Double_t ptTrkMin          = 0.1;
-  const Double_t ptDeltaMax[NCuts] = {0.5, 0.25, 0.1, 0.05, 0.03, 0.02, 0.01};
-  const Double_t normRange[NRange] = {0.2, 1.2};
+  const UInt_t   nInttTrkMin          = 1;
+  const UInt_t   nMVtxTrkMin          = 2;
+  const UInt_t   nTpcTrkMin           = 35;
+  const Double_t qualTrkMax           = 10.;
+  const Double_t vzTrkMax             = 10.;
+  const Double_t ptTrkMin             = 0.1;
+  const Double_t ptDeltaMax[NDPtCuts] = {0.5, 0.25, 0.1, 0.05, 0.03, 0.02, 0.01};
+  const Double_t ptDeltaSig[NSigCuts] = {1.,  2.,   3.};
+  const Double_t normRange[NRange]    = {0.2, 1.2};
 
   // histogram parameters
-  const TString sPtTrueBase       = "PtTrue";
-  const TString sPtRecoBase       = "PtReco";
-  const TString sPtFracBase       = "PtFrac";
-  const TString sPtDeltaBase      = "DeltaPt";
-  const TString sPtTrkTruBase     = "PtTrkTruth";
-  const TString sRejectBase       = "Reject";
-  const TString sEffBase          = "Efficiency";
-  const TString sDPtSuffix[NCuts] = {"_dPt50", "_dPt25", "_dPt10", "_dPt05", "_dPt03", "_dPt02", "_dPt01"};
+  const TString sPtTrueBase          = "PtTrue";
+  const TString sPtRecoBase          = "PtReco";
+  const TString sPtFracBase          = "PtFrac";
+  const TString sPtDeltaBase         = "DeltaPt";
+  const TString sPtTrkTruBase        = "PtTrkTruth";
+  const TString sPtProjBase          = "DeltaPtProj";
+  const TString sRejCutBase          = "Reject_flatDPtCut";
+  const TString sRejSigBase          = "Reject_sigmaDPtCut";
+  const TString sMuHiBase            = "MeanPlusSigma";
+  const TString sMuLoBase            = "MeanMinusSigma";
+  const TString sSigBase             = "ProjectionSigma";
+  const TString sMuBase              = "ProjectionMean";
+  const TString sEffBase             = "Efficiency";
+  const TString sProjSuffix[NProj]   = {"_pt05",    "_pt1",     "_pt2",   "_pt5",   "_pt10",  "_pt20"}; 
+  const TString sDPtSuffix[NDPtCuts] = {"_dPt50",   "_dPt25",   "_dPt10", "_dPt05", "_dPt03", "_dPt02", "_dPt01"};
+  const TString sSigSuffix[NSigCuts] = {"_sigDPt1", "_sigDPt2", "_sigDPt3"};
 
   // histogram text parameters
   const TString sTitle        = "";
@@ -75,18 +88,32 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const TString sPtFracAxis   = "p_{T}^{reco} / p_{T}^{true}";
   const TString sPtDeltaAxis  = "#Deltap_{T} / p_{T}^{reco}";
   const TString sDeltaCutAxis = "max #Deltap_{T} / p_{T}^{reco}";
+  const TString sSigmaCutAxis = "n #times #sigma(#Deltap_{T} / p_{T}^{reco})";
+  const TString sSigProjAxis  = "#sigma(#Deltap_{T} / p_{T}^{reco})";
+  const TString sMuProjAxis   = "#mu(#Deltap_{T} / p_{T}^{reco}) #pm (n #times #sigma(#Deltap_{T} / p_{T}^{reco}))";
   const TString sRejectAxis   = "rejection factor";
   const TString sEffAxis      = "#epsilon_{trk}";
 
-  // histogram style parameters
+  // sigma calculation parameters
+  const Double_t ptProj[NProj]      = {0.5, 1., 2., 5., 10., 20.};
+  const Double_t sigLoGuess[NPar]   = {1., 1., 1.};
+  const Double_t sigHiGuess[NPar]   = {1., 1., 1.};
+  const Double_t ptFitRange[NRange] = {0., 20.};
+
+  // style parameters
   const UInt_t  fColTrue(923);
   const UInt_t  fColPure(923);
   const UInt_t  fColTrk(809);
   const UInt_t  fMarTrue(20);
   const UInt_t  fMarPure(20);
   const UInt_t  fMarTrk(46);
-  const UInt_t  fColCut[NCuts]      = {899, 909, 879, 889, 859, 869, 839};
-  const UInt_t  fMarCut[NCuts]      = {24,  26,  32,  25,  27,  28,  30};
+  const UInt_t  fColFit[NProj]      = {803, 893, 883, 863, 843, 813};
+  const UInt_t  fColProj[NProj]     = {799, 899, 879, 859, 839, 819};
+  const UInt_t  fMarProj[NProj]     = {20,  22,  23,  21,  33,  34};
+  const UInt_t  fColCut[NDPtCuts]   = {899, 909, 879, 889, 859, 869, 839};
+  const UInt_t  fMarCut[NDPtCuts]   = {24,  26,  32,  25,  27,  28,  30};
+  const UInt_t  fColSig[NSigCuts]   = {899, 879, 859};
+  const UInt_t  fMarSig[NSigCuts]   = {24,  26,  32};
   const Float_t rPtRange[NRange]    = {0., 30.};
   const Float_t rFracRange[NRange]  = {0., 4.};
   const Float_t rDeltaRange[NRange] = {0., 1.};
@@ -94,22 +121,47 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   // legend parameters
   const TString sLegTrue("truth");
   const TString sLegTrack("tracks (w/ cuts)");
-  const TString sInfo[NTxt]        = {"#bf{#it{sPHENIX}} Simulation",
-                                      "100 #pi^{-}/event, p_{T} #in (0, 20) GeV/c",
-                                      "#bf{Only #pi^{-}}"};
-  const TString sLegCut[NCuts]     = {"#Deltap_{T} / p_{T} < 0.5",
-                                      "#Deltap_{T} / p_{T} < 0.25",
-                                      "#Deltap_{T} / p_{T} < 0.1",
-                                      "#Deltap_{T} / p_{T} < 0.05",
-                                      "#Deltap_{T} / p_{T} < 0.03",
-                                      "#Deltap_{T} / p_{T} < 0.02",
-                                      "#Deltap_{T} / p_{T} < 0.01"};
-  const TString sTrkCuts[NTrkCuts] = {"|v_{z}| < 10 cm",
-                                      "N_{hit}^{intt} #geq 1",
-                                      "N_{hit}^{mvtx} > 2",
-                                      "N_{hit}^{tpc} > 35",
-                                      "p_{T}^{reco} > 0.1 GeV/c",
-                                      "quality < 10"};
+  const TString sLegMu("Mean #Deltap_{T} / p_{T}^{reco} (n = 0)");
+  const TString sInfo[NTxt] = {
+    "#bf{#it{sPHENIX}} Simulation",
+    "100 #pi^{-}/event, p_{T} #in (0, 20) GeV/c",
+    "#bf{Only #pi^{-}}"
+  };
+  const TString sLegProj[NProj] = {
+    "p_{T}^{reco} = 0.5 GeV/c",
+    "p_{T}^{reco} = 1 GeV/c",
+    "p_{T}^{reco} = 2 GeV/c",
+    "p_{T}^{reco} = 5 GeV/c",
+    "p_{T}^{reco} = 10 GeV/c",
+    "p_{T}^{reco} = 20 GeV/c"
+  };
+  const TString sLegCut[NDPtCuts] = {
+    "#Deltap_{T} / p_{T}^{reco} < 0.5",
+    "#Deltap_{T} / p_{T}^{reco} < 0.25",
+    "#Deltap_{T} / p_{T}^{reco} < 0.1",
+    "#Deltap_{T} / p_{T}^{reco} < 0.05",
+    "#Deltap_{T} / p_{T}^{reco} < 0.03",
+    "#Deltap_{T} / p_{T}^{reco} < 0.02",
+    "#Deltap_{T} / p_{T}^{reco} < 0.01"
+  };
+  const TString sLegProjSig[NSigCuts] = {
+    "n = 1",
+    "n = 2",
+    "n = 3"
+  };
+  const TString sLegSig[NSigCuts] = {
+    "#Deltap_{T} / p_{T}^{reco} #in 1 #times sigma(#Deltap_{T} / p_{T}^{reco})",
+    "#Deltap_{T} / p_{T}^{reco} #in 2 #times sigma(#Deltap_{T} / p_{T}^{reco})",
+    "#Deltap_{T} / p_{T}^{reco} #in 3 #times sigma(#Deltap_{T} / p_{T}^{reco})"
+  };
+  const TString sTrkCuts[NTrkCuts] = {
+    "|v_{z}| < 10 cm",
+    "N_{hit}^{intt} #geq 1",
+    "N_{hit}^{mvtx} > 2",
+    "N_{hit}^{tpc} > 35",
+    "p_{T}^{reco} > 0.1 GeV/c",
+    "quality < 10"
+  };
 
   // open files
   TFile *fOutput = new TFile(sOutput.Data(), "recreate");
@@ -539,20 +591,30 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   TH1D *hPtTrack;
   TH1D *hPtFrac;
   TH1D *hPtTrkTru;
-  TH1D *hPtDeltaCut[NCuts];
-  TH1D *hPtTrackCut[NCuts];
-  TH1D *hPtFracCut[NCuts];
-  TH1D *hPtTrkTruCut[NCuts];
-  TH1D *hEffCut[NCuts];
+  TH1D *hPtDeltaProj[NProj];
+  TH1D *hPtDeltaCut[NDPtCuts];
+  TH1D *hPtDeltaSig[NSigCuts];
+  TH1D *hPtTrackCut[NDPtCuts];
+  TH1D *hPtTrackSig[NSigCuts];
+  TH1D *hPtFracCut[NDPtCuts];
+  TH1D *hPtFracSig[NSigCuts];
+  TH1D *hPtTrkTruCut[NDPtCuts];
+  TH1D *hPtTrkTruSig[NSigCuts];
+  TH1D *hEffCut[NDPtCuts];
+  TH1D *hEffSig[NSigCuts];
 
   TH2D *hPtDeltaVsFrac;
   TH2D *hPtDeltaVsTrue;
   TH2D *hPtDeltaVsTrack;
   TH2D *hPtTrueVsTrack;
-  TH2D *hPtDeltaVsFracCut[NCuts];
-  TH2D *hPtDeltaVsTrueCut[NCuts];
-  TH2D *hPtDeltaVsTrackCut[NCuts];
-  TH2D *hPtTrueVsTrackCut[NCuts];
+  TH2D *hPtDeltaVsFracCut[NDPtCuts];
+  TH2D *hPtDeltaVsFracSig[NSigCuts];
+  TH2D *hPtDeltaVsTrueCut[NDPtCuts];
+  TH2D *hPtDeltaVsTrueSig[NSigCuts];
+  TH2D *hPtDeltaVsTrackCut[NDPtCuts];
+  TH2D *hPtDeltaVsTrackSig[NSigCuts];
+  TH2D *hPtTrueVsTrackCut[NDPtCuts];
+  TH2D *hPtTrueVsTrackSig[NSigCuts];
 
   // histogram binning
   const UInt_t  nPtBins(500);
@@ -591,15 +653,24 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   sPtDeltaVsTrack.Append(sPtRecoBase.Data());
   sPtTrueVsTrack.Append(sPtRecoBase.Data());
 
-  TString sPtDeltaCut[NCuts];
-  TString sPtTrackCut[NCuts];
-  TString sPtFracCut[NCuts];
-  TString sPtTrkTruCut[NCuts];
-  TString sPtDeltaVsFracCut[NCuts];
-  TString sPtDeltaVsTrueCut[NCuts];
-  TString sPtDeltaVsTrackCut[NCuts];
-  TString sPtTrueVsTrackCut[NCuts];
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+  // delta-pt projection names
+  TString sPtProj[NProj];
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+    sPtProj[iProj] = "h";
+    sPtProj[iProj].Append(sPtProjBase.Data());
+    sPtProj[iProj].Append(sProjSuffix[iProj].Data());
+  }
+
+  // flat delta-pt cut names
+  TString sPtDeltaCut[NDPtCuts];
+  TString sPtTrackCut[NDPtCuts];
+  TString sPtFracCut[NDPtCuts];
+  TString sPtTrkTruCut[NDPtCuts];
+  TString sPtDeltaVsFracCut[NDPtCuts];
+  TString sPtDeltaVsTrueCut[NDPtCuts];
+  TString sPtDeltaVsTrackCut[NDPtCuts];
+  TString sPtTrueVsTrackCut[NDPtCuts];
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     sPtDeltaCut[iCut]  = "h";
     sPtTrackCut[iCut]  = "h";
     sPtFracCut[iCut]   = "h";
@@ -636,6 +707,52 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     sPtTrueVsTrackCut[iCut].Append(sDPtSuffix[iCut].Data());
   }
 
+  // pt-dependent delta-pt cut names
+  TString sPtDeltaSig[NSigCuts];
+  TString sPtTrackSig[NSigCuts];
+  TString sPtFracSig[NSigCuts];
+  TString sPtTrkTruSig[NSigCuts];
+  TString sPtDeltaVsFracSig[NSigCuts];
+  TString sPtDeltaVsTrueSig[NSigCuts];
+  TString sPtDeltaVsTrackSig[NSigCuts];
+  TString sPtTrueVsTrackSig[NSigCuts];
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    sPtDeltaSig[iSig]  = "h";
+    sPtTrackSig[iSig]  = "h";
+    sPtFracSig[iSig]   = "h";
+    sPtTrkTruSig[iSig] = "h";
+    sPtDeltaSig[iSig].Append(sPtDeltaBase.Data());
+    sPtTrackSig[iSig].Append(sPtRecoBase.Data());
+    sPtFracSig[iSig].Append(sPtFracBase.Data());
+    sPtTrkTruSig[iSig].Append(sPtTrkTruBase.Data());
+    sPtDeltaSig[iSig].Append(sSigSuffix[iSig].Data());
+    sPtTrackSig[iSig].Append(sSigSuffix[iSig].Data());
+    sPtFracSig[iSig].Append(sSigSuffix[iSig].Data());
+    sPtTrkTruSig[iSig].Append(sSigSuffix[iSig].Data());
+
+    sPtDeltaVsFracSig[iSig]  = "h";
+    sPtDeltaVsTrueSig[iSig]  = "h";
+    sPtDeltaVsTrackSig[iSig] = "h";
+    sPtTrueVsTrackSig[iSig]  = "h";
+    sPtDeltaVsFracSig[iSig].Append(sPtDeltaBase.Data());
+    sPtDeltaVsFracSig[iSig].Append(sPtDeltaBase.Data());
+    sPtDeltaVsTrueSig[iSig].Append(sPtDeltaBase.Data());
+    sPtDeltaVsTrackSig[iSig].Append(sPtDeltaBase.Data());
+    sPtTrueVsTrackSig[iSig].Append(sPtTrueBase.Data());
+    sPtDeltaVsFracSig[iSig].Append("Vs");
+    sPtDeltaVsTrueSig[iSig].Append("Vs");
+    sPtDeltaVsTrackSig[iSig].Append("Vs");
+    sPtTrueVsTrackSig[iSig].Append("Vs");
+    sPtDeltaVsFracSig[iSig].Append(sPtFracBase.Data());
+    sPtDeltaVsTrueSig[iSig].Append(sPtTrueBase.Data());
+    sPtDeltaVsTrackSig[iSig].Append(sPtRecoBase.Data());
+    sPtTrueVsTrackSig[iSig].Append(sPtRecoBase.Data());
+    sPtDeltaVsFracSig[iSig].Append(sSigSuffix[iSig].Data());
+    sPtDeltaVsTrueSig[iSig].Append(sSigSuffix[iSig].Data());
+    sPtDeltaVsTrackSig[iSig].Append(sSigSuffix[iSig].Data());
+    sPtTrueVsTrackSig[iSig].Append(sSigSuffix[iSig].Data());
+  }
+
   // initialize histograms
   hPtTruth  = new TH1D(sPtTruth.Data(),  "", nPtBins,    rPtBins[0],    rPtBins[1]);
   hPtDelta  = new TH1D(sPtDelta.Data(),  "", nDeltaBins, rDeltaBins[0], rDeltaBins[1]);
@@ -657,7 +774,14 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   hPtDeltaVsTrack -> Sumw2();
   hPtTrueVsTrack  -> Sumw2();
 
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+  // delta-pt projection histograms
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+    hPtDeltaProj[iProj] = new TH1D(sPtProj[iProj].Data(), "", nDeltaBins, rDeltaBins[0], rDeltaBins[1]);
+    hPtDeltaProj[iProj] -> Sumw2();
+  }
+
+  // flat delta-pt cut histograms
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     hPtDeltaCut[iCut]  = new TH1D(sPtDeltaCut[iCut].Data(),  "", nDeltaBins, rDeltaBins[0], rDeltaBins[1]);
     hPtTrackCut[iCut]  = new TH1D(sPtTrackCut[iCut].Data(),  "", nPtBins,    rPtBins[0],    rPtBins[1]);
     hPtFracCut[iCut]   = new TH1D(sPtFracCut[iCut].Data(),   "", nFracBins,  rFracBins[0],  rFracBins[1]);
@@ -677,19 +801,66 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     hPtTrueVsTrackCut[iCut]  -> Sumw2();
   }
 
+  // pt-dependent delta-pt cut histograms
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    hPtDeltaSig[iSig]  = new TH1D(sPtDeltaSig[iSig].Data(),  "", nDeltaBins, rDeltaBins[0], rDeltaBins[1]);
+    hPtTrackSig[iSig]  = new TH1D(sPtTrackSig[iSig].Data(),  "", nPtBins,    rPtBins[0],    rPtBins[1]);
+    hPtFracSig[iSig]   = new TH1D(sPtFracSig[iSig].Data(),   "", nFracBins,  rFracBins[0],  rFracBins[1]);
+    hPtTrkTruSig[iSig] = new TH1D(sPtTrkTruSig[iSig].Data(), "", nPtBins,    rPtBins[0],    rPtBins[1]);
+    hPtDeltaSig[iSig]  -> Sumw2();
+    hPtTrackSig[iSig]  -> Sumw2();
+    hPtFracSig[iSig]   -> Sumw2();
+    hPtTrkTruSig[iSig] -> Sumw2();
+
+    hPtDeltaVsFracSig[iSig]  = new TH2D(sPtDeltaVsFracSig[iSig].Data(),  "", nFracBins, rFracBins[0], rFracBins[1], nDeltaBins, rDeltaBins[0], rDeltaBins[1]);
+    hPtDeltaVsTrueSig[iSig]  = new TH2D(sPtDeltaVsTrueSig[iSig].Data(),  "", nPtBins,   rPtBins[0],   rPtBins[1],   nDeltaBins, rDeltaBins[0], rDeltaBins[1]);
+    hPtDeltaVsTrackSig[iSig] = new TH2D(sPtDeltaVsTrackSig[iSig].Data(), "", nPtBins,   rPtBins[0],   rPtBins[1],   nDeltaBins, rDeltaBins[0], rDeltaBins[1]);
+    hPtTrueVsTrackSig[iSig]  = new TH2D(sPtTrueVsTrackSig[iSig].Data(),  "", nPtBins,   rPtBins[0],   rPtBins[1],   nPtBins,    rPtBins[0],    rPtBins[1]);
+    hPtDeltaVsFracSig[iSig]  -> Sumw2();
+    hPtDeltaVsTrueSig[iSig]  -> Sumw2();
+    hPtDeltaVsTrackSig[iSig] -> Sumw2();
+    hPtTrueVsTrackSig[iSig]  -> Sumw2();
+  }
+
   // grab no. of entries
   const Long64_t nTrks = ntTrack -> GetEntries();
   const Long64_t nTrus = ntTruth -> GetEntries();
-  cout << "    Beginning tuple loops: " << nTrks << " reco. tracks and " << nTrus << " particles to process..." << endl;
+  cout << "    Beginning tuple loops: " << nTrks << " reco. tracks and " << nTrus << " particles to process\n"
+       << "      First loop over reco. tracks:"
+       << endl;
+
+  // for sigma calculatin
+  Double_t muProj[NProj];
+  Double_t sigProj[NProj];
+  Double_t muHiProj[NSigCuts][NProj];
+  Double_t muLoProj[NSigCuts][NProj];
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+    muProj[iProj]  = 0.;
+    sigProj[iProj] = 0.;
+  }
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+      muHiProj[iSig][iProj] = 0.;
+      muLoProj[iSig][iProj] = 0.;
+    }
+  }
 
   // for reject calculation
-  UInt_t   nNorm[NCuts];
-  UInt_t   nWeird[NCuts];
-  Double_t reject[NCuts];
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
-    nNorm[iCut]  = 0;
-    nWeird[iCut] = 0;
-    reject[iCut] = 0.;
+  UInt_t   nNormCut[NDPtCuts];
+  UInt_t   nNormSig[NSigCuts];
+  UInt_t   nWeirdCut[NDPtCuts];
+  UInt_t   nWeirdSig[NSigCuts];
+  Double_t rejCut[NDPtCuts];
+  Double_t rejSig[NSigCuts];
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
+    nNormCut[iCut]  = 0;
+    nWeirdCut[iCut] = 0;
+    rejCut[iCut]    = 0.;
+  }
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    nNormSig[iSig]  = 0;
+    nWeirdSig[iSig] = 0;
+    rejSig[iSig]    = 0.;
   }
 
   // track loop
@@ -707,9 +878,9 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     // announce progress
     const Long64_t iProgTrk = iTrk + 1;
     if (iProgTrk == nTrks) {
-      cout << "      Processing track " << iProgTrk << "/" << nTrks << "..." << endl;
+      cout << "        Processing track " << iProgTrk << "/" << nTrks << "..." << endl;
     } else {
-      cout << "      Processing track " << iProgTrk << "/" << nTrks << "...\r" << flush;
+      cout << "        Processing track " << iProgTrk << "/" << nTrks << "...\r" << flush;
     }
 
     // do calculations
@@ -738,7 +909,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
 
     // apply delta-pt cuts
     const Bool_t isNormalTrk = ((ptFrac > normRange[0]) && (ptFrac < normRange[1]));
-    for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+    for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
       const Bool_t isInDeltaPtCut = (ptDelta < ptDeltaMax[iCut]);
       if (isInDeltaPtCut) {
 
@@ -754,18 +925,100 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
 
         // increment counters
         if (isNormalTrk) {
-          ++nNorm[iCut];
+          ++nNormCut[iCut];
         } else {
-          ++nWeird[iCut];
+          ++nWeirdCut[iCut];
         }
       }
     }  // end delta-pt cut
   }  // end track loop
+  cout << "      First loop over reco. tracks finished!" << endl;
 
-  // calculate purities
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
-    reject[iCut] = (Double_t) nNorm[iCut] / (Double_t) nWeird[iCut];
+  // calculate flat delta-pt rejection factors
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
+    rejCut[iCut] = (Double_t) nNormCut[iCut] / (Double_t) nWeirdCut[iCut];
   }
+  cout << "      Calculated flat delta-pt rejection factors." << endl;
+
+  // projection fit names
+  TString sFitProj[NProj];
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+    sFitProj[iProj] = "f";
+    sFitProj[iProj].Append(sPtProjBase.Data());
+    sFitProj[iProj].Append(sProjSuffix[iProj].Data());
+  }
+
+  // project slices of delta-pt and get sigmas
+  const UInt_t fWidFit = 2;
+  const UInt_t fLinFit = 1;
+
+  TF1 *fPtDeltaProj[NProj];
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+
+    // do projection
+    const UInt_t iBinProj = hPtDeltaVsTrack -> GetXaxis() -> FindBin(ptProj[iProj]);
+    hPtDeltaProj[iProj]   = hPtDeltaVsTrack -> ProjectionY(sPtProj[iProj], iBinProj, iBinProj, "");
+
+    // get initial values for fit
+    const Float_t ampGuess = hPtDeltaProj[iProj] -> GetMaximum();
+    const Float_t muGuess  = hPtDeltaProj[iProj] -> GetMean();
+    const Float_t sigGuess = hPtDeltaProj[iProj] -> GetRMS();
+
+    // fit with gaussian
+    fPtDeltaProj[iProj] = new TF1(sFitProj[iProj].Data(), "gaus", ptFitRange[0], ptFitRange[1]);
+    fPtDeltaProj[iProj] -> SetLineColor(fColFit[iProj]);
+    fPtDeltaProj[iProj] -> SetLineStyle(fLinFit);
+    fPtDeltaProj[iProj] -> SetLineWidth(fWidFit);
+    fPtDeltaProj[iProj] -> SetParameter(0, ampGuess);
+    fPtDeltaProj[iProj] -> SetParameter(1, muGuess);
+    fPtDeltaProj[iProj] -> SetParameter(2, sigGuess);
+    hPtDeltaProj[iProj] -> Fit(sFitProj[iProj].Data(), "R");
+
+    // add values to arrays
+    muProj[iProj]  = fPtDeltaProj[iProj] -> GetParameter(1);
+    sigProj[iProj] = fPtDeltaProj[iProj] -> GetParameter(2);
+    for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+      muHiProj[iSig][iProj] = muProj[iProj] + (ptDeltaSig[iSig] * sigProj[iProj]);
+      muLoProj[iSig][iProj] = muProj[iProj] - (ptDeltaSig[iSig] * sigProj[iProj]);
+    }
+  }  // end projection loop
+  cout << "      Obtained delta-pt projections, fits, and sigmas." << endl;
+
+  // sigma graph names
+  TString sMuProj("gr");
+  TString sSigProj("gr");
+  sMuProj.Append(sMuBase.Data());
+  sSigProj.Append(sSigBase.Data());
+
+  TString sMuHiProj[NSigCuts];
+  TString sMuLoProj[NSigCuts];
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    sMuHiProj[iSig] = "gr";
+    sMuLoProj[iSig] = "gr";
+    sMuHiProj[iSig].Append(sMuHiBase.Data());
+    sMuLoProj[iSig].Append(sMuLoBase.Data());
+    sMuHiProj[iSig].Append(sSigSuffix[iSig].Data());
+    sMuLoProj[iSig].Append(sSigSuffix[iSig].Data());
+  }
+
+  // construct sigma graphs
+  TGraph *grMuProj  = new TGraph(NProj, ptProj, muProj);
+  TGraph *grSigProj = new TGraph(NProj, ptProj, sigProj);
+  grMuProj  -> SetName(sMuProj);
+  grSigProj -> SetName(sSigProj);
+
+  TGraph *grMuHiProj[NSigCuts];
+  TGraph *grMuLoProj[NSigCuts];
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    grMuHiProj[iSig] = new TGraph(NProj, ptProj, muHiProj[iSig]);
+    grMuLoProj[iSig] = new TGraph(NProj, ptProj, muLoProj[iSig]);
+    grMuHiProj[iSig] -> SetName(sMuHiProj[iSig]);
+    grMuLoProj[iSig] -> SetName(sMuLoProj[iSig]);
+  }
+  cout << "      Created sigma graphs." << endl;
+
+  /* fitting of graphs, 2nd loop over reco tracks, and calculation of sigma rejection factors goes here */
+  cout << "      Loop over particles:" << endl;
 
   // truth loop
   Long64_t nBytesTru = 0;
@@ -782,9 +1035,9 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     // announce progress
     const Long64_t iProgTru = iTru + 1;
     if (iProgTru == nTrus) {
-      cout << "      Processing particle " << iProgTru << "/" << nTrus << "..." << endl;
+      cout << "        Processing particle " << iProgTru << "/" << nTrus << "..." << endl;
     } else {
-      cout << "      Processing particle" << iProgTru << "/" << nTrus << "...\r" << flush;
+      cout << "        Processing particle" << iProgTru << "/" << nTrus << "...\r" << flush;
     }
 
     // fill truth histogram
@@ -793,41 +1046,74 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
       hPtTruth -> Fill(tru_gpt);
     }
   }  // end track loop
+  cout << "      Loop over particles finished!" << endl;
 
-  // announce purities
-  cout << "    Finished tuple loops! Calculated rejection factors:" << endl;
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
-    cout << "      n(Norm, Weird) = (" << nNorm[iCut] << ", " << nWeird[iCut] << "), rejection = " << reject[iCut] << endl;
+  // announce rejection factors
+  cout << "    Finished tuple loops! Rejection factors:" << endl;
+
+  // flat delta-t rejection factors
+  cout << "      Flat delta-pt cuts" << endl;
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
+    cout << "        n(Norm, Weird) = (" << nNormCut[iCut] << ", " << nWeirdCut[iCut] << "), rejection = " << rejCut[iCut] << endl;
   }
 
-  // make rejection graph
-  TString sReject("gr");
-  sReject.Append(sRejectBase.Data());
+  // flat delta-t rejection factors
+  cout << "      Pt-dependent delta-pt cuts" << endl;
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    cout << "        n(Norm, Weird) = (" << nNormSig[iSig] << ", " << nWeirdSig[iSig] << "), rejection = " << rejSig[iSig] << endl;
+  }
 
-  TGraph *grReject = new TGraph(NCuts, ptDeltaMax, reject);
-  grReject -> SetName(sReject.Data());
+  // make rejection graphs
+  TString sRejCut("gr");
+  TString sRejSig("gr");
+  sRejCut.Append(sRejCutBase.Data());
+  sRejSig.Append(sRejSigBase.Data());
+
+  TGraph *grRejCut = new TGraph(NDPtCuts, ptDeltaMax, rejCut);
+  TGraph *grRejSig = new TGraph(NSigCuts, ptDeltaSig, rejSig);
+  grRejCut -> SetName(sRejCut.Data());
+  grRejSig -> SetName(sRejSig.Data());
   cout << "    Made rejection factor graph." << endl; 
 
   // calculate efficiencies
   TString sEff("h");
   sEff.Append(sEffBase.Data());
 
-  TString sEffCut[NCuts];
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+  // flat delta-pt cut efficiency names
+  TString sEffCut[NDPtCuts];
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     sEffCut[iCut] = "h";
     sEffCut[iCut].Append(sEffBase.Data());
     sEffCut[iCut].Append(sDPtSuffix[iCut].Data());
+  }
+
+  // pt-dependent delta-pt cut efficiency names
+  TString sEffSig[NSigCuts];
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    sEffSig[iSig] = "h";
+    sEffSig[iSig].Append(sEffBase.Data());
+    sEffSig[iSig].Append(sSigSuffix[iSig].Data());
   }
 
   hEff = (TH1D*) hPtTruth -> Clone();
   hEff -> SetName(sEff.Data());
   hEff -> Reset("ICES");
   hEff -> Divide(hPtTrkTru, hPtTruth, 1., 1.);
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+
+  // flat delta-pt cut efficiencies
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     hEffCut[iCut] = (TH1D*) hPtTruth -> Clone();
     hEffCut[iCut] -> SetName(sEffCut[iCut].Data());
     hEffCut[iCut] -> Reset("ICES");
     hEffCut[iCut] -> Divide(hPtTrkTruCut[iCut], hPtTruth, 1., 1.);
+  }
+
+  // pt-dependent delta-pt cut efficiencies
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    hEffSig[iSig] = (TH1D*) hPtTruth -> Clone();
+    hEffSig[iSig] -> SetName(sEffSig[iSig].Data());
+    hEffSig[iSig] -> Reset("ICES");
+    hEffSig[iSig] -> Divide(hPtTrkTruSig[iSig], hPtTruth, 1., 1.);
   }
   cout << "    Calculated efficiencies." << endl;
 
@@ -843,29 +1129,52 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const Float_t fOffX[NPad] = {1.1,   1.};
   const Float_t fOffY[NPad] = {0.7,   1.3};
   const Float_t fOffZ[NPad] = {1.1,   1.1};
-  grReject        -> SetMarkerColor(fColTrue);
-  grReject        -> SetMarkerStyle(fMarTrue);
-  grReject        -> SetFillColor(fColTrue);
-  grReject        -> SetFillStyle(fFil);
-  grReject        -> SetLineColor(fColTrue);
-  grReject        -> SetLineStyle(fLin);
-  grReject        -> SetLineWidth(fWid);
-  grReject        -> SetTitle(sTitle.Data());
-  grReject        -> GetXaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
-  grReject        -> GetXaxis() -> SetTitle(sDeltaCutAxis.Data());
-  grReject        -> GetXaxis() -> SetTitleFont(fTxt);
-  grReject        -> GetXaxis() -> SetTitleSize(fTit[1]);
-  grReject        -> GetXaxis() -> SetTitleOffset(fOffX[1]);
-  grReject        -> GetXaxis() -> SetLabelFont(fTxt);
-  grReject        -> GetXaxis() -> SetLabelSize(fLab[1]);
-  grReject        -> GetXaxis() -> CenterTitle(fCnt);
-  grReject        -> GetYaxis() -> SetTitle(sRejectAxis.Data());
-  grReject        -> GetYaxis() -> SetTitleFont(fTxt);
-  grReject        -> GetYaxis() -> SetTitleSize(fTit[1]);
-  grReject        -> GetYaxis() -> SetTitleOffset(fOffY[1]);
-  grReject        -> GetYaxis() -> SetLabelFont(fTxt);
-  grReject        -> GetYaxis() -> SetLabelSize(fLab[1]);
-  grReject        -> GetYaxis() -> CenterTitle(fCnt);
+  grRejCut        -> SetMarkerColor(fColTrue);
+  grRejCut        -> SetMarkerStyle(fMarTrue);
+  grRejCut        -> SetFillColor(fColTrue);
+  grRejCut        -> SetFillStyle(fFil);
+  grRejCut        -> SetLineColor(fColTrue);
+  grRejCut        -> SetLineStyle(fLin);
+  grRejCut        -> SetLineWidth(fWid);
+  grRejCut        -> SetTitle(sTitle.Data());
+  grRejCut        -> GetXaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
+  grRejCut        -> GetXaxis() -> SetTitle(sDeltaCutAxis.Data());
+  grRejCut        -> GetXaxis() -> SetTitleFont(fTxt);
+  grRejCut        -> GetXaxis() -> SetTitleSize(fTit[1]);
+  grRejCut        -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+  grRejCut        -> GetXaxis() -> SetLabelFont(fTxt);
+  grRejCut        -> GetXaxis() -> SetLabelSize(fLab[1]);
+  grRejCut        -> GetXaxis() -> CenterTitle(fCnt);
+  grRejCut        -> GetYaxis() -> SetTitle(sRejectAxis.Data());
+  grRejCut        -> GetYaxis() -> SetTitleFont(fTxt);
+  grRejCut        -> GetYaxis() -> SetTitleSize(fTit[1]);
+  grRejCut        -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+  grRejCut        -> GetYaxis() -> SetLabelFont(fTxt);
+  grRejCut        -> GetYaxis() -> SetLabelSize(fLab[1]);
+  grRejCut        -> GetYaxis() -> CenterTitle(fCnt);
+  grRejSig        -> SetMarkerColor(fColTrue);
+  grRejSig        -> SetMarkerStyle(fMarTrue);
+  grRejSig        -> SetFillColor(fColTrue);
+  grRejSig        -> SetFillStyle(fFil);
+  grRejSig        -> SetLineColor(fColTrue);
+  grRejSig        -> SetLineStyle(fLin);
+  grRejSig        -> SetLineWidth(fWid);
+  grRejSig        -> SetTitle(sTitle.Data());
+  grRejSig        -> GetXaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
+  grRejSig        -> GetXaxis() -> SetTitle(sSigmaCutAxis.Data());
+  grRejSig        -> GetXaxis() -> SetTitleFont(fTxt);
+  grRejSig        -> GetXaxis() -> SetTitleSize(fTit[1]);
+  grRejSig        -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+  grRejSig        -> GetXaxis() -> SetLabelFont(fTxt);
+  grRejSig        -> GetXaxis() -> SetLabelSize(fLab[1]);
+  grRejSig        -> GetXaxis() -> CenterTitle(fCnt);
+  grRejSig        -> GetYaxis() -> SetTitle(sRejectAxis.Data());
+  grRejSig        -> GetYaxis() -> SetTitleFont(fTxt);
+  grRejSig        -> GetYaxis() -> SetTitleSize(fTit[1]);
+  grRejSig        -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+  grRejSig        -> GetYaxis() -> SetLabelFont(fTxt);
+  grRejSig        -> GetYaxis() -> SetLabelSize(fLab[1]);
+  grRejSig        -> GetYaxis() -> CenterTitle(fCnt);
   hEff            -> SetMarkerColor(fColTrk);
   hEff            -> SetMarkerStyle(fMarTrk);
   hEff            -> SetFillColor(fColTrk);
@@ -1138,7 +1447,131 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   hPtTrueVsTrack  -> GetZaxis() -> SetLabelFont(fTxt);
   hPtTrueVsTrack  -> GetZaxis() -> SetLabelSize(fLab[1]);
   hPtTrueVsTrack  -> GetZaxis() -> CenterTitle(fCnt);
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+
+  // set styles of delta-pt projection histograms
+  grMuProj  -> SetMarkerColor(fColTrue);
+  grMuProj  -> SetMarkerStyle(fMarTrue);
+  grMuProj  -> SetFillColor(fColTrue);
+  grMuProj  -> SetFillStyle(fFil);
+  grMuProj  -> SetLineColor(fColTrue);
+  grMuProj  -> SetLineStyle(fLin);
+  grMuProj  -> SetLineWidth(fWid);
+  grMuProj  -> SetTitle(sTitle.Data());
+  grMuProj  -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+  grMuProj  -> GetXaxis() -> SetTitle(sPtRecoAxis.Data());
+  grMuProj  -> GetXaxis() -> SetTitleFont(fTxt);
+  grMuProj  -> GetXaxis() -> SetTitleSize(fTit[1]);
+  grMuProj  -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+  grMuProj  -> GetXaxis() -> SetLabelFont(fTxt);
+  grMuProj  -> GetXaxis() -> SetLabelSize(fLab[1]);
+  grMuProj  -> GetXaxis() -> CenterTitle(fCnt);
+  grMuProj  -> GetYaxis() -> SetTitle(sMuProjAxis.Data());
+  grMuProj  -> GetYaxis() -> SetTitleFont(fTxt);
+  grMuProj  -> GetYaxis() -> SetTitleSize(fTit[1]);
+  grMuProj  -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+  grMuProj  -> GetYaxis() -> SetLabelFont(fTxt);
+  grMuProj  -> GetYaxis() -> SetLabelSize(fLab[1]);
+  grMuProj  -> GetYaxis() -> CenterTitle(fCnt);
+  grSigProj -> SetMarkerColor(fColTrue);
+  grSigProj -> SetMarkerStyle(fMarTrue);
+  grSigProj -> SetFillColor(fColTrue);
+  grSigProj -> SetFillStyle(fFil);
+  grSigProj -> SetLineColor(fColTrue);
+  grSigProj -> SetLineStyle(fLin);
+  grSigProj -> SetLineWidth(fWid);
+  grSigProj -> SetTitle(sTitle.Data());
+  grSigProj -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+  grSigProj -> GetXaxis() -> SetTitle(sPtRecoAxis.Data());
+  grSigProj -> GetXaxis() -> SetTitleFont(fTxt);
+  grSigProj -> GetXaxis() -> SetTitleSize(fTit[1]);
+  grSigProj -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+  grSigProj -> GetXaxis() -> SetLabelFont(fTxt);
+  grSigProj -> GetXaxis() -> SetLabelSize(fLab[1]);
+  grSigProj -> GetXaxis() -> CenterTitle(fCnt);
+  grSigProj -> GetYaxis() -> SetTitle(sSigProjAxis.Data());
+  grSigProj -> GetYaxis() -> SetTitleFont(fTxt);
+  grSigProj -> GetYaxis() -> SetTitleSize(fTit[1]);
+  grSigProj -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+  grSigProj -> GetYaxis() -> SetLabelFont(fTxt);
+  grSigProj -> GetYaxis() -> SetLabelSize(fLab[1]);
+  grSigProj -> GetYaxis() -> CenterTitle(fCnt);
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+    hPtDeltaProj[iProj] -> SetMarkerColor(fColProj[iProj]);
+    hPtDeltaProj[iProj] -> SetMarkerStyle(fMarProj[iProj]);
+    hPtDeltaProj[iProj] -> SetFillColor(fColProj[iProj]);
+    hPtDeltaProj[iProj] -> SetFillStyle(fFil);
+    hPtDeltaProj[iProj] -> SetLineColor(fColProj[iProj]);
+    hPtDeltaProj[iProj] -> SetLineStyle(fLin);
+    hPtDeltaProj[iProj] -> SetLineWidth(fWid);
+    hPtDeltaProj[iProj] -> SetTitle(sTitle.Data());
+    hPtDeltaProj[iProj] -> SetTitleFont(fTxt);
+    hPtDeltaProj[iProj] -> GetXaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
+    hPtDeltaProj[iProj] -> GetXaxis() -> SetTitle(sPtDeltaAxis.Data());
+    hPtDeltaProj[iProj] -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtDeltaProj[iProj] -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaProj[iProj] -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtDeltaProj[iProj] -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtDeltaProj[iProj] -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaProj[iProj] -> GetXaxis() -> CenterTitle(fCnt);
+    hPtDeltaProj[iProj] -> GetYaxis() -> SetTitle(sCounts.Data());
+    hPtDeltaProj[iProj] -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtDeltaProj[iProj] -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaProj[iProj] -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtDeltaProj[iProj] -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtDeltaProj[iProj] -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaProj[iProj] -> GetYaxis() -> CenterTitle(fCnt);
+  }
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    grMuHiProj[iSig]  -> SetMarkerColor(fColSig[iSig]);
+    grMuHiProj[iSig]  -> SetMarkerStyle(fMarSig[iSig]);
+    grMuHiProj[iSig]  -> SetFillColor(fColSig[iSig]);
+    grMuHiProj[iSig]  -> SetFillStyle(fFil);
+    grMuHiProj[iSig]  -> SetLineColor(fColSig[iSig]);
+    grMuHiProj[iSig]  -> SetLineStyle(fLin);
+    grMuHiProj[iSig]  -> SetLineWidth(fWid);
+    grMuHiProj[iSig]  -> SetTitle(sTitle.Data());
+    grMuHiProj[iSig]  -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    grMuHiProj[iSig]  -> GetXaxis() -> SetTitle(sPtRecoAxis.Data());
+    grMuHiProj[iSig]  -> GetXaxis() -> SetTitleFont(fTxt);
+    grMuHiProj[iSig]  -> GetXaxis() -> SetTitleSize(fTit[1]);
+    grMuHiProj[iSig]  -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    grMuHiProj[iSig]  -> GetXaxis() -> SetLabelFont(fTxt);
+    grMuHiProj[iSig]  -> GetXaxis() -> SetLabelSize(fLab[1]);
+    grMuHiProj[iSig]  -> GetXaxis() -> CenterTitle(fCnt);
+    grMuHiProj[iSig]  -> GetYaxis() -> SetTitle(sMuProjAxis.Data());
+    grMuHiProj[iSig]  -> GetYaxis() -> SetTitleFont(fTxt);
+    grMuHiProj[iSig]  -> GetYaxis() -> SetTitleSize(fTit[1]);
+    grMuHiProj[iSig]  -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    grMuHiProj[iSig]  -> GetYaxis() -> SetLabelFont(fTxt);
+    grMuHiProj[iSig]  -> GetYaxis() -> SetLabelSize(fLab[1]);
+    grMuHiProj[iSig]  -> GetYaxis() -> CenterTitle(fCnt);
+    grMuLoProj[iSig]  -> SetMarkerColor(fColSig[iSig]);
+    grMuLoProj[iSig]  -> SetMarkerStyle(fMarSig[iSig]);
+    grMuLoProj[iSig]  -> SetFillColor(fColSig[iSig]);
+    grMuLoProj[iSig]  -> SetFillStyle(fFil);
+    grMuLoProj[iSig]  -> SetLineColor(fColSig[iSig]);
+    grMuLoProj[iSig]  -> SetLineStyle(fLin);
+    grMuLoProj[iSig]  -> SetLineWidth(fWid);
+    grMuLoProj[iSig]  -> SetTitle(sTitle.Data());
+    grMuLoProj[iSig]  -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    grMuLoProj[iSig]  -> GetXaxis() -> SetTitle(sPtRecoAxis.Data());
+    grMuLoProj[iSig]  -> GetXaxis() -> SetTitleFont(fTxt);
+    grMuLoProj[iSig]  -> GetXaxis() -> SetTitleSize(fTit[1]);
+    grMuLoProj[iSig]  -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    grMuLoProj[iSig]  -> GetXaxis() -> SetLabelFont(fTxt);
+    grMuLoProj[iSig]  -> GetXaxis() -> SetLabelSize(fLab[1]);
+    grMuLoProj[iSig]  -> GetXaxis() -> CenterTitle(fCnt);
+    grMuLoProj[iSig]  -> GetYaxis() -> SetTitle(sMuProjAxis.Data());
+    grMuLoProj[iSig]  -> GetYaxis() -> SetTitleFont(fTxt);
+    grMuLoProj[iSig]  -> GetYaxis() -> SetTitleSize(fTit[1]);
+    grMuLoProj[iSig]  -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    grMuLoProj[iSig]  -> GetYaxis() -> SetLabelFont(fTxt);
+    grMuLoProj[iSig]  -> GetYaxis() -> SetLabelSize(fLab[1]);
+    grMuLoProj[iSig]  -> GetYaxis() -> CenterTitle(fCnt);
+  }
+
+  // set styles of flat delta-pt cut histograms
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     hEffCut[iCut]            -> SetMarkerColor(fColCut[iCut]);
     hEffCut[iCut]            -> SetMarkerStyle(fMarCut[iCut]);
     hEffCut[iCut]            -> SetFillColor(fColCut[iCut]);
@@ -1388,14 +1821,272 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     hPtTrueVsTrackCut[iCut]  -> GetZaxis() -> SetLabelSize(fLab[1]);
     hPtTrueVsTrackCut[iCut]  -> GetZaxis() -> CenterTitle(fCnt);
   }
+
+  // set styles of flat delta-pt cut histograms
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    hEffSig[iSig]            -> SetMarkerColor(fColSig[iSig]);
+    hEffSig[iSig]            -> SetMarkerStyle(fMarSig[iSig]);
+    hEffSig[iSig]            -> SetFillColor(fColSig[iSig]);
+    hEffSig[iSig]            -> SetFillStyle(fFil);
+    hEffSig[iSig]            -> SetLineColor(fColSig[iSig]);
+    hEffSig[iSig]            -> SetLineStyle(fLin);
+    hEffSig[iSig]            -> SetLineWidth(fWid);
+    hEffSig[iSig]            -> SetTitle(sTitle.Data());
+    hEffSig[iSig]            -> SetTitleFont(fTxt);
+    hEffSig[iSig]            -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    hEffSig[iSig]            -> GetXaxis() -> SetTitle(sPtTrueAxis.Data());
+    hEffSig[iSig]            -> GetXaxis() -> SetTitleFont(fTxt);
+    hEffSig[iSig]            -> GetXaxis() -> SetTitleSize(fTit[0]);
+    hEffSig[iSig]            -> GetXaxis() -> SetTitleOffset(fOffX[0]);
+    hEffSig[iSig]            -> GetXaxis() -> SetLabelFont(fTxt);
+    hEffSig[iSig]            -> GetXaxis() -> SetLabelSize(fLab[0]);
+    hEffSig[iSig]            -> GetXaxis() -> CenterTitle(fCnt);
+    hEffSig[iSig]            -> GetYaxis() -> SetTitle(sEffAxis.Data());
+    hEffSig[iSig]            -> GetYaxis() -> SetTitleFont(fTxt);
+    hEffSig[iSig]            -> GetYaxis() -> SetTitleSize(fTit[0]);
+    hEffSig[iSig]            -> GetYaxis() -> SetTitleOffset(fOffY[0]);
+    hEffSig[iSig]            -> GetYaxis() -> SetLabelFont(fTxt);
+    hEffSig[iSig]            -> GetYaxis() -> SetLabelSize(fLab[0]);
+    hEffSig[iSig]            -> GetYaxis() -> CenterTitle(fCnt);
+    hPtDeltaSig[iSig]        -> SetMarkerColor(fColSig[iSig]);
+    hPtDeltaSig[iSig]        -> SetMarkerStyle(fMarSig[iSig]);
+    hPtDeltaSig[iSig]        -> SetFillColor(fColSig[iSig]);
+    hPtDeltaSig[iSig]        -> SetFillStyle(fFil);
+    hPtDeltaSig[iSig]        -> SetLineColor(fColSig[iSig]);
+    hPtDeltaSig[iSig]        -> SetLineStyle(fLin);
+    hPtDeltaSig[iSig]        -> SetLineWidth(fWid);
+    hPtDeltaSig[iSig]        -> SetTitle(sTitle.Data());
+    hPtDeltaSig[iSig]        -> SetTitleFont(fTxt);
+    hPtDeltaSig[iSig]        -> GetXaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
+    hPtDeltaSig[iSig]        -> GetXaxis() -> SetTitle(sPtDeltaAxis.Data());
+    hPtDeltaSig[iSig]        -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtDeltaSig[iSig]        -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaSig[iSig]        -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtDeltaSig[iSig]        -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtDeltaSig[iSig]        -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaSig[iSig]        -> GetXaxis() -> CenterTitle(fCnt);
+    hPtDeltaSig[iSig]        -> GetYaxis() -> SetTitle(sCounts.Data());
+    hPtDeltaSig[iSig]        -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtDeltaSig[iSig]        -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaSig[iSig]        -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtDeltaSig[iSig]        -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtDeltaSig[iSig]        -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaSig[iSig]        -> GetYaxis() -> CenterTitle(fCnt);
+    hPtTrackSig[iSig]        -> SetMarkerColor(fColSig[iSig]);
+    hPtTrackSig[iSig]        -> SetMarkerStyle(fMarSig[iSig]);
+    hPtTrackSig[iSig]        -> SetFillColor(fColSig[iSig]);
+    hPtTrackSig[iSig]        -> SetFillStyle(fFil);
+    hPtTrackSig[iSig]        -> SetLineColor(fColSig[iSig]);
+    hPtTrackSig[iSig]        -> SetLineStyle(fLin);
+    hPtTrackSig[iSig]        -> SetLineWidth(fWid);
+    hPtTrackSig[iSig]        -> SetTitle(sTitle.Data());
+    hPtTrackSig[iSig]        -> SetTitleFont(fTxt);
+    hPtTrackSig[iSig]        -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    hPtTrackSig[iSig]        -> GetXaxis() -> SetTitle(sPtRecoAxis.Data());
+    hPtTrackSig[iSig]        -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtTrackSig[iSig]        -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtTrackSig[iSig]        -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtTrackSig[iSig]        -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtTrackSig[iSig]        -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtTrackSig[iSig]        -> GetXaxis() -> CenterTitle(fCnt);
+    hPtTrackSig[iSig]        -> GetYaxis() -> SetTitle(sCounts.Data());
+    hPtTrackSig[iSig]        -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtTrackSig[iSig]        -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtTrackSig[iSig]        -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtTrackSig[iSig]        -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtTrackSig[iSig]        -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtTrackSig[iSig]        -> GetYaxis() -> CenterTitle(fCnt);
+    hPtFracSig[iSig]         -> SetMarkerColor(fColSig[iSig]);
+    hPtFracSig[iSig]         -> SetMarkerStyle(fMarSig[iSig]);
+    hPtFracSig[iSig]         -> SetFillColor(fColSig[iSig]);
+    hPtFracSig[iSig]         -> SetFillStyle(fFil);
+    hPtFracSig[iSig]         -> SetLineColor(fColSig[iSig]);
+    hPtFracSig[iSig]         -> SetLineStyle(fLin);
+    hPtFracSig[iSig]         -> SetLineWidth(fWid);
+    hPtFracSig[iSig]         -> SetTitle(sTitle.Data());
+    hPtFracSig[iSig]         -> SetTitleFont(fTxt);
+    hPtFracSig[iSig]         -> GetXaxis() -> SetRangeUser(rFracRange[0], rFracRange[1]);
+    hPtFracSig[iSig]         -> GetXaxis() -> SetTitle(sPtFracAxis.Data());
+    hPtFracSig[iSig]         -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtFracSig[iSig]         -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtFracSig[iSig]         -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtFracSig[iSig]         -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtFracSig[iSig]         -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtFracSig[iSig]         -> GetXaxis() -> CenterTitle(fCnt);
+    hPtFracSig[iSig]         -> GetYaxis() -> SetTitle(sCounts.Data());
+    hPtFracSig[iSig]         -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtFracSig[iSig]         -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtFracSig[iSig]         -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtFracSig[iSig]         -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtFracSig[iSig]         -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtFracSig[iSig]         -> GetYaxis() -> CenterTitle(fCnt);
+    hPtTrkTruSig[iSig]       -> SetMarkerColor(fColSig[iSig]);
+    hPtTrkTruSig[iSig]       -> SetMarkerStyle(fMarSig[iSig]);
+    hPtTrkTruSig[iSig]       -> SetFillColor(fColSig[iSig]);
+    hPtTrkTruSig[iSig]       -> SetFillStyle(fFil);
+    hPtTrkTruSig[iSig]       -> SetLineColor(fColSig[iSig]);
+    hPtTrkTruSig[iSig]       -> SetLineStyle(fLin);
+    hPtTrkTruSig[iSig]       -> SetLineWidth(fWid);
+    hPtTrkTruSig[iSig]       -> SetTitle(sTitle.Data());
+    hPtTrkTruSig[iSig]       -> SetTitleFont(fTxt);
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> SetTitle(sPtTrueAxis.Data());
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtTrkTruSig[iSig]       -> GetXaxis() -> CenterTitle(fCnt);
+    hPtTrkTruSig[iSig]       -> GetYaxis() -> SetTitle(sCounts.Data());
+    hPtTrkTruSig[iSig]       -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtTrkTruSig[iSig]       -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtTrkTruSig[iSig]       -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtTrkTruSig[iSig]       -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtTrkTruSig[iSig]       -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtTrkTruSig[iSig]       -> GetYaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsFracSig[iSig]  -> SetMarkerColor(fColSig[iSig]);
+    hPtDeltaVsFracSig[iSig]  -> SetMarkerStyle(fMarSig[iSig]);
+    hPtDeltaVsFracSig[iSig]  -> SetFillColor(fColSig[iSig]);
+    hPtDeltaVsFracSig[iSig]  -> SetFillStyle(fFil);
+    hPtDeltaVsFracSig[iSig]  -> SetLineColor(fColSig[iSig]);
+    hPtDeltaVsFracSig[iSig]  -> SetLineStyle(fLin);
+    hPtDeltaVsFracSig[iSig]  -> SetLineWidth(fWid);
+    hPtDeltaVsFracSig[iSig]  -> SetTitle(sTitle.Data());
+    hPtDeltaVsFracSig[iSig]  -> SetTitleFont(fTxt);
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> SetRangeUser(rFracRange[0], rFracRange[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> SetTitle(sPtFracAxis.Data());
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetXaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> SetTitle(sPtDeltaAxis.Data());
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetYaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsFracSig[iSig]  -> GetZaxis() -> SetTitle(sCounts.Data());
+    hPtDeltaVsFracSig[iSig]  -> GetZaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsFracSig[iSig]  -> GetZaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetZaxis() -> SetTitleOffset(fOffZ[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetZaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsFracSig[iSig]  -> GetZaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsFracSig[iSig]  -> GetZaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsTrueSig[iSig]  -> SetMarkerColor(fColTrk);
+    hPtDeltaVsTrueSig[iSig]  -> SetMarkerStyle(fMarTrk);
+    hPtDeltaVsTrueSig[iSig]  -> SetFillColor(fColTrk);
+    hPtDeltaVsTrueSig[iSig]  -> SetFillStyle(fFil);
+    hPtDeltaVsTrueSig[iSig]  -> SetLineColor(fColTrk);
+    hPtDeltaVsTrueSig[iSig]  -> SetLineStyle(fLin);
+    hPtDeltaVsTrueSig[iSig]  -> SetLineWidth(fWid);
+    hPtDeltaVsTrueSig[iSig]  -> SetTitle(sTitle.Data());
+    hPtDeltaVsTrueSig[iSig]  -> SetTitleFont(fTxt);
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> SetTitle(sPtTrueAxis.Data());
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetXaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> SetTitle(sPtDeltaAxis.Data());
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetYaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsTrueSig[iSig]  -> GetZaxis() -> SetTitle(sCounts.Data());
+    hPtDeltaVsTrueSig[iSig]  -> GetZaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsTrueSig[iSig]  -> GetZaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetZaxis() -> SetTitleOffset(fOffZ[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetZaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsTrueSig[iSig]  -> GetZaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsTrueSig[iSig]  -> GetZaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsTrackSig[iSig] -> SetMarkerColor(fColTrk);
+    hPtDeltaVsTrackSig[iSig] -> SetMarkerStyle(fMarTrk);
+    hPtDeltaVsTrackSig[iSig] -> SetFillColor(fColTrk);
+    hPtDeltaVsTrackSig[iSig] -> SetFillStyle(fFil);
+    hPtDeltaVsTrackSig[iSig] -> SetLineColor(fColTrk);
+    hPtDeltaVsTrackSig[iSig] -> SetLineStyle(fLin);
+    hPtDeltaVsTrackSig[iSig] -> SetLineWidth(fWid);
+    hPtDeltaVsTrackSig[iSig] -> SetTitle(sTitle.Data());
+    hPtDeltaVsTrackSig[iSig] -> SetTitleFont(fTxt);
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> SetTitle(sPtRecoAxis.Data());
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetXaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> SetRangeUser(rDeltaRange[0], rDeltaRange[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> SetTitle(sPtDeltaAxis.Data());
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetYaxis() -> CenterTitle(fCnt);
+    hPtDeltaVsTrackSig[iSig] -> GetZaxis() -> SetTitle(sCounts.Data());
+    hPtDeltaVsTrackSig[iSig] -> GetZaxis() -> SetTitleFont(fTxt);
+    hPtDeltaVsTrackSig[iSig] -> GetZaxis() -> SetTitleSize(fTit[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetZaxis() -> SetTitleOffset(fOffZ[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetZaxis() -> SetLabelFont(fTxt);
+    hPtDeltaVsTrackSig[iSig] -> GetZaxis() -> SetLabelSize(fLab[1]);
+    hPtDeltaVsTrackSig[iSig] -> GetZaxis() -> CenterTitle(fCnt);
+    hPtTrueVsTrackSig[iSig]  -> SetMarkerColor(fColSig[iSig]);
+    hPtTrueVsTrackSig[iSig]  -> SetMarkerStyle(fMarSig[iSig]);
+    hPtTrueVsTrackSig[iSig]  -> SetFillColor(fColSig[iSig]);
+    hPtTrueVsTrackSig[iSig]  -> SetFillStyle(fFil);
+    hPtTrueVsTrackSig[iSig]  -> SetLineColor(fColSig[iSig]);
+    hPtTrueVsTrackSig[iSig]  -> SetLineStyle(fLin);
+    hPtTrueVsTrackSig[iSig]  -> SetLineWidth(fWid);
+    hPtTrueVsTrackSig[iSig]  -> SetTitle(sTitle.Data());
+    hPtTrueVsTrackSig[iSig]  -> SetTitleFont(fTxt);
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> SetTitle(sPtRecoAxis.Data());
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> SetTitleFont(fTxt);
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> SetTitleSize(fTit[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> SetTitleOffset(fOffX[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> SetLabelFont(fTxt);
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> SetLabelSize(fLab[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetXaxis() -> CenterTitle(fCnt);
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> SetRangeUser(rPtRange[0], rPtRange[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> SetTitle(sPtTrueAxis.Data());
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> SetTitleFont(fTxt);
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> SetTitleSize(fTit[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> SetTitleOffset(fOffY[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> SetLabelFont(fTxt);
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> SetLabelSize(fLab[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetYaxis() -> CenterTitle(fCnt);
+    hPtTrueVsTrackSig[iSig]  -> GetZaxis() -> SetTitle(sCounts.Data());
+    hPtTrueVsTrackSig[iSig]  -> GetZaxis() -> SetTitleFont(fTxt);
+    hPtTrueVsTrackSig[iSig]  -> GetZaxis() -> SetTitleSize(fTit[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetZaxis() -> SetTitleOffset(fOffZ[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetZaxis() -> SetLabelFont(fTxt);
+    hPtTrueVsTrackSig[iSig]  -> GetZaxis() -> SetLabelSize(fLab[1]);
+    hPtTrueVsTrackSig[iSig]  -> GetZaxis() -> CenterTitle(fCnt);
+  }
   cout << "    Set styles." << endl;
 
-  // make legend
-  const UInt_t  fColLe       = 0;
-  const UInt_t  fFilLe       = 0;
-  const UInt_t  fLinLe       = 0;
-  const Float_t yObjLe       = 0.1 + ((NCuts + 2) * 0.05);
-  const Float_t fLegXY[NVtx] = {0.1, 0.1, 0.3, yObjLe};
+  // make legends
+  const UInt_t  fColLe          = 0;
+  const UInt_t  fFilLe          = 0;
+  const UInt_t  fLinLe          = 0;
+  const Float_t yObjLe          = 0.1 + ((NDPtCuts + 2) * 0.05);
+  const Float_t yObjMu          = 0.1 + ((NSigCuts + 1) * 0.05);
+  const Float_t yObjPro         = 0.1 + (NProj * 0.05);
+  const Float_t yObjSig         = 0.1 + ((NSigCuts + 2) * 0.05);
+  const Float_t fLegXY[NVtx]    = {0.1, 0.1, 0.3, yObjLe};
+  const Float_t fLegMuXY[NVtx]  = {0.1, 0.1, 0.3, yObjMu};
+  const Float_t fLegProXY[NVtx] = {0.1, 0.1, 0.3, yObjPro};
+  const Float_t fLegSigXY[NVtx] = {0.1, 0.1, 0.3, yObjSig};
 
   TLegend *leg = new TLegend(fLegXY[0], fLegXY[1], fLegXY[2], fLegXY[3]);
   leg -> SetFillColor(fColLe);
@@ -1406,10 +2097,46 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   leg -> SetTextAlign(fAln);
   leg -> AddEntry(hPtTruth,  sLegTrue.Data(),  "pf");
   leg -> AddEntry(hPtTrkTru, sLegTrack.Data(), "pf");
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     leg -> AddEntry(hPtTrkTruCut[iCut], sLegCut[iCut].Data(), "pf");
   }
-  cout << "    Made legend." << endl;
+
+  TLegend *legMu = new TLegend(fLegMuXY[0], fLegMuXY[1], fLegMuXY[2], fLegMuXY[3]);
+  legMu -> SetFillColor(fColLe);
+  legMu -> SetFillStyle(fFilLe);
+  legMu -> SetLineColor(fColLe);
+  legMu -> SetLineStyle(fLinLe);
+  legMu -> SetTextFont(fTxt);
+  legMu -> SetTextAlign(fAln);
+  legMu -> AddEntry(grMuProj, sLegMu.Data(), "p");
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    legMu -> AddEntry(grMuHiProj[iSig], sLegProjSig[iSig].Data(), "p");
+  }
+
+  TLegend *legPro = new TLegend(fLegProXY[0], fLegProXY[1], fLegProXY[2], fLegProXY[3]);
+  legPro -> SetFillColor(fColLe);
+  legPro -> SetFillStyle(fFilLe);
+  legPro -> SetLineColor(fColLe);
+  legPro -> SetLineStyle(fLinLe);
+  legPro -> SetTextFont(fTxt);
+  legPro -> SetTextAlign(fAln);
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+    legPro -> AddEntry(hPtDeltaProj[iProj], sLegProj[iProj].Data(), "pf");
+  }
+
+  TLegend *legSig = new TLegend(fLegSigXY[0], fLegSigXY[1], fLegSigXY[2], fLegSigXY[3]);
+  legSig -> SetFillColor(fColLe);
+  legSig -> SetFillStyle(fFilLe);
+  legSig -> SetLineColor(fColLe);
+  legSig -> SetLineStyle(fLinLe);
+  legSig -> SetTextFont(fTxt);
+  legSig -> SetTextAlign(fAln);
+  legSig -> AddEntry(hPtTruth,  sLegTrue.Data(),  "pf");
+  legSig -> AddEntry(hPtTrkTru, sLegTrack.Data(), "pf");
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    legSig -> AddEntry(hPtTrkTruSig[iSig], sLegSig[iSig].Data(), "pf");
+  }
+  cout << "    Made legends." << endl;
 
   // make text boxes
   const UInt_t  fColInf       = 0;
@@ -1471,6 +2198,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const UInt_t  fFrame(0);
   const Float_t fMarginL(0.15);
   const Float_t fMarginR(0.02);
+  const Float_t fMarginR2D(0.15);
   const Float_t fMarginT1(0.005);
   const Float_t fMarginT2(0.02);
   const Float_t fMarginTNR(0.02);
@@ -1479,115 +2207,169 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const Float_t fMarginBNR(0.15);
   const Float_t fEffXY[NVtx]       = {0.,  0.,   1.,  0.35};
   const Float_t fTrksXY[NVtx]      = {0.,  0.35, 1.,  1.};
+  const Float_t fTwoDimXY[NVtx]    = {0.,  0.,   0.5, 1.};
+  const Float_t fProjectXY[NVtx]   = {0.5, 0.,   1.,  1.};
   const Float_t fBeforeDPtXY[NVtx] = {0.,  0.,   0.5, 1.};
   const Float_t fAfterDPtXY[NVtx]  = {0.5, 0.,   1.,  1.};
 
-  TCanvas *cEff  = new TCanvas("cEfficiency", "", width, height);
-  TPad    *pEff  = new TPad("pEff",  "", fEffXY[0],  fEffXY[1],  fEffXY[2],  fEffXY[3]);
-  TPad    *pTrks = new TPad("pTrks", "", fTrksXY[0], fTrksXY[1], fTrksXY[2], fTrksXY[3]);
-  cEff  -> SetGrid(fGrid, fGrid);
-  cEff  -> SetTicks(fTick, fTick);
-  cEff  -> SetBorderMode(fMode);
-  cEff  -> SetBorderSize(fBord);
-  pEff  -> SetGrid(fGrid, fGrid);
-  pEff  -> SetTicks(fTick, fTick);
-  pEff  -> SetLogx(fLogX);
-  pEff  -> SetLogy(fLogY1);
-  pEff  -> SetBorderMode(fMode);
-  pEff  -> SetBorderSize(fBord);
-  pEff  -> SetFrameBorderMode(fFrame);
-  pEff  -> SetLeftMargin(fMarginL);
-  pEff  -> SetRightMargin(fMarginR);
-  pEff  -> SetTopMargin(fMarginT1);
-  pEff  -> SetBottomMargin(fMarginB1);
-  pTrks -> SetGrid(fGrid, fGrid);
-  pTrks -> SetTicks(fTick, fTick);
-  pTrks -> SetLogx(fLogX);
-  pTrks -> SetLogy(fLogY2);
-  pTrks -> SetBorderMode(fMode);
-  pTrks -> SetBorderSize(fBord);
-  pTrks -> SetFrameBorderMode(fFrame);
-  pTrks -> SetLeftMargin(fMarginL);
-  pTrks -> SetRightMargin(fMarginR);
-  pTrks -> SetTopMargin(fMarginT2);
-  pTrks -> SetBottomMargin(fMarginB2);
-  cEff  -> cd();
-  pEff  -> Draw();
-  pTrks -> Draw();
-  pEff  -> cd();
-  hEff  -> Draw();
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+  TCanvas *cEffCut = new TCanvas("cEfficiency_FlatCut", "", width, height);
+  TPad    *pEffCut = new TPad("pEffCut", "", fEffXY[0],  fEffXY[1],  fEffXY[2],  fEffXY[3]);
+  TPad    *pTrkCut = new TPad("pTrkCut", "", fTrksXY[0], fTrksXY[1], fTrksXY[2], fTrksXY[3]);
+  cEffCut -> SetGrid(fGrid, fGrid);
+  cEffCut -> SetTicks(fTick, fTick);
+  cEffCut -> SetBorderMode(fMode);
+  cEffCut -> SetBorderSize(fBord);
+  pEffCut -> SetGrid(fGrid, fGrid);
+  pEffCut -> SetTicks(fTick, fTick);
+  pEffCut -> SetLogx(fLogX);
+  pEffCut -> SetLogy(fLogY1);
+  pEffCut -> SetBorderMode(fMode);
+  pEffCut -> SetBorderSize(fBord);
+  pEffCut -> SetFrameBorderMode(fFrame);
+  pEffCut -> SetLeftMargin(fMarginL);
+  pEffCut -> SetRightMargin(fMarginR);
+  pEffCut -> SetTopMargin(fMarginT1);
+  pEffCut -> SetBottomMargin(fMarginB1);
+  pTrkCut -> SetGrid(fGrid, fGrid);
+  pTrkCut -> SetTicks(fTick, fTick);
+  pTrkCut -> SetLogx(fLogX);
+  pTrkCut -> SetLogy(fLogY2);
+  pTrkCut -> SetBorderMode(fMode);
+  pTrkCut -> SetBorderSize(fBord);
+  pTrkCut -> SetFrameBorderMode(fFrame);
+  pTrkCut -> SetLeftMargin(fMarginL);
+  pTrkCut -> SetRightMargin(fMarginR);
+  pTrkCut -> SetTopMargin(fMarginT2);
+  pTrkCut -> SetBottomMargin(fMarginB2);
+  cEffCut -> cd();
+  pEffCut -> Draw();
+  pTrkCut -> Draw();
+  pEffCut -> cd();
+  hEff    -> Draw();
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     hEffCut[iCut] -> Draw("SAME");
   }
   line      -> Draw();
-  pTrks     -> cd();
+  pTrkCut   -> cd();
   hPtTruth  -> Draw();
   hPtTrkTru -> Draw("SAME");
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     hPtTrkTruCut[iCut] -> Draw("SAME");
   }
   leg     -> Draw();
   info    -> Draw();
   cuts    -> Draw();
   fOutput -> cd();
-  cEff    -> Write();
-  cEff    -> Close();
+  cEffCut -> Write();
+  cEffCut -> Close();
+
+  TCanvas *cPtDelVsTrk = new TCanvas("cPtDeltaVsTrack", "", width2D, heightNR);
+  TPad    *pTwoDim     = new TPad("pTwoDim",      "", fTwoDimXY[0],  fTwoDimXY[1],  fTwoDimXY[2],  fTwoDimXY[3]);
+  TPad    *pProject    = new TPad("pProjections", "", fProjectXY[0], fProjectXY[1], fProjectXY[2], fProjectXY[3]);
+  cPtDelVsTrk     -> SetGrid(fGrid, fGrid);
+  cPtDelVsTrk     -> SetTicks(fTick, fTick);
+  cPtDelVsTrk     -> SetBorderMode(fMode);
+  cPtDelVsTrk     -> SetBorderSize(fBord);
+  pTwoDim         -> SetGrid(fGrid, fGrid);
+  pTwoDim         -> SetTicks(fTick, fTick);
+  pTwoDim         -> SetLogx(fLogX);
+  pTwoDim         -> SetLogy(fLogYNR);
+  pTwoDim         -> SetBorderMode(fMode);
+  pTwoDim         -> SetBorderSize(fBord);
+  pTwoDim         -> SetFrameBorderMode(fFrame);
+  pTwoDim         -> SetLeftMargin(fMarginL);
+  pTwoDim         -> SetRightMargin(fMarginR2D);
+  pTwoDim         -> SetTopMargin(fMarginTNR);
+  pTwoDim         -> SetBottomMargin(fMarginBNR);
+  pProject        -> SetGrid(fGrid, fGrid);
+  pProject        -> SetTicks(fTick, fTick);
+  pProject        -> SetLogx(fLogX);
+  pProject        -> SetLogy(fLogYNR);
+  pProject        -> SetBorderMode(fMode);
+  pProject        -> SetBorderSize(fBord);
+  pProject        -> SetFrameBorderMode(fFrame);
+  pProject        -> SetLeftMargin(fMarginL);
+  pProject        -> SetRightMargin(fMarginR2D);
+  pProject        -> SetTopMargin(fMarginTNR);
+  pProject        -> SetBottomMargin(fMarginBNR);
+  cPtDelVsTrk     -> cd();
+  pTwoDim         -> Draw();
+  pProject        -> Draw();
+  pTwoDim         -> cd();
+  hPtDeltaVsTrack -> Draw("colz");
+  cuts            -> Draw();
+  pProject        -> cd();
+  hPtDeltaProj[0] -> Draw();
+  for (Ssiz_t iProj = 1; iProj < NProj; iProj++) {
+    hPtDeltaProj[iProj] -> Draw("same");
+  }
+  legPro      -> Draw();
+  info        -> Draw();
+  fOutput     -> cd();
+  cPtDelVsTrk -> Write();
+  cPtDelVsTrk -> Close();
 
   TCanvas *cPtTruVsTrk = new TCanvas("cPtTruthVsTrack", "", width2D, heightNR);
   TPad    *pBefore     = new TPad("pBeforeDPt", "", fBeforeDPtXY[0], fBeforeDPtXY[1], fBeforeDPtXY[2], fBeforeDPtXY[3]);
-  TPad    *pAfter      = new TPad("pAfterDPt", "",  fAfterDPtXY[0],  fAfterDPtXY[1],  fAfterDPtXY[2],  fAfterDPtXY[3]);
-  cPtTruVsTrk                  -> SetGrid(fGrid, fGrid);
-  cPtTruVsTrk                  -> SetTicks(fTick, fTick);
-  cPtTruVsTrk                  -> SetBorderMode(fMode);
-  cPtTruVsTrk                  -> SetBorderSize(fBord);
-  pBefore                      -> SetGrid(fGrid, fGrid);
-  pBefore                      -> SetTicks(fTick, fTick);
-  pBefore                      -> SetLogx(fLogX);
-  pBefore                      -> SetLogy(fLogYNR);
-  pBefore                      -> SetBorderMode(fMode);
-  pBefore                      -> SetBorderSize(fBord);
-  pBefore                      -> SetFrameBorderMode(fFrame);
-  pAfter                       -> SetGrid(fGrid, fGrid);
-  pAfter                       -> SetTicks(fTick, fTick);
-  pAfter                       -> SetLogx(fLogX);
-  pAfter                       -> SetLogy(fLogYNR);
-  pAfter                       -> SetBorderMode(fMode);
-  pAfter                       -> SetBorderSize(fBord);
-  pAfter                       -> SetFrameBorderMode(fFrame);
-  cPtTruVsTrk                  -> cd();
-  pBefore                      -> Draw();
-  pAfter                       -> Draw();
-  pBefore                      -> cd();
-  hPtTrueVsTrack               -> SetTitle("Before #Deltap_{T}/p_{T} cut");
-  hPtTrueVsTrack               -> Draw("colz");
-  cuts                         -> Draw();
-  pAfter                       -> cd();
-  hPtTrueVsTrackCut[NCuts - 3] -> SetTitle("After #Deltap_{T}/p_{T} < 0.03 cut");
-  hPtTrueVsTrackCut[NCuts - 3] -> Draw("colz");
-  info                         -> Draw();
-  fOutput                      -> cd();
-  cPtTruVsTrk                  -> Write();
-  cPtTruVsTrk                  -> Close();
+  TPad    *pAfter      = new TPad("pAfterDPt",  "", fAfterDPtXY[0],  fAfterDPtXY[1],  fAfterDPtXY[2],  fAfterDPtXY[3]);
+  cPtTruVsTrk                     -> SetGrid(fGrid, fGrid);
+  cPtTruVsTrk                     -> SetTicks(fTick, fTick);
+  cPtTruVsTrk                     -> SetBorderMode(fMode);
+  cPtTruVsTrk                     -> SetBorderSize(fBord);
+  pBefore                         -> SetGrid(fGrid, fGrid);
+  pBefore                         -> SetTicks(fTick, fTick);
+  pBefore                         -> SetLogx(fLogX);
+  pBefore                         -> SetLogy(fLogYNR);
+  pBefore                         -> SetBorderMode(fMode);
+  pBefore                         -> SetBorderSize(fBord);
+  pBefore                         -> SetFrameBorderMode(fFrame);
+  pBefore                         -> SetLeftMargin(fMarginL);
+  pBefore                         -> SetRightMargin(fMarginR2D);
+  pBefore                         -> SetBottomMargin(fMarginBNR);
+  pAfter                          -> SetGrid(fGrid, fGrid);
+  pAfter                          -> SetTicks(fTick, fTick);
+  pAfter                          -> SetLogx(fLogX);
+  pAfter                          -> SetLogy(fLogYNR);
+  pAfter                          -> SetBorderMode(fMode);
+  pAfter                          -> SetBorderSize(fBord);
+  pAfter                          -> SetFrameBorderMode(fFrame);
+  pAfter                          -> SetLeftMargin(fMarginL);
+  pAfter                          -> SetRightMargin(fMarginR2D);
+  pAfter                          -> SetBottomMargin(fMarginBNR);
+  cPtTruVsTrk                     -> cd();
+  pBefore                         -> Draw();
+  pAfter                          -> Draw();
+  pBefore                         -> cd();
+  hPtTrueVsTrack                  -> SetTitle("Before #Deltap_{T}/p_{T} cut");
+  hPtTrueVsTrack                  -> Draw("colz");
+  cuts                            -> Draw();
+  pAfter                          -> cd();
+  hPtTrueVsTrackCut[NDPtCuts - 3] -> SetTitle("After #Deltap_{T}/p_{T} < 0.03 cut");
+  hPtTrueVsTrackCut[NDPtCuts - 3] -> Draw("colz");
+  info                            -> Draw();
+  fOutput                         -> cd();
+  cPtTruVsTrk                     -> Write();
+  cPtTruVsTrk                     -> Close();
 
-  TCanvas *cReject = new TCanvas("cReject", "", width, heightNR);
-  cReject  -> SetGrid(fGrid, fGrid);
-  cReject  -> SetTicks(fTick, fTick);
-  cReject  -> SetBorderMode(fMode);
-  cReject  -> SetBorderSize(fBord);
-  cReject  -> SetFrameBorderMode(fFrame);
-  cReject  -> SetLeftMargin(fMarginL);
-  cReject  -> SetRightMargin(fMarginR);
-  cReject  -> SetTopMargin(fMarginTNR);
-  cReject  -> SetBottomMargin(fMarginBNR);
-  cReject  -> SetLogx(fLogX);
-  cReject  -> SetLogy(fLogYNR);
-  cReject  -> cd();
-  grReject -> Draw("ALP");
+  TCanvas *cRejCut = new TCanvas("cReject_FlatCut", "", width, heightNR);
+  cRejCut  -> SetGrid(fGrid, fGrid);
+  cRejCut  -> SetTicks(fTick, fTick);
+  cRejCut  -> SetBorderMode(fMode);
+  cRejCut  -> SetBorderSize(fBord);
+  cRejCut  -> SetFrameBorderMode(fFrame);
+  cRejCut  -> SetLeftMargin(fMarginL);
+  cRejCut  -> SetRightMargin(fMarginR);
+  cRejCut  -> SetTopMargin(fMarginTNR);
+  cRejCut  -> SetBottomMargin(fMarginBNR);
+  cRejCut  -> SetLogx(fLogX);
+  cRejCut  -> SetLogy(fLogYNR);
+  cRejCut  -> cd();
+  grRejCut -> Draw("ALP");
   info     -> Draw();
   cuts     -> Draw();
   fOutput  -> cd();
-  cReject  -> Write();
-  cReject  -> Close();
+  cRejCut  -> Write();
+  cRejCut  -> Close();
 
   TCanvas *cDeltaPt = new TCanvas("cDeltaPt", "", width, heightNR);
   cDeltaPt  -> SetGrid(fGrid, fGrid);
@@ -1608,11 +2390,62 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   fOutput   -> cd();
   cDeltaPt  -> Write();
   cDeltaPt  -> Close();
+
+  TCanvas *cMuProj = new TCanvas("cMuDeltaPt", "", width, heightNR);
+  cMuProj  -> SetGrid(fGrid, fGrid);
+  cMuProj  -> SetTicks(fTick, fTick);
+  cMuProj  -> SetBorderMode(fMode);
+  cMuProj  -> SetBorderSize(fBord);
+  cMuProj  -> SetFrameBorderMode(fFrame);
+  cMuProj  -> SetLeftMargin(fMarginL);
+  cMuProj  -> SetRightMargin(fMarginR);
+  cMuProj  -> SetTopMargin(fMarginTNR);
+  cMuProj  -> SetBottomMargin(fMarginBNR);
+  cMuProj  -> SetLogx(fLogX);
+  cMuProj  -> SetLogy(fLogYNR);
+  cMuProj  -> cd();
+  grMuProj -> Draw("ALP");
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    grMuHiProj[iSig] -> Draw("LP");
+    grMuLoProj[iSig] -> Draw("LP");
+  }
+  legMu   -> Draw();
+  info    -> Draw();
+  cuts    -> Draw();
+  fOutput -> cd();
+  cMuProj -> Write();
+  cMuProj -> Close();
+
+  TCanvas *cSigProj = new TCanvas("cSigmaDeltaPt", "", width, heightNR);
+  cSigProj  -> SetGrid(fGrid, fGrid);
+  cSigProj  -> SetTicks(fTick, fTick);
+  cSigProj  -> SetBorderMode(fMode);
+  cSigProj  -> SetBorderSize(fBord);
+  cSigProj  -> SetFrameBorderMode(fFrame);
+  cSigProj  -> SetLeftMargin(fMarginL);
+  cSigProj  -> SetRightMargin(fMarginR);
+  cSigProj  -> SetTopMargin(fMarginTNR);
+  cSigProj  -> SetBottomMargin(fMarginBNR);
+  cSigProj  -> SetLogx(fLogX);
+  cSigProj  -> SetLogy(fLogYNR);
+  cSigProj  -> cd();
+  grSigProj -> Draw("ALP");
+  info      -> Draw();
+  cuts      -> Draw();
+  fOutput   -> cd();
+  cSigProj  -> Write();
+  cSigProj  -> Close();
   cout << "    Made plots." << endl;
+
+  // make directories
+  TDirectory *dNoCut    = (TDirectory*) fOutput -> mkdir("NoCuts");
+  TDirectory *dFlatCut  = (TDirectory*) fOutput -> mkdir("FlatCuts");
+  TDirectory *dSigmaCut = (TDirectory*) fOutput -> mkdir("SigmaCuts");
+  TDirectory *dProject  = (TDirectory*) fOutput -> mkdir("Projections");
 
   // save histograms
   fOutput         -> cd();
-  grReject        -> Write();
+  dNoCut          -> cd();
   hEff            -> Write();
   hPtTruth        -> Write();
   hPtDelta        -> Write();
@@ -1623,7 +2456,11 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   hPtDeltaVsTrue  -> Write();
   hPtDeltaVsTrack -> Write();
   hPtTrueVsTrack  -> Write();
-  for (Ssiz_t iCut = 0; iCut < NCuts; iCut++) {
+
+  // save flat delta-pt cut histograms
+  dFlatCut -> cd();
+  grRejCut -> Write();
+  for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
     hEffCut[iCut]            -> Write();
     hPtDeltaCut[iCut]        -> Write();
     hPtTrackCut[iCut]        -> Write();
@@ -1634,6 +2471,35 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     hPtDeltaVsTrackCut[iCut] -> Write();
     hPtTrueVsTrackCut[iCut]  -> Write();
   }
+
+  // save pt-dependent delta-pt cut histograms
+  dSigmaCut -> cd();
+  grRejSig  -> Write();
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    hEffSig[iSig]            -> Write();
+    hPtDeltaSig[iSig]        -> Write();
+    hPtTrackSig[iSig]        -> Write();
+    hPtFracSig[iSig]         -> Write();
+    hPtTrkTruSig[iSig]       -> Write();
+    hPtDeltaVsFracSig[iSig]  -> Write();
+    hPtDeltaVsTrueSig[iSig]  -> Write();
+    hPtDeltaVsTrackSig[iSig] -> Write();
+    hPtTrueVsTrackSig[iSig]  -> Write();
+  }
+
+  // save delta-pt projection histograms
+  dProject  -> cd();
+  grMuProj  -> Write();
+  grSigProj -> Write();
+  for (Ssiz_t iProj = 0; iProj < NProj; iProj++) {
+    hPtDeltaProj[iProj] -> Write();
+    fPtDeltaProj[iProj] -> Write();
+  }
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    grMuHiProj[iSig] -> Write();
+    grMuLoProj[iSig] -> Write();
+  }
+  cout << "    Saved histograms." << endl;
 
   // close files
   fOutput -> cd();

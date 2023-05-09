@@ -35,13 +35,13 @@ static const Ssiz_t  NRange   = 2;
 static const Ssiz_t  NProj    = 6;
 static const Ssiz_t  NTrkCuts = 6;
 static const Ssiz_t  NDPtCuts = 7;
-static const Ssiz_t  NSigCuts = 3;
+static const Ssiz_t  NSigCuts = 5;
 static const TString SInTrack = "ntp_track";
 static const TString SInTruth = "ntp_gtrack";
 
 // default parameters
 static const TString SInDef  = "input/embed_only/final_merge/sPhenixG4_forSectorCheck_embedScanOn_embedOnly.pt020n5pim.d11m4y2023.root";
-static const TString SOutDef = "varyDeltaPtCut.withPtDependentDeltaPtCut.pt020n5pim.d8m5y2023.root";
+static const TString SOutDef = "varyDeltaPtCut.withPtDependentDeltaPtCut.pt020n5pim.d9m5y2023.root";
 
 
 
@@ -59,7 +59,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const Double_t vzTrkMax             = 10.;
   const Double_t ptTrkMin             = 0.1;
   const Double_t ptDeltaMax[NDPtCuts] = {0.5, 0.25, 0.1, 0.05, 0.03, 0.02, 0.01};
-  const Double_t ptDeltaSig[NSigCuts] = {1.,  2.,   3.};
+  const Double_t ptDeltaSig[NSigCuts] = {1.,  1.5,  2.,  2.5,  3.};
   const Double_t normRange[NRange]    = {0.2, 1.2};
 
   // histogram parameters
@@ -70,15 +70,24 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const TString sPtTrkTruBase        = "PtTrkTruth";
   const TString sPtProjBase          = "DeltaPtProj";
   const TString sRejCutBase          = "Reject_flatDPtCut";
-  const TString sRejSigBase          = "Reject_sigmaDPtCut";
+  const TString sRejSigBase          = "Reject_sigmaCut";
   const TString sMuHiBase            = "MeanPlusSigma";
   const TString sMuLoBase            = "MeanMinusSigma";
   const TString sSigBase             = "ProjectionSigma";
   const TString sMuBase              = "ProjectionMean";
   const TString sEffBase             = "Efficiency";
-  const TString sProjSuffix[NProj]   = {"_pt05",    "_pt1",     "_pt2",   "_pt5",   "_pt10",  "_pt20"}; 
-  const TString sDPtSuffix[NDPtCuts] = {"_dPt50",   "_dPt25",   "_dPt10", "_dPt05", "_dPt03", "_dPt02", "_dPt01"};
-  const TString sSigSuffix[NSigCuts] = {"_sigDPt1", "_sigDPt2", "_sigDPt3"};
+  const TString sProjSuffix[NProj]   = {"_pt05",    "_pt1",      "_pt2",     "_pt5",      "_pt10",  "_pt20"}; 
+  const TString sDPtSuffix[NDPtCuts] = {"_dPt50",   "_dPt25",    "_dPt10",   "_dPt05",    "_dPt03", "_dPt02", "_dPt01"};
+  const TString sSigSuffix[NSigCuts] = {"_sigDPt1", "_sidDpt15", "_sigDPt2", "_sigDPt25", "_sigDPt3"};
+
+  // plot parameters
+  const UInt_t  iCutToDraw     = NDPtCuts - 3;
+  const UInt_t  iSigToDraw     = NSigCuts - 3;
+  const UInt_t  nEffRebin      = 5;
+  const Bool_t  doEffRebin     = true;
+  const TString sBeforeTitle   = "Before #Deltap_{T}/p_{T} cuts";
+  const TString sAfterCutTitle = "After #Deltap_{T}/p_{T} < 0.03 cut";
+  const TString sAfterSigTitle = "After 2 #times #sigma(#Deltap_{T}/p_{T}) cut";
 
   // histogram text parameters
   const TString sTitle        = "";
@@ -95,28 +104,32 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const TString sEffAxis      = "#epsilon_{trk}";
 
   // sigma calculation parameters
-  const Double_t ptProj[NProj]      = {0.5, 1., 2., 5., 10., 20.};
-  const Double_t sigLoGuess[NPar]   = {1., 1., 1.};
-  const Double_t sigHiGuess[NPar]   = {1., 1., 1.};
-  const Double_t ptFitRange[NRange] = {0., 20.};
+  const Double_t ptProj[NProj]         = {0.5, 1., 2., 5., 10., 20.};
+  const Double_t sigHiGuess[NPar]      = {1., -1., 1.};
+  const Double_t sigLoGuess[NPar]      = {1., -1., 1.};
+  const Double_t deltaFitRange[NRange] = {0.,  0.05};
+  const Double_t ptFitRange[NRange]    = {0.5, 20.};
 
-  // style parameters
+  // histogram style parameters
   const UInt_t  fColTrue(923);
   const UInt_t  fColPure(923);
   const UInt_t  fColTrk(809);
   const UInt_t  fMarTrue(20);
   const UInt_t  fMarPure(20);
   const UInt_t  fMarTrk(46);
-  const UInt_t  fColFit[NProj]      = {803, 893, 883, 863, 843, 813};
   const UInt_t  fColProj[NProj]     = {799, 899, 879, 859, 839, 819};
   const UInt_t  fMarProj[NProj]     = {20,  22,  23,  21,  33,  34};
   const UInt_t  fColCut[NDPtCuts]   = {899, 909, 879, 889, 859, 869, 839};
   const UInt_t  fMarCut[NDPtCuts]   = {24,  26,  32,  25,  27,  28,  30};
-  const UInt_t  fColSig[NSigCuts]   = {899, 879, 859};
-  const UInt_t  fMarSig[NSigCuts]   = {24,  26,  32};
   const Float_t rPtRange[NRange]    = {0., 30.};
   const Float_t rFracRange[NRange]  = {0., 4.};
   const Float_t rDeltaRange[NRange] = {0., 1.};
+
+  // graph/fit style parameters
+  const UInt_t fColFit[NProj]       = {803, 893, 883, 863, 843, 813};
+  const UInt_t fColSigFit[NSigCuts] = {893, 903, 873, 883, 863};
+  const UInt_t fColSig[NSigCuts]    = {899, 909, 879, 889, 859};
+  const UInt_t fMarSig[NSigCuts]    = {24,  26,  32,  25,  27};
 
   // legend parameters
   const TString sLegTrue("truth");
@@ -146,12 +159,23 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   };
   const TString sLegProjSig[NSigCuts] = {
     "n = 1",
+    "n = 1.5",
     "n = 2",
+    "n = 2.5",
     "n = 3"
+  };
+  const TString sLegDelta[NSigCuts] = {
+    "1 #times #sigma(#Deltap_{T} / p_{T}^{reco})",
+    "1.5 #times #sigma(#Deltap_{T} / p_{T}^{reco})",
+    "2 #times #sigma(#Deltap_{T} / p_{T}^{reco})",
+    "2.5 #times #sigma(#Deltap_{T} / p_{T}^{reco})",
+    "3 #times #sigma(#Deltap_{T} / p_{T}^{reco})"
   };
   const TString sLegSig[NSigCuts] = {
     "#Deltap_{T} / p_{T}^{reco} #in 1 #times sigma(#Deltap_{T} / p_{T}^{reco})",
+    "#Deltap_{T} / p_{T}^{reco} #in 1.5 #times sigma(#Deltap_{T} / p_{T}^{reco})",
     "#Deltap_{T} / p_{T}^{reco} #in 2 #times sigma(#Deltap_{T} / p_{T}^{reco})",
+    "#Deltap_{T} / p_{T}^{reco} #in 2.5 #times sigma(#Deltap_{T} / p_{T}^{reco})",
     "#Deltap_{T} / p_{T}^{reco} #in 3 #times sigma(#Deltap_{T} / p_{T}^{reco})"
   };
   const TString sTrkCuts[NTrkCuts] = {
@@ -825,9 +849,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   // grab no. of entries
   const Long64_t nTrks = ntTrack -> GetEntries();
   const Long64_t nTrus = ntTruth -> GetEntries();
-  cout << "    Beginning tuple loops: " << nTrks << " reco. tracks and " << nTrus << " particles to process\n"
-       << "      First loop over reco. tracks:"
-       << endl;
+  cout << "    Beginning tuple loops: " << nTrks << " reco. tracks and " << nTrus << " particles to process" << endl;
 
   // for sigma calculatin
   Double_t muProj[NProj];
@@ -862,8 +884,9 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     nWeirdSig[iSig] = 0;
     rejSig[iSig]    = 0.;
   }
+  cout << "      First loop over reco. tracks:" << endl;
 
-  // track loop
+  // 1st track loop
   Long64_t nBytesTrk = 0;
   for (Long64_t iTrk = 0; iTrk < nTrks; iTrk++) {
 
@@ -931,7 +954,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
         }
       }
     }  // end delta-pt cut
-  }  // end track loop
+  }  // end 1st track loop
   cout << "      First loop over reco. tracks finished!" << endl;
 
   // calculate flat delta-pt rejection factors
@@ -965,7 +988,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     const Float_t sigGuess = hPtDeltaProj[iProj] -> GetRMS();
 
     // fit with gaussian
-    fPtDeltaProj[iProj] = new TF1(sFitProj[iProj].Data(), "gaus", ptFitRange[0], ptFitRange[1]);
+    fPtDeltaProj[iProj] = new TF1(sFitProj[iProj].Data(), "gaus", deltaFitRange[0], deltaFitRange[1]);
     fPtDeltaProj[iProj] -> SetLineColor(fColFit[iProj]);
     fPtDeltaProj[iProj] -> SetLineStyle(fLinFit);
     fPtDeltaProj[iProj] -> SetLineWidth(fWidFit);
@@ -990,15 +1013,23 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   sMuProj.Append(sMuBase.Data());
   sSigProj.Append(sSigBase.Data());
 
-  TString sMuHiProj[NSigCuts];
-  TString sMuLoProj[NSigCuts];
+  TString sGrMuHiProj[NSigCuts];
+  TString sGrMuLoProj[NSigCuts];
+  TString sFnMuHiProj[NSigCuts];
+  TString sFnMuLoProj[NSigCuts];
   for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
-    sMuHiProj[iSig] = "gr";
-    sMuLoProj[iSig] = "gr";
-    sMuHiProj[iSig].Append(sMuHiBase.Data());
-    sMuLoProj[iSig].Append(sMuLoBase.Data());
-    sMuHiProj[iSig].Append(sSigSuffix[iSig].Data());
-    sMuLoProj[iSig].Append(sSigSuffix[iSig].Data());
+    sGrMuHiProj[iSig] = "gr";
+    sGrMuLoProj[iSig] = "gr";
+    sFnMuHiProj[iSig] = "f";
+    sFnMuLoProj[iSig] = "f";
+    sGrMuHiProj[iSig].Append(sMuHiBase.Data());
+    sGrMuLoProj[iSig].Append(sMuLoBase.Data());
+    sFnMuHiProj[iSig].Append(sMuHiBase.Data());
+    sFnMuLoProj[iSig].Append(sMuLoBase.Data());
+    sGrMuHiProj[iSig].Append(sSigSuffix[iSig].Data());
+    sGrMuLoProj[iSig].Append(sSigSuffix[iSig].Data());
+    sFnMuHiProj[iSig].Append(sSigSuffix[iSig].Data());
+    sFnMuLoProj[iSig].Append(sSigSuffix[iSig].Data());
   }
 
   // construct sigma graphs
@@ -1007,18 +1038,115 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   grMuProj  -> SetName(sMuProj);
   grSigProj -> SetName(sSigProj);
 
+  TF1    *fMuHiProj[NSigCuts];
+  TF1    *fMuLoProj[NSigCuts];
   TGraph *grMuHiProj[NSigCuts];
   TGraph *grMuLoProj[NSigCuts];
   for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+
+    // create graphs
     grMuHiProj[iSig] = new TGraph(NProj, ptProj, muHiProj[iSig]);
     grMuLoProj[iSig] = new TGraph(NProj, ptProj, muLoProj[iSig]);
-    grMuHiProj[iSig] -> SetName(sMuHiProj[iSig]);
-    grMuLoProj[iSig] -> SetName(sMuLoProj[iSig]);
-  }
-  cout << "      Created sigma graphs." << endl;
+    grMuHiProj[iSig] -> SetName(sGrMuHiProj[iSig].Data());
+    grMuLoProj[iSig] -> SetName(sGrMuLoProj[iSig].Data());
 
-  /* fitting of graphs, 2nd loop over reco tracks, and calculation of sigma rejection factors goes here */
-  cout << "      Loop over particles:" << endl;
+    // create fit functions
+    fMuHiProj[iSig] = new TF1(sFnMuHiProj[iSig].Data(), "pol2", rPtRange[0], rPtRange[1]);
+    fMuLoProj[iSig] = new TF1(sFnMuLoProj[iSig].Data(), "pol2", rPtRange[0], rPtRange[1]);
+    fMuHiProj[iSig] -> SetLineColor(fColSigFit[iSig]);
+    fMuLoProj[iSig] -> SetLineColor(fColSigFit[iSig]);
+    fMuHiProj[iSig] -> SetLineStyle(fLinFit);
+    fMuLoProj[iSig] -> SetLineStyle(fLinFit);
+    fMuHiProj[iSig] -> SetLineWidth(fWidFit);
+    fMuLoProj[iSig] -> SetLineWidth(fWidFit);
+    fMuHiProj[iSig] -> SetParameter(0, sigHiGuess[0]);
+    fMuLoProj[iSig] -> SetParameter(0, sigLoGuess[0]);
+    fMuHiProj[iSig] -> SetParameter(1, sigHiGuess[1]);
+    fMuLoProj[iSig] -> SetParameter(1, sigLoGuess[1]);
+    fMuHiProj[iSig] -> SetParameter(2, sigHiGuess[2]);
+    fMuLoProj[iSig] -> SetParameter(2, sigLoGuess[2]);
+
+    // fit graphs
+    grMuHiProj[iSig] -> Fit(sFnMuHiProj[iSig].Data(), "", "", ptFitRange[0], ptFitRange[1]);
+    grMuLoProj[iSig] -> Fit(sFnMuLoProj[iSig].Data(), "", "", ptFitRange[0], ptFitRange[1]);
+  }
+  cout << "      Created and fit sigma graphs.\n"
+       << "      Second loop over reco. tracks:"
+       << endl;
+
+  // 2nd track loop
+  nBytesTrk = 0;
+  for (Long64_t iTrk = 0; iTrk < nTrks; iTrk++) {
+
+    // grab entry
+    const Long64_t bytesTrk = ntTrack -> GetEntry(iTrk);
+    if (bytesTrk < 0.) {
+      cerr << "WARNING: something wrong with track #" << iTrk << "! Aborting loop!" << endl;
+      break;
+    }
+    nBytesTrk += bytesTrk;
+
+    // announce progress
+    const Long64_t iProgTrk = iTrk + 1;
+    if (iProgTrk == nTrks) {
+      cout << "        Processing track " << iProgTrk << "/" << nTrks << "..." << endl;
+    } else {
+      cout << "        Processing track " << iProgTrk << "/" << nTrks << "...\r" << flush;
+    }
+
+    // do calculations
+    const Double_t ptFrac  = trk_pt / trk_gpt;
+    const Double_t ptDelta = trk_deltapt / trk_pt;
+
+    // apply trk cuts
+    const Bool_t isInZVtxCut = (abs(trk_vz) <  vzTrkMax);
+    const Bool_t isInInttCut = (trk_nintt   >= nInttTrkMin);
+    const Bool_t isInMVtxCut = (trk_nlmaps  >  nMVtxTrkMin);
+    const Bool_t isInTpcCut  = (trk_ntpc    >  nTpcTrkMin);
+    const Bool_t isInPtCut   = (trk_pt      >  ptTrkMin);
+    const Bool_t isInQualCut = (trk_quality <  qualTrkMax);
+    const Bool_t isGoodTrk   = (isInZVtxCut && isInInttCut && isInMVtxCut && isInTpcCut && isInPtCut && isInQualCut);
+    if (!isGoodTrk) continue;
+
+    // apply delta-pt cuts
+    const Bool_t isNormalTrk = ((ptFrac > normRange[0]) && (ptFrac < normRange[1]));
+    for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+
+      // get bounds
+      const Float_t ptDeltaMin = fMuLoProj[iSig] -> Eval(trk_pt);
+      const Float_t ptDeltaMax = fMuHiProj[iSig] -> Eval(trk_pt);
+
+      const Bool_t isInDeltaPtSigma = ((ptDelta >= ptDeltaMin) && (ptDelta <= ptDeltaMax));
+      if (isInDeltaPtSigma) {
+
+        // fill histograms
+        hPtDeltaSig[iSig]        -> Fill(ptDelta);
+        hPtTrackSig[iSig]        -> Fill(trk_pt);
+        hPtFracSig[iSig]         -> Fill(ptFrac);
+        hPtTrkTruSig[iSig]       -> Fill(trk_gpt);
+        hPtDeltaVsFracSig[iSig]  -> Fill(ptFrac,  ptDelta);
+        hPtDeltaVsTrueSig[iSig]  -> Fill(trk_gpt, ptDelta);
+        hPtDeltaVsTrackSig[iSig] -> Fill(trk_pt,  ptDelta);
+        hPtTrueVsTrackSig[iSig]  -> Fill(trk_pt,  trk_gpt);
+
+        // increment counters
+        if (isNormalTrk) {
+          ++nNormSig[iSig];
+        } else {
+          ++nWeirdSig[iSig];
+        }
+      }
+    }  // end delta-pt cut
+  }  // end 1st track loop
+  cout << "      Second loop over reco. tracks finished!" << endl;
+
+  // calculate pt-dependent delta-pt rejection factors
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    rejSig[iSig] = (Double_t) nNormSig[iSig] / (Double_t) nWeirdSig[iSig];
+  }
+  cout << "      Calculated pt-depdendent delta-pt rejection factors.\n"
+       << "      Loop over particles:"
+       << endl;
 
   // truth loop
   Long64_t nBytesTru = 0;
@@ -1074,6 +1202,19 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   grRejCut -> SetName(sRejCut.Data());
   grRejSig -> SetName(sRejSig.Data());
   cout << "    Made rejection factor graph." << endl; 
+
+  // rebin efficiency histograms if needed
+  if (doEffRebin) {
+    hPtTruth  -> Rebin(nEffRebin);
+    hPtTrkTru -> Rebin(nEffRebin);
+    for (Ssiz_t iCut = 0; iCut < NDPtCuts; iCut++) {
+      hPtTrkTruCut[iCut] -> Rebin(nEffRebin);
+    }
+    for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+      hPtTrkTruSig[iSig] -> Rebin(nEffRebin);
+    }
+    cout << "    Rebinned efficiency histograms." << endl;
+  }
 
   // calculate efficiencies
   TString sEff("h");
@@ -2081,10 +2222,12 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const UInt_t  fLinLe          = 0;
   const Float_t yObjLe          = 0.1 + ((NDPtCuts + 2) * 0.05);
   const Float_t yObjMu          = 0.1 + ((NSigCuts + 1) * 0.05);
+  const Float_t yObjDel         = 0.1 + (NSigCuts * 0.05);
   const Float_t yObjPro         = 0.1 + (NProj * 0.05);
   const Float_t yObjSig         = 0.1 + ((NSigCuts + 2) * 0.05);
   const Float_t fLegXY[NVtx]    = {0.1, 0.1, 0.3, yObjLe};
   const Float_t fLegMuXY[NVtx]  = {0.1, 0.1, 0.3, yObjMu};
+  const Float_t fLegDelXY[NVtx] = {0.1, 0.1, 0.3, yObjDel};
   const Float_t fLegProXY[NVtx] = {0.1, 0.1, 0.3, yObjPro};
   const Float_t fLegSigXY[NVtx] = {0.1, 0.1, 0.3, yObjSig};
 
@@ -2111,6 +2254,17 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   legMu -> AddEntry(grMuProj, sLegMu.Data(), "p");
   for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
     legMu -> AddEntry(grMuHiProj[iSig], sLegProjSig[iSig].Data(), "p");
+  }
+
+  TLegend *legDel = new TLegend(fLegDelXY[0], fLegDelXY[1], fLegDelXY[2], fLegDelXY[3]);
+  legDel -> SetFillColor(fColLe);
+  legDel -> SetFillStyle(fFilLe);
+  legDel -> SetLineColor(fColLe);
+  legDel -> SetLineStyle(fLinLe);
+  legDel -> SetTextFont(fTxt);
+  legDel -> SetTextAlign(fAln);
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    legDel -> AddEntry(fMuHiProj[iSig], sLegDelta[iSig].Data(), "l");
   }
 
   TLegend *legPro = new TLegend(fLegProXY[0], fLegProXY[1], fLegProXY[2], fLegProXY[3]);
@@ -2263,6 +2417,180 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   cEffCut -> Write();
   cEffCut -> Close();
 
+  TCanvas *cEffSig = new TCanvas("cEfficiency_SigmaCut", "", width, height);
+  TPad    *pEffSig = new TPad("pEffSig", "", fEffXY[0],  fEffXY[1],  fEffXY[2],  fEffXY[3]);
+  TPad    *pTrkSig = new TPad("pTrkSig", "", fTrksXY[0], fTrksXY[1], fTrksXY[2], fTrksXY[3]);
+  cEffSig -> SetGrid(fGrid, fGrid);
+  cEffSig -> SetTicks(fTick, fTick);
+  cEffSig -> SetBorderMode(fMode);
+  cEffSig -> SetBorderSize(fBord);
+  pEffSig -> SetGrid(fGrid, fGrid);
+  pEffSig -> SetTicks(fTick, fTick);
+  pEffSig -> SetLogx(fLogX);
+  pEffSig -> SetLogy(fLogY1);
+  pEffSig -> SetBorderMode(fMode);
+  pEffSig -> SetBorderSize(fBord);
+  pEffSig -> SetFrameBorderMode(fFrame);
+  pEffSig -> SetLeftMargin(fMarginL);
+  pEffSig -> SetRightMargin(fMarginR);
+  pEffSig -> SetTopMargin(fMarginT1);
+  pEffSig -> SetBottomMargin(fMarginB1);
+  pTrkSig -> SetGrid(fGrid, fGrid);
+  pTrkSig -> SetTicks(fTick, fTick);
+  pTrkSig -> SetLogx(fLogX);
+  pTrkSig -> SetLogy(fLogY2);
+  pTrkSig -> SetBorderMode(fMode);
+  pTrkSig -> SetBorderSize(fBord);
+  pTrkSig -> SetFrameBorderMode(fFrame);
+  pTrkSig -> SetLeftMargin(fMarginL);
+  pTrkSig -> SetRightMargin(fMarginR);
+  pTrkSig -> SetTopMargin(fMarginT2);
+  pTrkSig -> SetBottomMargin(fMarginB2);
+  cEffSig -> cd();
+  pEffSig -> Draw();
+  pTrkSig -> Draw();
+  pEffSig -> cd();
+  hEff    -> Draw();
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    hEffSig[iSig] -> Draw("SAME");
+  }
+  line      -> Draw();
+  pTrkSig   -> cd();
+  hPtTruth  -> Draw();
+  hPtTrkTru -> Draw("SAME");
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    hPtTrkTruSig[iSig] -> Draw("SAME");
+  }
+  legSig  -> Draw();
+  info    -> Draw();
+  cuts    -> Draw();
+  fOutput -> cd();
+  cEffSig -> Write();
+  cEffSig -> Close();
+
+  TCanvas *cRejCut = new TCanvas("cReject_FlatCut", "", width, heightNR);
+  cRejCut  -> SetGrid(fGrid, fGrid);
+  cRejCut  -> SetTicks(fTick, fTick);
+  cRejCut  -> SetBorderMode(fMode);
+  cRejCut  -> SetBorderSize(fBord);
+  cRejCut  -> SetFrameBorderMode(fFrame);
+  cRejCut  -> SetLeftMargin(fMarginL);
+  cRejCut  -> SetRightMargin(fMarginR);
+  cRejCut  -> SetTopMargin(fMarginTNR);
+  cRejCut  -> SetBottomMargin(fMarginBNR);
+  cRejCut  -> SetLogx(fLogX);
+  cRejCut  -> SetLogy(fLogYNR);
+  cRejCut  -> cd();
+  grRejCut -> Draw("ALP");
+  info     -> Draw();
+  cuts     -> Draw();
+  fOutput  -> cd();
+  cRejCut  -> Write();
+  cRejCut  -> Close();
+
+  TCanvas *cRejSig = new TCanvas("cReject_SigmaCut", "", width, heightNR);
+  cRejSig  -> SetGrid(fGrid, fGrid);
+  cRejSig  -> SetTicks(fTick, fTick);
+  cRejSig  -> SetBorderMode(fMode);
+  cRejSig  -> SetBorderSize(fBord);
+  cRejSig  -> SetFrameBorderMode(fFrame);
+  cRejSig  -> SetLeftMargin(fMarginL);
+  cRejSig  -> SetRightMargin(fMarginR);
+  cRejSig  -> SetTopMargin(fMarginTNR);
+  cRejSig  -> SetBottomMargin(fMarginBNR);
+  cRejSig  -> SetLogx(fLogX);
+  cRejSig  -> SetLogy(fLogYNR);
+  cRejSig  -> cd();
+  grRejSig -> Draw("ALP");
+  info     -> Draw();
+  cuts     -> Draw();
+  fOutput  -> cd();
+  cRejSig  -> Write();
+  cRejSig  -> Close();
+
+  TCanvas *cPtTruVsTrkCut = new TCanvas("cPtTruthVsReco_FlatCut", "", width2D, heightNR);
+  TPad    *pBeforeCut     = new TPad("pBeforeCut", "", fBeforeDPtXY[0], fBeforeDPtXY[1], fBeforeDPtXY[2], fBeforeDPtXY[3]);
+  TPad    *pAfterCut      = new TPad("pAfterCut",  "", fAfterDPtXY[0],  fAfterDPtXY[1],  fAfterDPtXY[2],  fAfterDPtXY[3]);
+  cPtTruVsTrkCut                -> SetGrid(fGrid, fGrid);
+  cPtTruVsTrkCut                -> SetTicks(fTick, fTick);
+  cPtTruVsTrkCut                -> SetBorderMode(fMode);
+  cPtTruVsTrkCut                -> SetBorderSize(fBord);
+  pBeforeCut                    -> SetGrid(fGrid, fGrid);
+  pBeforeCut                    -> SetTicks(fTick, fTick);
+  pBeforeCut                    -> SetLogx(fLogX);
+  pBeforeCut                    -> SetLogy(fLogYNR);
+  pBeforeCut                    -> SetBorderMode(fMode);
+  pBeforeCut                    -> SetBorderSize(fBord);
+  pBeforeCut                    -> SetFrameBorderMode(fFrame);
+  pBeforeCut                    -> SetLeftMargin(fMarginL);
+  pBeforeCut                    -> SetRightMargin(fMarginR2D);
+  pBeforeCut                    -> SetBottomMargin(fMarginBNR);
+  pAfterCut                     -> SetGrid(fGrid, fGrid);
+  pAfterCut                     -> SetTicks(fTick, fTick);
+  pAfterCut                     -> SetLogx(fLogX);
+  pAfterCut                     -> SetLogy(fLogYNR);
+  pAfterCut                     -> SetBorderMode(fMode);
+  pAfterCut                     -> SetBorderSize(fBord);
+  pAfterCut                     -> SetFrameBorderMode(fFrame);
+  pAfterCut                     -> SetLeftMargin(fMarginL);
+  pAfterCut                     -> SetRightMargin(fMarginR2D);
+  pAfterCut                     -> SetBottomMargin(fMarginBNR);
+  cPtTruVsTrkCut                -> cd();
+  pBeforeCut                    -> Draw();
+  pAfterCut                     -> Draw();
+  pBeforeCut                    -> cd();
+  hPtTrueVsTrack                -> SetTitle(sBeforeTitle.Data());
+  hPtTrueVsTrack                -> Draw("colz");
+  cuts                          -> Draw();
+  pAfterCut                     -> cd();
+  hPtTrueVsTrackCut[iCutToDraw] -> SetTitle(sAfterCutTitle.Data());
+  hPtTrueVsTrackCut[iCutToDraw] -> Draw("colz");
+  info                          -> Draw();
+  fOutput                       -> cd();
+  cPtTruVsTrkCut                -> Write();
+  cPtTruVsTrkCut                -> Close();
+
+  TCanvas *cPtTruVsTrkSig = new TCanvas("cPtTruthVsReco_SigmaCut", "", width2D, heightNR);
+  TPad    *pBeforeSig     = new TPad("pBeforeSig", "", fBeforeDPtXY[0], fBeforeDPtXY[1], fBeforeDPtXY[2], fBeforeDPtXY[3]);
+  TPad    *pAfterSig      = new TPad("pAfterSig",  "", fAfterDPtXY[0],  fAfterDPtXY[1],  fAfterDPtXY[2],  fAfterDPtXY[3]);
+  cPtTruVsTrkSig                -> SetGrid(fGrid, fGrid);
+  cPtTruVsTrkSig                -> SetTicks(fTick, fTick);
+  cPtTruVsTrkSig                -> SetBorderMode(fMode);
+  cPtTruVsTrkSig                -> SetBorderSize(fBord);
+  pBeforeSig                    -> SetGrid(fGrid, fGrid);
+  pBeforeSig                    -> SetTicks(fTick, fTick);
+  pBeforeSig                    -> SetLogx(fLogX);
+  pBeforeSig                    -> SetLogy(fLogYNR);
+  pBeforeSig                    -> SetBorderMode(fMode);
+  pBeforeSig                    -> SetBorderSize(fBord);
+  pBeforeSig                    -> SetFrameBorderMode(fFrame);
+  pBeforeSig                    -> SetLeftMargin(fMarginL);
+  pBeforeSig                    -> SetRightMargin(fMarginR2D);
+  pBeforeSig                    -> SetBottomMargin(fMarginBNR);
+  pAfterSig                     -> SetGrid(fGrid, fGrid);
+  pAfterSig                     -> SetTicks(fTick, fTick);
+  pAfterSig                     -> SetLogx(fLogX);
+  pAfterSig                     -> SetLogy(fLogYNR);
+  pAfterSig                     -> SetBorderMode(fMode);
+  pAfterSig                     -> SetBorderSize(fBord);
+  pAfterSig                     -> SetFrameBorderMode(fFrame);
+  pAfterSig                     -> SetLeftMargin(fMarginL);
+  pAfterSig                     -> SetRightMargin(fMarginR2D);
+  pAfterSig                     -> SetBottomMargin(fMarginBNR);
+  cPtTruVsTrkSig                -> cd();
+  pBeforeSig                    -> Draw();
+  pAfterSig                     -> Draw();
+  pBeforeSig                    -> cd();
+  hPtTrueVsTrack                -> Draw("colz");
+  cuts                          -> Draw();
+  pAfterSig                     -> cd();
+  hPtTrueVsTrackSig[iSigToDraw] -> SetTitle(sAfterSigTitle.Data());
+  hPtTrueVsTrackSig[iSigToDraw] -> Draw("colz");
+  info                          -> Draw();
+  fOutput                       -> cd();
+  cPtTruVsTrkSig                -> Write();
+  cPtTruVsTrkSig                -> Close();
+
   TCanvas *cPtDelVsTrk = new TCanvas("cPtDeltaVsTrack", "", width2D, heightNR);
   TPad    *pTwoDim     = new TPad("pTwoDim",      "", fTwoDimXY[0],  fTwoDimXY[1],  fTwoDimXY[2],  fTwoDimXY[3]);
   TPad    *pProject    = new TPad("pProjections", "", fProjectXY[0], fProjectXY[1], fProjectXY[2], fProjectXY[3]);
@@ -2297,79 +2625,24 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   pProject        -> Draw();
   pTwoDim         -> cd();
   hPtDeltaVsTrack -> Draw("colz");
+  for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    fMuHiProj[iSig] -> Draw("same");
+    fMuLoProj[iSig] -> Draw("same");
+  }
+  legDel          -> Draw();
   cuts            -> Draw();
   pProject        -> cd();
   hPtDeltaProj[0] -> Draw();
+  fPtDeltaProj[0] -> Draw("same");
   for (Ssiz_t iProj = 1; iProj < NProj; iProj++) {
     hPtDeltaProj[iProj] -> Draw("same");
+    fPtDeltaProj[iProj] -> Draw("same");
   }
   legPro      -> Draw();
   info        -> Draw();
   fOutput     -> cd();
   cPtDelVsTrk -> Write();
   cPtDelVsTrk -> Close();
-
-  TCanvas *cPtTruVsTrk = new TCanvas("cPtTruthVsTrack", "", width2D, heightNR);
-  TPad    *pBefore     = new TPad("pBeforeDPt", "", fBeforeDPtXY[0], fBeforeDPtXY[1], fBeforeDPtXY[2], fBeforeDPtXY[3]);
-  TPad    *pAfter      = new TPad("pAfterDPt",  "", fAfterDPtXY[0],  fAfterDPtXY[1],  fAfterDPtXY[2],  fAfterDPtXY[3]);
-  cPtTruVsTrk                     -> SetGrid(fGrid, fGrid);
-  cPtTruVsTrk                     -> SetTicks(fTick, fTick);
-  cPtTruVsTrk                     -> SetBorderMode(fMode);
-  cPtTruVsTrk                     -> SetBorderSize(fBord);
-  pBefore                         -> SetGrid(fGrid, fGrid);
-  pBefore                         -> SetTicks(fTick, fTick);
-  pBefore                         -> SetLogx(fLogX);
-  pBefore                         -> SetLogy(fLogYNR);
-  pBefore                         -> SetBorderMode(fMode);
-  pBefore                         -> SetBorderSize(fBord);
-  pBefore                         -> SetFrameBorderMode(fFrame);
-  pBefore                         -> SetLeftMargin(fMarginL);
-  pBefore                         -> SetRightMargin(fMarginR2D);
-  pBefore                         -> SetBottomMargin(fMarginBNR);
-  pAfter                          -> SetGrid(fGrid, fGrid);
-  pAfter                          -> SetTicks(fTick, fTick);
-  pAfter                          -> SetLogx(fLogX);
-  pAfter                          -> SetLogy(fLogYNR);
-  pAfter                          -> SetBorderMode(fMode);
-  pAfter                          -> SetBorderSize(fBord);
-  pAfter                          -> SetFrameBorderMode(fFrame);
-  pAfter                          -> SetLeftMargin(fMarginL);
-  pAfter                          -> SetRightMargin(fMarginR2D);
-  pAfter                          -> SetBottomMargin(fMarginBNR);
-  cPtTruVsTrk                     -> cd();
-  pBefore                         -> Draw();
-  pAfter                          -> Draw();
-  pBefore                         -> cd();
-  hPtTrueVsTrack                  -> SetTitle("Before #Deltap_{T}/p_{T} cut");
-  hPtTrueVsTrack                  -> Draw("colz");
-  cuts                            -> Draw();
-  pAfter                          -> cd();
-  hPtTrueVsTrackCut[NDPtCuts - 3] -> SetTitle("After #Deltap_{T}/p_{T} < 0.03 cut");
-  hPtTrueVsTrackCut[NDPtCuts - 3] -> Draw("colz");
-  info                            -> Draw();
-  fOutput                         -> cd();
-  cPtTruVsTrk                     -> Write();
-  cPtTruVsTrk                     -> Close();
-
-  TCanvas *cRejCut = new TCanvas("cReject_FlatCut", "", width, heightNR);
-  cRejCut  -> SetGrid(fGrid, fGrid);
-  cRejCut  -> SetTicks(fTick, fTick);
-  cRejCut  -> SetBorderMode(fMode);
-  cRejCut  -> SetBorderSize(fBord);
-  cRejCut  -> SetFrameBorderMode(fFrame);
-  cRejCut  -> SetLeftMargin(fMarginL);
-  cRejCut  -> SetRightMargin(fMarginR);
-  cRejCut  -> SetTopMargin(fMarginTNR);
-  cRejCut  -> SetBottomMargin(fMarginBNR);
-  cRejCut  -> SetLogx(fLogX);
-  cRejCut  -> SetLogy(fLogYNR);
-  cRejCut  -> cd();
-  grRejCut -> Draw("ALP");
-  info     -> Draw();
-  cuts     -> Draw();
-  fOutput  -> cd();
-  cRejCut  -> Write();
-  cRejCut  -> Close();
 
   TCanvas *cDeltaPt = new TCanvas("cDeltaPt", "", width, heightNR);
   cDeltaPt  -> SetGrid(fGrid, fGrid);
@@ -2496,6 +2769,8 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     fPtDeltaProj[iProj] -> Write();
   }
   for (Ssiz_t iSig = 0; iSig < NSigCuts; iSig++) {
+    fMuHiProj[iSig]  -> Write();
+    fMuLoProj[iSig]  -> Write();
     grMuHiProj[iSig] -> Write();
     grMuLoProj[iSig] -> Write();
   }

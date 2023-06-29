@@ -27,7 +27,7 @@ void QuickTuplePlotter() {
   cout << "\n  Beginning quick tuple plotting..." << endl;
 
   // i/o parameters
-  const TString sOutput  = "test_tuple_plotter.root";
+  const TString sOutput  = "deltaPtBandFollowUp.plotsForSecondaryNMaps3andPidUnder100.pt2040n100pim.d13m6y2023.root";
   const TString sInput   = "input/embed_only/final_merge/sPhenixG4_forPtCheck_embedScanOn_embedOnly.pt2040n100pim.d8m5y2023.root";
   const TString sInTuple = "ntp_track";
 
@@ -36,13 +36,25 @@ void QuickTuplePlotter() {
     "(abs(vz)<10)&&(nintt>=1)&&(nmaps>2)&&(ntpc>35)&&(pt>20)&&(pt<100)&&(quality<10)",
     "(abs(vz)<10)&&(nintt>=1)&&(nmaps>2)&&(ntpc>35)&&(pt>20)&&(pt<100)&&(quality<10)&&((deltapt/pt)>(0.00125*pt+0.007))",
     "(abs(vz)<10)&&(nintt>=1)&&(nmaps>2)&&(ntpc>35)&&(pt>20)&&(pt<100)&&(quality<10)&&((deltapt/pt)<(0.001*pt+0.0025))",
-    "(abs(vz)<10)&&(nintt>=1)&&(nmaps>2)&&(ntpc>35)&&(pt>20)&&(pt<100)&&(quality<10)&&(!(((deltapt/pt)>(0.00125*pt+0.007))&&((deltapt/pt)<(0.001*pt+0.0025))))"
+    "(abs(vz)<10)&&(nintt>=1)&&(nmaps>2)&&(ntpc>35)&&(pt>20)&&(pt<100)&&(quality<10)&&(!(((deltapt/pt)>(0.00125*pt+0.007))&&((deltapt/pt)<(0.001*pt+0.0025))))",
+    "(abs(vz)<10)&&(ntpc>35)&&(nlmaps==3)&&(pt>0.1)&&(pt<20)&&(quality<10)&&(gprimary==1)",
+    "(abs(vz)<10)&&(ntpc>35)&&(nlmaps==3)&&(pt>0.1)&&(pt<20)&&(quality<10)&&(gprimary==0)",
+    "(abs(vz)<10)&&(ntpc>35)&&(nlmaps==3)&&(pt>0.1)&&(pt<20)&&(quality<10)&&(gprimary==1)&&(abs(gflavor)<2000)",
+    "(abs(vz)<10)&&(ntpc>35)&&(nlmaps==3)&&(pt>0.1)&&(pt<20)&&(quality<10)&&(gprimary==0)&&(abs(gflavor)<2000)",
+    "(abs(vz)<10)&&(ntpc>35)&&(nlmaps==3)&&(pt>0.1)&&(pt<20)&&(quality<10)&&(gprimary==1)&&(abs(gflavor)<100)",
+    "(abs(vz)<10)&&(ntpc>35)&&(nlmaps==3)&&(pt>0.1)&&(pt<20)&&(quality<10)&&(gprimary==0)&&(abs(gflavor)<100)"
   };
   const vector<TString> vecCutLabels = {
     "defaultSelect",
     "upSelect",
     "downSelect",
-    "centerSelect"
+    "centerSelect",
+    "isPrimary_nlmaps3",
+    "isSecondary_nlmaps3",
+    "isPrimary_nlmaps3_gflavorUnder2K",
+    "isSecondary_nlmaps3_gflavorUnder2K",
+    "isPrimary_nlmaps3_gflavorUnder100",
+    "isSecondary_nlmaps3_gflavorUnder100"
   };
 
   // 1d things to draw and histogram names
@@ -50,25 +62,68 @@ void QuickTuplePlotter() {
     "nlintt",
     "nlmaps",
     "gnlintt",
-    "gnlmaps"
+    "gnlmaps",
+    "deltaeta",
+    "deltaphi",
+    "deltaeta/eta",
+    "deltaphi/phi",
+    "gflavor",
+    "gvx",
+    "gvy",
+    "gvz",
+    "sqrt((gvx*gvx)+(gvy*gvy))"
   };
   const vector<TString> vecHistNames1D = {
     "hNLayerIntt",
     "hNLayerMvtx",
     "hNLayerInttTruth",
     "hNLayerMvtxTruth",
+    "hDeltaEta",
+    "hDeltaPhi",
+    "hDeltaEtaOverEta",
+    "hDeltaPhiOverPhi",
+    "hPID",
+    "hTruthVx",
+    "hTruthVy",
+    "hTruthVz",
+    "hTruthVr"
   };
 
   // 2d things to draw, histogram names, and options
   const vector<TString> vecToDraw2D = {
+    "quality:eta",
     "eta-geta:eta",
-    "phi-gphi:phi"
+    "phi-gphi:phi",
+    "deltaeta:eta",
+    "deltaphi:phi",
+    "deltaeta/eta:eta",
+    "deltaphi/phi:phi",
+    "gvy:gvx",
+    "sqrt((gvx*gvx)+(gvy*gvy)):gvz",
+    "gflavor:sqrt((gvx*gvx)+(gvy*gvy))",
+    "gflavor:gvz"
   };
   const vector<TString> vecHistNames2D = {
+    "hQualityVsEta",
     "hEtaDiffVsEta",
-    "hPhiDiffVsPhi"
+    "hPhiDiffVsPhi",
+    "hDeltaEtaVsEta",
+    "hDeltaPhiVsPhi",
+    "hDeltaEtaOverEtaVsEta",
+    "hDeltaPhiOverPhiVsPhi",
+    "hTruthVyVsVx",
+    "hTruthVrVsVz",
+    "hPIDvsTruthVr",
+    "hPIDvsTruthVz"
   };
   const vector<TString> vecHistOpts2D = {
+    "colz",
+    "colz",
+    "colz",
+    "colz",
+    "colz",
+    "colz",
+    "colz",
     "colz",
     "colz"
   };

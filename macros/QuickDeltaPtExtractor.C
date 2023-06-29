@@ -32,7 +32,7 @@ static const Ssiz_t  NPad     = 2;
 static const Ssiz_t  NPar     = 3;
 static const Ssiz_t  NVtx     = 4;
 static const Ssiz_t  NRange   = 2;
-static const Ssiz_t  NProj    = 6;
+static const Ssiz_t  NProj    = 8;
 static const Ssiz_t  NTrkCuts = 6;
 static const Ssiz_t  NDPtCuts = 7;
 static const Ssiz_t  NSigCuts = 5;
@@ -40,8 +40,8 @@ static const TString SInTrack = "ntp_track";
 static const TString SInTruth = "ntp_gtrack";
 
 // default parameters
-static const TString SInDef  = "input/embed_only/final_merge/sPhenixG4_forSectorCheck_embedScanOn_embedOnly.pt020n5pim.d11m4y2023.root";
-static const TString SOutDef = "varyDeltaPtCut.withPtDependentDeltaPtCut.pt020n5pim.d9m5y2023.root";
+static const TString SInDef  = "input/embed_only/final_merge/sPhenixG4_forPtCheck_embedScanOn_embedOnly.pt2040n100pim.d8m5y2023.root";
+static const TString SOutDef = "varyDeltaPtCut.withPtDependentDeltaPtCut.pt2040n100pim.d10m5y2023.root";
 
 
 
@@ -76,7 +76,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const TString sSigBase             = "ProjectionSigma";
   const TString sMuBase              = "ProjectionMean";
   const TString sEffBase             = "Efficiency";
-  const TString sProjSuffix[NProj]   = {"_pt05",    "_pt1",      "_pt2",     "_pt5",      "_pt10",  "_pt20"}; 
+  const TString sProjSuffix[NProj]   = {"_pt05",    "_pt1",      "_pt2",     "_pt5",      "_pt10",  "_pt20",  "_pt30", "_pt40"}; 
   const TString sDPtSuffix[NDPtCuts] = {"_dPt50",   "_dPt25",    "_dPt10",   "_dPt05",    "_dPt03", "_dPt02", "_dPt01"};
   const TString sSigSuffix[NSigCuts] = {"_sigDPt1", "_sidDpt15", "_sigDPt2", "_sigDPt25", "_sigDPt3"};
 
@@ -104,11 +104,11 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const TString sEffAxis      = "#epsilon_{trk}";
 
   // sigma calculation parameters
-  const Double_t ptProj[NProj]         = {0.5, 1., 2., 5., 10., 20.};
+  const Double_t ptProj[NProj]         = {0.5, 1., 2., 5., 10., 20., 30., 40.};
   const Double_t sigHiGuess[NPar]      = {1., -1., 1.};
   const Double_t sigLoGuess[NPar]      = {1., -1., 1.};
-  const Double_t deltaFitRange[NRange] = {0.,  0.05};
-  const Double_t ptFitRange[NRange]    = {0.5, 20.};
+  const Double_t deltaFitRange[NRange] = {0.,  0.1};
+  const Double_t ptFitRange[NRange]    = {0.5, 40.};
 
   // histogram style parameters
   const UInt_t  fColTrue(923);
@@ -117,16 +117,16 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const UInt_t  fMarTrue(20);
   const UInt_t  fMarPure(20);
   const UInt_t  fMarTrk(46);
-  const UInt_t  fColProj[NProj]     = {799, 899, 879, 859, 839, 819};
-  const UInt_t  fMarProj[NProj]     = {20,  22,  23,  21,  33,  34};
+  const UInt_t  fColProj[NProj]     = {799, 633, 899, 617, 879, 859, 839, 819};
+  const UInt_t  fMarProj[NProj]     = {20,  22,  23,  21,  33,  34,  47,  20};
   const UInt_t  fColCut[NDPtCuts]   = {899, 909, 879, 889, 859, 869, 839};
   const UInt_t  fMarCut[NDPtCuts]   = {24,  26,  32,  25,  27,  28,  30};
-  const Float_t rPtRange[NRange]    = {0., 30.};
+  const Float_t rPtRange[NRange]    = {0., 60.};
   const Float_t rFracRange[NRange]  = {0., 4.};
-  const Float_t rDeltaRange[NRange] = {0., 1.};
+  const Float_t rDeltaRange[NRange] = {0., 0.1};
 
   // graph/fit style parameters
-  const UInt_t fColFit[NProj]       = {803, 893, 883, 863, 843, 813};
+  const UInt_t fColFit[NProj]       = {803, 636, 893, 620, 883, 863, 843, 813};
   const UInt_t fColSigFit[NSigCuts] = {893, 903, 873, 883, 863};
   const UInt_t fColSig[NSigCuts]    = {899, 909, 879, 889, 859};
   const UInt_t fMarSig[NSigCuts]    = {24,  26,  32,  25,  27};
@@ -137,7 +137,7 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   const TString sLegMu("Mean #Deltap_{T} / p_{T}^{reco} (n = 0)");
   const TString sInfo[NTxt] = {
     "#bf{#it{sPHENIX}} Simulation",
-    "100 #pi^{-}/event, p_{T} #in (0, 20) GeV/c",
+    "100 #pi^{-}/event, p_{T} #in (20, 40) GeV/c",
     "#bf{Only #pi^{-}}"
   };
   const TString sLegProj[NProj] = {
@@ -146,7 +146,9 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     "p_{T}^{reco} = 2 GeV/c",
     "p_{T}^{reco} = 5 GeV/c",
     "p_{T}^{reco} = 10 GeV/c",
-    "p_{T}^{reco} = 20 GeV/c"
+    "p_{T}^{reco} = 20 GeV/c",
+    "p_{T}^{reco} = 30 GeV/c",
+    "p_{T}^{reco} = 40 GeV/c"
   };
   const TString sLegCut[NDPtCuts] = {
     "#Deltap_{T} / p_{T}^{reco} < 0.5",
@@ -641,10 +643,10 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   TH2D *hPtTrueVsTrackSig[NSigCuts];
 
   // histogram binning
-  const UInt_t  nPtBins(500);
+  const UInt_t  nPtBins(1000);
   const UInt_t  nFracBins(1000);
   const UInt_t  nDeltaBins(5000);
-  const Float_t rPtBins[NRange]    = {0., 50.};
+  const Float_t rPtBins[NRange]    = {0., 100.};
   const Float_t rFracBins[NRange]  = {0., 10.};
   const Float_t rDeltaBins[NRange] = {0., 5.};
 
@@ -900,11 +902,11 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
 
     // announce progress
     const Long64_t iProgTrk = iTrk + 1;
-    if (iProgTrk == nTrks) {
-      cout << "        Processing track " << iProgTrk << "/" << nTrks << "..." << endl;
-    } else {
-      cout << "        Processing track " << iProgTrk << "/" << nTrks << "...\r" << flush;
-    }
+    //if (iProgTrk == nTrks) {
+    //  cout << "        Processing track " << iProgTrk << "/" << nTrks << "..." << endl;
+    //} else {
+    //  cout << "        Processing track " << iProgTrk << "/" << nTrks << "...\r" << flush;
+    //}
 
     // do calculations
     const Double_t ptFrac  = trk_pt / trk_gpt;
@@ -919,6 +921,11 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
     const Bool_t isInQualCut = (trk_quality <  qualTrkMax);
     const Bool_t isGoodTrk   = (isInZVtxCut && isInInttCut && isInMVtxCut && isInTpcCut && isInPtCut && isInQualCut);
     if (!isGoodTrk) continue;
+
+    if (trk_pt < 20) {
+      cout << "CHECK intt = " << trk_nintt << ", mvtx = " << trk_nlmaps << ", tpc = " << trk_ntpc << ", quality = " << trk_quality << ", ptTrue = " << trk_gpt
+           << ", dcaXY = " << trk_dca3dxy << ", dcaZ = " << trk_dca3dz << endl;
+    }
 
     // fill histograms
     hPtDelta        -> Fill(ptDelta);
@@ -1364,11 +1371,11 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   hPtTruth        -> GetYaxis() -> SetLabelFont(fTxt);
   hPtTruth        -> GetYaxis() -> SetLabelSize(fLab[1]);
   hPtTruth        -> GetYaxis() -> CenterTitle(fCnt);
-  hPtDelta        -> SetMarkerColor(fColTrk);
-  hPtDelta        -> SetMarkerStyle(fMarTrk);
-  hPtDelta        -> SetFillColor(fColTrk);
+  hPtDelta        -> SetMarkerColor(fColTrue);
+  hPtDelta        -> SetMarkerStyle(fMarTrue);
+  hPtDelta        -> SetFillColor(fColTrue);
   hPtDelta        -> SetFillStyle(fFil);
-  hPtDelta        -> SetLineColor(fColTrk);
+  hPtDelta        -> SetLineColor(fColTrue);
   hPtDelta        -> SetLineStyle(fLin);
   hPtDelta        -> SetLineWidth(fWid);
   hPtDelta        -> SetTitle(sTitle.Data());
@@ -1388,11 +1395,11 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   hPtDelta        -> GetYaxis() -> SetLabelFont(fTxt);
   hPtDelta        -> GetYaxis() -> SetLabelSize(fLab[1]);
   hPtDelta        -> GetYaxis() -> CenterTitle(fCnt);
-  hPtTrack        -> SetMarkerColor(fColTrk);
-  hPtTrack        -> SetMarkerStyle(fMarTrk);
-  hPtTrack        -> SetFillColor(fColTrk);
+  hPtTrack        -> SetMarkerColor(fColTrue);
+  hPtTrack        -> SetMarkerStyle(fMarTrue);
+  hPtTrack        -> SetFillColor(fColTrue);
   hPtTrack        -> SetFillStyle(fFil);
-  hPtTrack        -> SetLineColor(fColTrk);
+  hPtTrack        -> SetLineColor(fColTrue);
   hPtTrack        -> SetLineStyle(fLin);
   hPtTrack        -> SetLineWidth(fWid);
   hPtTrack        -> SetTitle(sTitle.Data());
@@ -1412,11 +1419,11 @@ void QuickDeltaPtExtractor(const TString sInput = SInDef, const TString sOutput 
   hPtTrack        -> GetYaxis() -> SetLabelFont(fTxt);
   hPtTrack        -> GetYaxis() -> SetLabelSize(fLab[1]);
   hPtTrack        -> GetYaxis() -> CenterTitle(fCnt);
-  hPtFrac         -> SetMarkerColor(fColTrk);
-  hPtFrac         -> SetMarkerStyle(fMarTrk);
-  hPtFrac         -> SetFillColor(fColTrk);
+  hPtFrac         -> SetMarkerColor(fColTrue);
+  hPtFrac         -> SetMarkerStyle(fMarTrue);
+  hPtFrac         -> SetFillColor(fColTrue);
   hPtFrac         -> SetFillStyle(fFil);
-  hPtFrac         -> SetLineColor(fColTrk);
+  hPtFrac         -> SetLineColor(fColTrue);
   hPtFrac         -> SetLineStyle(fLin);
   hPtFrac         -> SetLineWidth(fWid);
   hPtFrac         -> SetTitle(sTitle.Data());

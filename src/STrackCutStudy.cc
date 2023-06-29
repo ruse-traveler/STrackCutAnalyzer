@@ -569,11 +569,11 @@ void STrackCutStudy::End() {
     const Ssiz_t nToDrawOddEO(3);
     const Ssiz_t nToDrawAllPU(3);
     const Ssiz_t nToDrawCutPU(3);
-    const Int_t  sToDrawAllEO[nToDrawAllEO] = {TYPE::TRACK,    TYPE::TRUTH,     TYPE::WEIRD_ALL};
-    const Int_t  sToDrawCutEO[nToDrawCutEO] = {TYPE::TRK_CUT,  TYPE::TRU_CUT,   TYPE::WEIRD_CUT};
+    const Int_t  sToDrawAllEO[nToDrawAllEO] = {TYPE::TRACK,        TYPE::TRUTH,         TYPE::WEIRD_ALL};
+    const Int_t  sToDrawCutEO[nToDrawCutEO] = {TYPE::TRK_CUT,      TYPE::TRU_CUT,       TYPE::WEIRD_CUT};
     const Int_t  sToDrawOddEO[nToDrawOddEO] = {TYPE::WEIRD_SI_CUT, TYPE::WEIRD_TPC_CUT, TYPE::NORM_CUT};
-    const Int_t  sToDrawAllPU[nToDrawAllPU] = {TYPE::PILEUP,   TYPE::PRIMARY,   TYPE::NONPRIM};
-    const Int_t  sToDrawCutPU[nToDrawCutPU] = {TYPE::PILE_CUT, TYPE::PRIM_CUT,  TYPE::NONPRIM_CUT};
+    const Int_t  sToDrawAllPU[nToDrawAllPU] = {TYPE::PILEUP,       TYPE::PRIMARY,       TYPE::NONPRIM};
+    const Int_t  sToDrawCutPU[nToDrawCutPU] = {TYPE::PILE_CUT,     TYPE::PRIM_CUT,      TYPE::NONPRIM_CUT};
 
     // create desired plots
     ConstructPlots(nToDrawCutEO, sToDrawCutEO, sDirPlotCutEO, sLabelCutEO);

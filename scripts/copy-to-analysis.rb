@@ -12,8 +12,8 @@
 require 'fileutils'
 
 # top directory to copy from/to
-copy_from = "/sphenix/user/danderson/tracking/DeltaPtCutStudy"
-copy_to   = "/sphenix/user/danderson/sphenix/analysis/AndersonAnalysisModules/TrackStudies/DeltaPtCutStudy"
+copy_from = "/sphenix/user/danderson/tracking/TrackCutStudy"
+copy_to   = "/sphenix/user/danderson/sphenix/analysis/AndersonAnalysisModules/TrackStudies/STrackCutStudy"
 
 # what files to copy
 to_copy = [
@@ -21,10 +21,14 @@ to_copy = [
   "DoTrackCutStudy.C",
   "DoFastTrackCutStudy.C",
   "DoFastTrackCutStudy.sh",
+  "DoTrackCutStudyOnCondor.sh",
+  "DoTrackCutStudyOnCondor.job",
+  "SubmitTrackCutStudy.sh",
   "macros/QuickTuplePlotter.C",
-  "macros/QuickDeltaPtExtractor.C",
-  "macros/Fun4All_G4_sPHENIX_ForTrackCutStudy.C",
   "macros/Fun4All_G4_sPHENIX_ForTrackCutStudy_EmbedScanOff.C",
+  "macros/Fun4All_G4_sPHENIX_ForTrackCutStudy_EmbedScanOn.C",
+  "macros/Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOn.C",
+  "macros/Fun4All_G4_sPHENIX_ForTrackCutStudy_WithPileup_EmbedScanOff.C",
   "macros/G4Setup_sPHENIX.C",
   "macros/MergeFiles.C",
   "scripts/MergeFiles.rb",
@@ -37,7 +41,7 @@ to_copy = [
   "scripts/RunTrackCutStudyG4.sh",
   "scripts/RunTrackCutStudyWithPileupG4.job",
   "scripts/wipe-source.sh",
-  "scripts/copy-to-analysis.sh",
+  "scripts/copy-to-analysis.rb",
   "src/STrackCutStudy.cc",
   "src/STrackCutStudy.io.h",
   "src/STrackCutStudy.ana.h",
